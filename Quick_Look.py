@@ -90,7 +90,7 @@ def quick_look(pickle_file_name):
         
     verbose = global_dic['VERBOSE']
     if verbose:
-        print 'pickle file '+ pickle_file_name+' read'
+        print ( 'pickle file '+ pickle_file_name+' read' )
         
     # --------------- define and open output files -------------------------
     
@@ -132,7 +132,7 @@ def quick_look(pickle_file_name):
         
         case_dic = case_dic_list[case_idx] # get the input data for case in question
         if verbose:
-            print 'preparing case ',case_idx,' ', case_dic['CASE_NAME']
+            print ( 'preparing case ',case_idx,' ', case_dic['CASE_NAME'])
         result_dic = result_list[case_idx] # get the results data for case in question
         
         input_data = copy.copy(case_dic) # Dictionary for input into graphing functions will be superset of case_dic and result_dic
@@ -224,7 +224,7 @@ def quick_look(pickle_file_name):
         #----------------------------------------------------------------------
         input_data_list.append(input_data)
     if verbose:
-        print 'input_data dictionaries created for plotting programs'
+        print ( 'input_data dictionaries created for plotting programs')
         
         # end of section to generate list of input_data dictionaries
 
@@ -236,7 +236,7 @@ def quick_look(pickle_file_name):
         prepare_plot_results_time_series_1scenario (input_data) # produce single case time series plots
         
         if verbose:
-            print 'done with prepare_plot_results_time_series_1scenario for case '+input_data['CASE_NAME']
+            print ( 'done with prepare_plot_results_time_series_1scenario for case '+input_data['CASE_NAME'])
             
             
     # ============= LOGIC FOR COMPARING CASES ==============================
@@ -244,10 +244,10 @@ def quick_look(pickle_file_name):
     
 #        func_optimization_results_system_results_Nscenarios (input_data) # produce weeks of the most extreme values
 #        if verbose:
-#            print 'func_optimization_results_system_results_Nscenarios executed'
+#            print ( 'func_optimization_results_system_results_Nscenarios executed'
 #        func_optimization_results_dispatch_var_Nscenarios (input_data)
 #        if verbose:
-#            print 'func_optimization_results_dispatch_var_Nscenarios executed'
+#            print ( 'func_optimization_results_dispatch_var_Nscenarios executed'
 #    prepare_plot_results_time_series_1scenario() -- directly callable
 #    func_optimization_results_system_results_Nscenarios() -- directly callable
 #    func_optimization_results_dispatch_var_Nscenarios() -- directly callable
@@ -257,7 +257,7 @@ def quick_look(pickle_file_name):
     pdf_each.close()
     text_file.close()
     if verbose:
-        print 'files closed'
+        print ( 'files closed')
 
       
 #%%
@@ -452,7 +452,7 @@ def plot_results_bar_1scenario (input_data):
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
         
-# Don't print legend on line plot by not having it defined in this dictionary
+# Don't print ( legend on line plot by not having it defined in this dictionary
 #        'legend':           legend_list_demand,
         #'legend_z':         'demand',
         'line_width':       0.5,
@@ -493,7 +493,7 @@ def plot_results_bar_1scenario (input_data):
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
         
-# Don't print legend on line plot by not having it defined in this dictionary
+# Don't print ( legend on line plot by not having it defined in this dictionary
 #        'legend':           legend_list_demand,
         #'legend_z':         'demand',
         'line_width':       0.5,
@@ -697,13 +697,13 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
     if hours_to_avg != None:
         if hours_to_avg > 1:
             avg_label = ' ' + str(hours_to_avg) + ' hr moving avg'
-            for i in xrange(results_matrix_dispatch.shape[1]):
+            for i in range(results_matrix_dispatch.shape[1]):
                 results_matrix_dispatch [:,i] = func_time_conversion(results_matrix_dispatch[:,i],hours_to_avg)
     
-            for i in xrange(results_matrix_demand.shape[1]):
+            for i in range(results_matrix_demand.shape[1]):
                 results_matrix_demand [:,i] = func_time_conversion(results_matrix_demand[:,i],hours_to_avg)
     
-            for i in xrange(results_matrix_curtailment.shape[1]):
+            for i in range(results_matrix_curtailment.shape[1]):
                 results_matrix_curtailment [:,i] = func_time_conversion(results_matrix_curtailment[:,i],hours_to_avg)
 
             demand = func_time_conversion(demand,hours_to_avg)
@@ -826,7 +826,7 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
         
-# Don't print legend on line plot by not having it defined in this dictionary
+# Don't print ( legend on line plot by not having it defined in this dictionary
 #        'legend':           legend_list_demand,
         #'legend_z':         'demand',
         'line_width':       0.5,
@@ -867,7 +867,7 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
         
-# Don't print legend on line plot by not having it defined in this dictionary
+# Don't print ( legend on line plot by not having it defined in this dictionary
 #        'legend':           legend_list_demand,
         #'legend_z':         'demand',
         'line_width':       0.5,
@@ -975,7 +975,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
-    for i in xrange(results_matrix_dispatch.shape[1]):
+    for i in range(results_matrix_dispatch.shape[1]):
         results_matrix_dispatch1 [:,i] = \
             -np.sort(-np.reshape(results_matrix_dispatch[:,i], -1))
     
@@ -1014,7 +1014,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 ##    results_matrix_dispatch1 = np.zeros(
 ##            results_matrix_dispatch.shape)
 ##    
-##    for i in xrange(results_matrix_dispatch.shape[1]):
+##    for i in range(results_matrix_dispatch.shape[1]):
 ##        results_matrix_dispatch1 [:,i] = \
 ##            -np.sort(-np.reshape(results_matrix_dispatch[:,i], -1))
 #    
@@ -1113,7 +1113,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
-    for i in xrange(results_matrix_dispatch.shape[1]):
+    for i in range(results_matrix_dispatch.shape[1]):
         results_matrix_dispatch1 [:,i] = func_time_conversion(results_matrix_dispatch[:,i],temporal_scale)
     
     # -------------------------
@@ -1152,7 +1152,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 ##            (int(results_matrix_dispatch.shape[0]/temporal_scale), 
 ##            int(results_matrix_dispatch.shape[1])))
 ##    
-##    for i in xrange(results_matrix_dispatch.shape[1]):
+##    for i in range(results_matrix_dispatch.shape[1]):
 ##        results_matrix_dispatch1 [:,i] = \
 ##            func_time_conversion(results_matrix_dispatch[:,i],temporal_scale)
 #    
@@ -1190,7 +1190,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
-    for i in xrange(results_matrix_dispatch.shape[1]):
+    for i in range(results_matrix_dispatch.shape[1]):
         results_matrix_dispatch1 [:,i] = \
             func_time_conversion(results_matrix_dispatch[:,i],temporal_scale)
     
@@ -1230,7 +1230,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 ##            (int(results_matrix_dispatch.shape[0]/temporal_scale), 
 ##            int(results_matrix_dispatch.shape[1])))
 ##    
-##    for i in xrange(results_matrix_dispatch.shape[1]):
+##    for i in range(results_matrix_dispatch.shape[1]):
 ##        results_matrix_dispatch1 [:,i] = \
 ##            func_time_conversion(results_matrix_dispatch[:,i],temporal_scale)
 #    
@@ -1665,7 +1665,7 @@ def func_optimization_results_system_results_Nscenarios(input_data):
     
     # loop to extract and 'combine' optimization results
     
-    for scenario_idx in xrange(len(scenario_list_number)):
+    for scenario_idx in range(len(scenario_list_number)):
     
         # actually load the data
     
@@ -1833,7 +1833,7 @@ def func_optimization_results_dispatch_var_Nscenarios(input_data):
     results_matrix_dispatch = \
         np.zeros([optimization_time_steps, len(scenario_list_number)])
     
-    for scenario_idx in xrange(len(scenario_list_number)):
+    for scenario_idx in range(len(scenario_list_number)):
 
         # actually load the data
             

@@ -34,7 +34,7 @@ def unpickle_raw_results(global_dic):
     with open(file_path_name, 'rb') as db:
        global_dic, case_dic_list, result_list = pickle.load (db)
     if verbose:
-        print 'data unpickled from '+file_path_name
+        print ('data unpickled from '+file_path_name)
     return global_dic, case_dic_list, result_list 
 
 def get_dimension_info(case_dic_list):
@@ -419,7 +419,7 @@ def stack_plot1(
     if multipanel:
         plotx = plot_stack_multi1(plot_case1, plot_case2, plot_case3, plot_case4, case_name)
     else:
-        print 'please use multipanel = True!'
+        print ('please use multipanel = True!')
 
     return plotx
 
@@ -496,16 +496,16 @@ def stack_plot2(
     if select_case:
         var1 = get_multicases_results(res, num_case , select_case[0][0])
         var2 = get_multicases_results(res, num_case , select_case[0][1])
-        print num_case
+        print (num_case)
         for idx in range(num_case):
             if var1[idx] == select_case[1][0] and var2[idx] == select_case[1][1]:
                 find_case_idx = True
                 case_idx = idx
                 break
         if find_case_idx: 
-            print 'Find case index:', case_idx
+            print ('Find case index:', case_idx)
         else:
-            print 'Error: no such case, exit'
+            print ('Error: no such case, exit')
             sys.exit(0)
         
     if find_case_idx == False:
@@ -514,7 +514,7 @@ def stack_plot2(
     CAPACITY_NATGAS   = get_multicases_results(res, num_case , 'CAPACITY_NATGAS')[case_idx]
     how_many_case = int(CAPACITY_NATGAS.size)
     if how_many_case > 1:
-        print "too many case for time path plot"
+        print ("too many case for time path plot")
         sys.exit(0)
     
     num_periods_week = 24 * 7
@@ -597,7 +597,7 @@ def stack_plot2(
     
     xaxis_week = np.arange(num_periods_week)+1
     
-    print len(curtail_natgas_week1),len(curtail_solar_week1),len(curtail_wind_week1),len(curtail_nuclear_week1)
+    print (len(curtail_natgas_week1),len(curtail_solar_week1),len(curtail_wind_week1),len(curtail_nuclear_week1))
     yaxis_week1_ne = np.vstack([curtail_natgas_week1*(-1),
                                curtail_solar_week1*(-1),
                                curtail_wind_week1*(-1),
@@ -640,7 +640,7 @@ def stack_plot2(
         plot_case3 = [xaxis_week, yaxis_week2_ne,yaxis_week2_po,labels, colors, demand_week2, info_week2]
         ploty = plot_stack_multi2(plot_case1,plot_case2,plot_case3,case_name)
     else:
-        print 'please use multipanel = True!'
+        print ('please use multipanel = True!')
     return ploty
     
 # --------- contour plot
@@ -782,7 +782,7 @@ def battery_calculation(
         if DISPATCH_FROM_STORAGE[idx] > 0:
             dispatch_remaining = DISPATCH_FROM_STORAGE[idx]
             while dispatch_remaining > 0:
-                #print len(lifo_stack),DISPATCH_FROM_STORAGE[idx],dispatch_remaining
+                #print (len(lifo_stack),DISPATCH_FROM_STORAGE[idx],dispatch_remaining
                 if len(lifo_stack) != 0:
                     top_of_stack = lifo_stack.pop()
                     if top_of_stack[1] > dispatch_remaining:
@@ -889,9 +889,9 @@ def battery_plot(res,
                 case_idx = idx
                 break
         if find_case_idx: 
-            print 'Find case index:', case_idx
+            print ('Find case index:', case_idx)
         else:
-            print 'Error: no such case, exit'
+            print ('Error: no such case, exit')
             sys.exit(0)
     if find_case_idx == False:
         case_idx = 0
@@ -936,14 +936,14 @@ def post_process(global_dic):
     for file in file_list:
         file_name = file
         if scenario_name == 'all' or file_name == scenario_name:
-            print 'deal with case:', scenario_name
+            print ('deal with case:', scenario_name)
         
             global_dic,case_dic_list,result_list = unpickle_raw_results(global_dic)
             res = prepare_scalar_variables (global_dic, case_dic_list, result_list )            
             cost_list, var_list = get_dimension_info(case_dic_list)
             
-            print cost_list
-            print var_list
+            print (cost_list)
+            print (var_list)
             
             num_case = len(res)
             num_var_list = len(var_list) 
@@ -955,16 +955,16 @@ def post_process(global_dic):
                     dimension = dimension+1
                     var_dimension.append( var_list[idx] )
             if dimension == 0:
-                print 'only one case included'
+                print ('only one case included')
                 ploty = stack_plot2(res, num_case, file_name,multipanel, var_dimension)
                 plotk = battery_plot(res,num_case,file_name, multipanel)
                 pp.savefig(ploty,dpi=200,bbox_inches='tight',transparent=True)
                 pp.savefig(plotk,dpi=200,bbox_inches='tight',transparent=True)
-                #print "set at least one dimension change"
+                #print ("set at least one dimension change"
                 #sys.exit()
             elif dimension == 1 or dimension ==2:
                 if dimension ==1 or dimension ==2:  # problem with 2D case, treat as 1D
-                    print "variation list:", var_dimension[0]
+                    print ("variation list:", var_dimension[0])
                     plotx = stack_plot1(res, num_case, file_name, multipanel, var_dimension)
                     pp.savefig(plotx,dpi=200,bbox_inches='tight',transparent=True)
                     for idx in range( len(cost_list[var_dimension[0]]) ):
@@ -976,8 +976,8 @@ def post_process(global_dic):
                         pp.savefig(ploty,dpi=200,bbox_inches='tight',transparent=True)
                         pp.savefig(plotk,dpi=200,bbox_inches='tight',transparent=True)
                 else:
-                    print "variation list 1:", var_dimension[0]
-                    print "variation list 2:", var_dimension[1]
+                    print ("variation list 1:", var_dimension[0])
+                    print ("variation list 2:", var_dimension[1])
                     plotz = contour_plot(res,num_case, file_name, var_dimension)
                     pp.savefig(plotz,dpi=200,bbox_inches='tight',transparent=True)
                     for idx_1 in range( len(cost_list[var_dimension[0]])):
@@ -1057,16 +1057,16 @@ if run:
                     dimension = dimension+1
                     var_dimension.append( var_list[idx] )
             if dimension == 0:
-                print 'only one case included'
+                print ('only one case included')
                 ploty = stack_plot2(res, num_case, case_name,multipanel, var_dimension)
                 plotk = battery_plot(res,num_case,case_name, multipanel)
                 pp.savefig(ploty,dpi=200,bbox_inches='tight',transparent=True)
                 pp.savefig(plotk,dpi=200,bbox_inches='tight',transparent=True)
-                #print "set at least one dimension change"
+                #print ("set at least one dimension change"
                 #sys.exit()
             elif dimension == 1 or dimension ==2:
                 if dimension ==1:
-                    print "variation list:", var_dimension[0]
+                    print ("variation list:", var_dimension[0])
                     plotx = stack_plot1(res, num_case, case_name, multipanel, var_dimension)
                     pp.savefig(plotx,dpi=200,bbox_inches='tight',transparent=True)
                     for idx in range( len(cost_list[var_dimension[0]]) ):
@@ -1077,8 +1077,8 @@ if run:
                         pp.savefig(ploty,dpi=200,bbox_inches='tight',transparent=True)
                         pp.savefig(plotk,dpi=200,bbox_inches='tight',transparent=True)
                 else:
-                    print "variation list 1:", var_dimension[0]
-                    print "variation list 2:", var_dimension[1]
+                    print ("variation list 1:", var_dimension[0])
+                    print ("variation list 2:", var_dimension[1])
                     plotz = contour_plot(res,num_case, case_name, var_dimension)
                     pp.savefig(plotz,dpi=200,bbox_inches='tight',transparent=True)
                     for idx_1 in range( len(cost_list[var_dimension[0]])):
@@ -1116,7 +1116,7 @@ if run:
                                 pp.savefig(ploty,dpi=200,bbox_inches='tight',transparent=True)
                                 pp.savefig(plotk,dpi=200,bbox_inches='tight',transparent=True)
             else:
-                print "not support larger than 2 dimensions yet"
+                print ("not support larger than 2 dimensions yet")
                 sys.exit()
 pp.close()
 #"""

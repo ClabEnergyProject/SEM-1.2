@@ -40,7 +40,6 @@ Each dictionary in <case_dic_list> OPTIONALLY contains:
 
 import csv
 import numpy as np
-import itertools
 
 
 
@@ -57,14 +56,14 @@ def import_case_input(case_input_path_filename):
     
     #Throw away all lines up to and include the line that has 'BEGIN_GLOBAL_DATA' in the first cell of the line
     while True:
-        line = rdr.next()
+        line = next(rdr)
         if line[0] == 'BEGIN_GLOBAL_DATA':
             break
     
     # Now take all non-blank lines until 'BEGIN_ALL_CASES_DATA' or 'BEGIN_CASE_DATA'
     global_data = []
     while True:
-        line = rdr.next()
+        line = next(rdr)
         if line[0] == 'BEGIN_ALL_CASES_DATA' or line[0] == 'BEGIN_CASE_DATA':
             break
         if line[0] != '':
@@ -74,7 +73,7 @@ def import_case_input(case_input_path_filename):
     all_cases_data = []
     if line[0] == 'BEGIN_ALL_CASES_DATA':
         while True:
-            line = rdr.next()
+            line = next(rdr)
             if line[0] == 'BEGIN_CASE_DATA':
                 break
             if line[0] != '':
@@ -83,7 +82,7 @@ def import_case_input(case_input_path_filename):
     # Now take all non-blank lines until 'END_DATA'
     case_data = []
     while True:
-        line = rdr.next()
+        line = next(rdr)
         if line[0] == 'END_DATA':
             break
         if line[0] != '':
@@ -109,17 +108,17 @@ def read_csv_dated_data_file(start_year,start_month,start_day,start_hour,
         
         #Throw away all lines up to and include the line that has 'BEGIN_GLOBAL_DATA' in the first cell of the line
         while True:
-            line = data_reader.next()
+            line = next(data_reader)
             if line[0] == 'BEGIN_DATA':
                 break
         # Now take the header row
-        line = data_reader.next()
+        line = next(data_reader)
         
         # Now take all non-blank lines
         data = []
         while True:
             try:
-                line = data_reader.next()
+                line = next(data_reader)
                 if any(field.strip() for field in line):
                     data.append([int(line[0]),int(line[1]),int(line[2]),int(line[3]),float(line[4])])
                     # the above if clause was from: https://stackoverflow.com/questions/4521426/delete-blank-rows-from-csv
@@ -149,17 +148,17 @@ def preprocess_input(case_input_path_filename):
     # -----------------------------------------------------------------------------
     # Recognized keywords in case_input.csv file
     
-    keywords_logical = map(str.upper,
+    keywords_logical = list(map(str.upper,
             ['VERBOSE','POSTPROCESS','QUICK_LOOK','NORMALIZE_DEMAND_TO_ONE']
-            )
+            ))
 
-    keywords_str = map(str.upper,
+    keywords_str = list(map(str.upper,
             ['DATA_PATH','DEMAND_FILE',
              'SOLAR_CAPACITY_FILE','WIND_CAPACITY_FILE','OUTPUT_PATH',
              'CASE_NAME','GLOBAL_NAME']
-            )
+            ))
     
-    keywords_real = map(str.upper,
+    keywords_real = list(map(str.upper,
             ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
              'END_DAY','END_HOUR','END_MONTH',
             'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_SOLAR','FIXED_COST_WIND',
@@ -174,15 +173,15 @@ def preprocess_input(case_input_path_filename):
             'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
             'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
             'PGP_STORAGE_CHARGING_EFFICIENCY']
-            )
+            ))
     
-    keywords_real_notscaled = map(str.upper,
+    keywords_real_notscaled = list(map(str.upper,
             ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
              'END_DAY','END_HOUR','END_MONTH',
             'END_YEAR',
             'START_DAY','START_HOUR','START_MONTH',
             'START_YEAR']
-            )
+            ))
     
     #Capacity cost -- Cost per hour of capacity that must be incurred whether or 
     #  not a facility is actually generating electricity. 
@@ -231,9 +230,9 @@ def preprocess_input(case_input_path_filename):
             global_dic[test_key] = literal_to_boolean(test_value)
     
     verbose = global_dic['VERBOSE']
-#    print global_dic
+#    print ( global_dic
     if verbose:
-        print 'Preprocess_Input.py: Preparing case input'
+        print ( 'Preprocess_Input.py: Preparing case input')
         
     # Parse all_cases_dic data
     all_cases_dic = {}
@@ -247,9 +246,9 @@ def preprocess_input(case_input_path_filename):
         elif test_key in keywords_logical:
             all_cases_dic[test_key] = literal_to_boolean(test_value)
     
-#    print all_cases_data
-#    print all_cases_dic        
-    case_transpose = map(list,zip(*case_data)) # transpose list of lists.
+#    print ( all_cases_data
+#    print ( all_cases_dic        
+    case_transpose = list(map(list,zip(*case_data))) # transpose list of lists.
     # Note that the above line could cause problems if not all numbers are
     # entered uniformly in the case input file.
         
@@ -267,13 +266,13 @@ def preprocess_input(case_input_path_filename):
             case_list_dic[test_key] = test_values
         elif test_key in keywords_real:
             if test_key in keywords_real_notscaled:
-                setNegToM1 = np.array(map(float,test_values))
+                setNegToM1 = np.array(list(map(float,test_values)))
             else:
-                setNegToM1 = case_list_dic[test_key] * np.array(map(float,test_values))
+                setNegToM1 = case_list_dic[test_key] * np.array(list(map(float,test_values)))
             setNegToM1[setNegToM1 < 0] = -1
             case_list_dic[test_key] = setNegToM1
         elif test_key in keywords_logical:
-            case_list_dic[test_key] = map(bool,test_values)
+            case_list_dic[test_key] = list(map(bool,test_values))
 
     # define all keywords in dictionary, but set to -1 if not present    
     dummy = [-1 for i in range(num_cases)]
@@ -296,7 +295,7 @@ def preprocess_input(case_input_path_filename):
 
     for case_index in range(num_cases):
         if verbose:
-            print 'Preprocess_Input.py: time series for ',case_list_dic['CASE_NAME'][case_index]
+            print ( 'Preprocess_Input.py: time series for ',case_list_dic['CASE_NAME'][case_index])
                 
         # first read in demand series (which must exist)
         demand_series_list_item = read_csv_dated_data_file(
@@ -370,7 +369,7 @@ def preprocess_input(case_input_path_filename):
     list_of_component_lists = []
     for case_index in range(num_cases):
         if verbose:
-            print 'Preprocess_Input.py:Components for ',case_list_dic['CASE_NAME'][case_index]
+            print ( 'Preprocess_Input.py:Components for ',case_list_dic['CASE_NAME'][case_index])
         component_list = []
         if 'FIXED_COST_NUCLEAR' in have_keys:
             if case_list_dic['FIXED_COST_NUCLEAR'][case_index] >= 0 and case_list_dic['VAR_COST_NUCLEAR'][case_index] >= 0 :

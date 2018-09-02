@@ -10,7 +10,6 @@
   
 '''
 
-
 from Core_Model import core_model_loop
 from Preprocess_Input import preprocess_input
 from Postprocess_Results import post_process
@@ -28,21 +27,21 @@ case_input_path_filename = './case_input.csv'
 # -----------------------------------------------------------------------------
 # =============================================================================
 
-print 'Simple_Energy_Model: Pre-processing input'
+print ('Simple_Energy_Model: Pre-processing input')
 global_dic,case_dic_list = preprocess_input(case_input_path_filename)
 
-print 'Simple_Energy_Model: Executing core model loop'
+print ('Simple_Energy_Model: Executing core model loop')
 result_list = core_model_loop (global_dic, case_dic_list)
 
-print 'Simple_Energy_Model: Saving basic results'
+print ('Simple_Energy_Model: Saving basic results')
 scalar_names,scalar_table = save_basic_results(global_dic, case_dic_list, result_list)
 
 if global_dic['POSTPROCESS']:
-    print 'Simple_Energy_Model: Post-processing results'
-    post_process(global_dic)  # Lei's old postprocessing
+    print ('Simple_Energy_Model: Post-processing results')
+    post_process(global_dic) # Lei's old postprocessing
 
 if global_dic['QUICK_LOOK']:
-    print 'Simple_Energy_Model: Preparing quick look at results'
+    print ('Simple_Energy_Model: Preparing quick look at results')
     pickle_file_name = './Output_Data/'+global_dic['GLOBAL_NAME']+'/'+global_dic['GLOBAL_NAME']+'.pickle'
     quick_look(pickle_file_name)  # Fan's new postprocessing
     

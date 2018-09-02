@@ -51,17 +51,17 @@ def save_basic_results(global_dic, case_dic_list, result_list ):
     
     verbose = global_dic['VERBOSE']
     if verbose:
-        print 'Save_Basic_Results.py: Pickling raw results'
+        print ( 'Save_Basic_Results.py: Pickling raw results')
     # put raw results in file for later analysis
     pickle_raw_results(global_dic, case_dic_list, result_list )
     
     if verbose:
-        print 'Save_Basic_Results.py: saving vector results'
+        print ( 'Save_Basic_Results.py: saving vector results')
     # Do the most basic scalar analysis
     save_vector_results_as_csv(global_dic, case_dic_list, result_list )
     
     if verbose:
-        print 'Save_Basic_Results.py: saving key scalar results'
+        print ( 'Save_Basic_Results.py: saving key scalar results')
     # Do the most basic scalar analysis
     scalar_names,scalar_table = postprocess_key_scalar_results(global_dic, case_dic_list, result_list )
     
@@ -137,7 +137,7 @@ def save_vector_results_as_csv( global_dic, case_dic_list, result_list ):
          
         output_file_name = case_dic['CASE_NAME']
     
-        with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'wb')) as output_file:
+        with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w')) as output_file:
             writer = csv.writer(output_file)
             writer.writerow(header_list)
             writer.writerows((np.asarray(series_list)).transpose())
@@ -279,14 +279,14 @@ def postprocess_key_scalar_results( global_dic, case_dic_list, result_list ):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         
-    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'wb')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(scalar_names)
         writer.writerows(scalar_table)
         output_file.close()
         
     if verbose: 
-        print 'file written: ' + output_file_name + '.csv'
+        print ( 'file written: ' + output_file_name + '.csv')
     
     return scalar_names,scalar_table
     
@@ -294,14 +294,14 @@ def out_csv(output_folder,output_file_name,names,table,verbose):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         
-    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'wb')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(names)
         writer.writerows(table)
         output_file.close()
         
     if verbose: 
-        print 'file written: ' + output_file_name + '.csv'
+        print ( 'file written: ' + output_file_name + '.csv')
     
 
 

@@ -77,7 +77,7 @@ def func_load_optimization_results(optimization_results_file_path):
     
     filename, optimization_results_data_type = os.path.splitext(optimization_results_file_path)
 
-    # print optimization_results_data_type
+    # print ( optimization_results_data_type
 
     if optimization_results_data_type == '.npz':
     
@@ -277,7 +277,7 @@ def func_change_in_period (input_data, window_size):
 #       data <np.array> the data to be studied
 #       window_size [scalar] the length/size of the moving window
 #       search_option <string> 'max' or 'min'
-#       print_option <integer> treated as a logical variable
+#       print (_option <integer> treated as a logical variable
 #
 # Output
 #   output_data <dict> reports the indice of the window location and the value
@@ -339,8 +339,8 @@ def func_find_period (input_data):
 
     if print_option == 1:
         
-        print 'center index = {}, value = {}'.format(center_index, value)
-        print 'left index = {}, right index = {}'.format(left_index, right_index)
+        print ( 'center index = {}, value = {}'.format(center_index, value))
+        print ( 'left index = {}, right index = {}'.format(left_index, right_index))
 
     output = {
         'value':        value,
@@ -516,7 +516,7 @@ def func_lines_plot(input_data):
     # each column is a (independent) line
     
     if len(y_data.shape) > 1: 
-        for i in xrange(y_data.shape[1]):
+        for i in range(y_data.shape[1]):
             ax.plot(
                     x_data[x_data_range[0]:x_data_range[1]],
                     y_data[x_data_range[0]:x_data_range[1], i], 
@@ -538,7 +538,7 @@ def func_lines_plot(input_data):
     
             # each column is a (independent) line
         if len(y_data.shape) > 1: 
-            for i in xrange(y_data.shape[1]):
+            for i in range(y_data.shape[1]):
                 ax2.plot(
                         x_data[x_data_range[0]:x_data_range[1]],
                         y2_data[x_data_range[0]:x_data_range[1], i], 
@@ -627,7 +627,7 @@ def func_lines_2yaxes_plot (input_data):
         
         # When y1_data is a numpy ndarray
         
-        for i in xrange(y1_data.shape[1]):
+        for i in range(y1_data.shape[1]):
             ax1.plot(x_data, y1_data[:, i], 'b')
     else:
         
@@ -640,7 +640,7 @@ def func_lines_2yaxes_plot (input_data):
         
         # When y2_data is a numpy ndarray
         
-        for i in xrange(y2_data.shape[1]):
+        for i in range(y2_data.shape[1]):
             ax2.plot(x_data, y2_data[:, i], 'r')
     else:
         
@@ -791,7 +791,7 @@ def func_stack_plot (input_data):
 
     if 'z_data' in input_data.keys():
         
-        # print 'z plotting'
+        # print ( 'z plotting'
         
         ax.plot(
                 x_data[x_data_range[0]:x_data_range[1]], 
@@ -808,7 +808,7 @@ def func_stack_plot (input_data):
         # add 'legend_z' at the beginning because this way could work
         legend = np.concatenate(([input_data['legend_z']], legend))
         
-        # print legend
+        # print ( legend
 
     # -------------------------------------------------------------------------
 

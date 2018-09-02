@@ -299,14 +299,11 @@ def cost_and_storage_lifo_stack_analysis( global_dic, case_dic, result ):
             + result['DISPATCH_UNMET_DEMAND']
             )
     lifo_stack = []
-<<<<<<< HEAD
 
     # We need to cycle to get a good initial condition.
     # Initially, we know the amount but not the age or cost of stored energy.
     # So, we make the assumption that the cost was zero and the age was -1.
     num_cycles = 3
-    
-=======
     tmp = 0.
     
     for idx in range(num_time_periods-start_point):
@@ -318,7 +315,7 @@ def cost_and_storage_lifo_stack_analysis( global_dic, case_dic, result ):
         if DISPATCH_FROM_STORAGE[idx] > 0:
             dispatch_remaining = DISPATCH_FROM_STORAGE[idx]
             while dispatch_remaining > 0:
-                #print len(lifo_stack),DISPATCH_FROM_STORAGE[idx],dispatch_remaining
+                #print (len(lifo_stack),DISPATCH_FROM_STORAGE[idx],dispatch_remaining
                 if len(lifo_stack) != 0:
                     top_of_stack = lifo_stack.pop()
                     if top_of_stack[1] > dispatch_remaining:
@@ -355,7 +352,7 @@ def cost_and_storage_lifo_stack_analysis( global_dic, case_dic, result ):
     lifo_storage = []
     lifo_storage.append([-1,result['ENERGY_STORAGE'][0],0.]) # dummy cost and time of placement in battery
     
-    lifo_pgp_storage[]
+    lifo_pgp_storage = []
     lifo_pgp_storage.append([-1,result['ENERGY_PGP_STORAGE'][0],0.]) # dummy cost and time of placement in battery
     
 
