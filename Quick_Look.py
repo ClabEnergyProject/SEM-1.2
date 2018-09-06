@@ -842,7 +842,6 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
     
     #figure1d = plt.figure(figsize=figsize_oneplot)
     ax1d = figure1a.add_subplot(3,2,4)
-    ax1d.set_color_cycle(color_list_demand)
     ax1d.set_prop_cycle(cycler('color', color_list_demand))
 
     inputs_demand['ax'] = ax1d
@@ -883,7 +882,6 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
     
     #figure1d = plt.figure(figsize=figsize_oneplot)
     ax1f = figure1a.add_subplot(3,2,6)
-    ax1f.set_color_cycle(color_list_curtailment)
     ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
 
     inputs_curtailment['ax'] = ax1f
