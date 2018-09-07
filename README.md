@@ -21,7 +21,7 @@ Copy that text and paste in in an Ubuntu window. (You might start these Ubuntu w
 
 7. Set up python link to Gurobi. Open up the Anaconda3 window as Administrator from the start menu.(Note this is a dos window, not a linux window.) And then type:
 
-> cd  /c/gurobi801/win64 
+	       > cd  /c/gurobi801/win64
 	       > python setup.py install
 
 8. Install cvxpy. For python3, cvxpy must be installed with pip. They recommend making a special virtual environment to allow different versions of things to run on the same machine, but I just installed into my general space.  Open up an Ubuntu window and type
