@@ -7,7 +7,7 @@ The following is installation instructions for Windows 10 machines.
 
 2. Use remove programs to remove all Gurobi (Not sure this is necessary. I had Gurobi 7 and new release is Gurobi 8.)
 
-3. Install Anaconda3. https://conda.io/docs/user-guide/install/windows.html
+3. Install Anaconda3. https://www.anaconda.com/download/ https://conda.io/docs/user-guide/install/windows.html
 
 4. Install Visual C++ 14.0.  Download and install software using this link. https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15 See this link for more information: https://www.scivision.co/python-windows-visual-c++-14-required/
 
