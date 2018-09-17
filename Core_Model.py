@@ -3,6 +3,8 @@
 
 '''
 
+NOTE: THIS VERSION OF THE MODEL NEEDS CVXPY-04.
+
 File name: Core_Model.py
 
 Simple Energy Model Ver 1
@@ -139,7 +141,7 @@ def core_model (global_dic, case_dic):
                 dispatch_natgas >= 0,
                 dispatch_natgas <= capacity_natgas
                 ]
-        fcn2min += capacity_natgas * fixed_cost_natgas + cvx.sum(dispatch_natgas * var_cost_natgas)/num_time_periods
+        fcn2min += capacity_natgas * fixed_cost_natgas + cvx.sum_entries(dispatch_natgas * var_cost_natgas)/num_time_periods
     else:
         capacity_natgas = 0
         dispatch_natgas = np.zeros(num_time_periods)
@@ -153,7 +155,7 @@ def core_model (global_dic, case_dic):
                 dispatch_solar >= 0, 
                 dispatch_solar <= capacity_solar * solar_series 
                 ]
-        fcn2min += capacity_solar * fixed_cost_solar + cvx.sum(dispatch_solar * var_cost_solar)/num_time_periods
+        fcn2min += capacity_solar * fixed_cost_solar + cvx.sum_entries(dispatch_solar * var_cost_solar)/num_time_periods
     else:
         capacity_solar = 0
         dispatch_solar = np.zeros(num_time_periods)
@@ -167,7 +169,7 @@ def core_model (global_dic, case_dic):
                 dispatch_wind >= 0, 
                 dispatch_wind <= capacity_wind * wind_series 
                 ]
-        fcn2min += capacity_wind * fixed_cost_wind + cvx.sum(dispatch_wind * var_cost_wind)/num_time_periods
+        fcn2min += capacity_wind * fixed_cost_wind + cvx.sum_entries(dispatch_wind * var_cost_wind)/num_time_periods
     else:
         capacity_wind = 0
         dispatch_wind = np.zeros(num_time_periods)
@@ -181,7 +183,7 @@ def core_model (global_dic, case_dic):
                 dispatch_nuclear >= 0, 
                 dispatch_nuclear <= capacity_nuclear 
                 ]
-        fcn2min += capacity_nuclear * fixed_cost_nuclear + cvx.sum(dispatch_nuclear * var_cost_nuclear)/num_time_periods
+        fcn2min += capacity_nuclear * fixed_cost_nuclear + cvx.sum_entries(dispatch_nuclear * var_cost_nuclear)/num_time_periods
     else:
         capacity_nuclear = 0
         dispatch_nuclear = np.zeros(num_time_periods)
@@ -205,8 +207,8 @@ def core_model (global_dic, case_dic):
                 ]
 
         fcn2min += capacity_storage * fixed_cost_storage +  \
-            cvx.sum(dispatch_to_storage * var_cost_to_storage)/num_time_periods + \
-            cvx.sum(dispatch_from_storage * var_cost_from_storage)/num_time_periods 
+            cvx.sum_entries(dispatch_to_storage * var_cost_to_storage)/num_time_periods + \
+            cvx.sum_entries(dispatch_from_storage * var_cost_from_storage)/num_time_periods 
  
         for i in range(num_time_periods):
 
@@ -253,8 +255,8 @@ def core_model (global_dic, case_dic):
 
         fcn2min += capacity_pgp_storage * fixed_cost_pgp_storage + \
             capacity_to_pgp_storage * fixed_cost_to_pgp_storage + capacity_from_pgp_storage * fixed_cost_from_pgp_storage + \
-            cvx.sum(dispatch_to_pgp_storage * var_cost_to_pgp_storage)/num_time_periods + \
-            cvx.sum(dispatch_from_pgp_storage * var_cost_from_pgp_storage)/num_time_periods 
+            cvx.sum_entries(dispatch_to_pgp_storage * var_cost_to_pgp_storage)/num_time_periods + \
+            cvx.sum_entries(dispatch_from_pgp_storage * var_cost_from_pgp_storage)/num_time_periods 
  
         for i in range(num_time_periods):
 
@@ -278,7 +280,7 @@ def core_model (global_dic, case_dic):
         constraints += [
                 dispatch_unmet_demand >= 0
                 ]
-        fcn2min += cvx.sum(dispatch_unmet_demand * var_cost_unmet_demand)/num_time_periods
+        fcn2min += cvx.sum_entries(dispatch_unmet_demand * var_cost_unmet_demand)/num_time_periods
     else:
         dispatch_unmet_demand = np.zeros(num_time_periods)
         
@@ -295,8 +297,8 @@ def core_model (global_dic, case_dic):
     # -----------------------------------------------------------------------------
     # Problem solving
     
-    # print (cvx.installed_solvers()
-    # print (>>orig_stdout, cvx.installed_solvers()
+    # print cvx.installed_solvers()
+    # print >>orig_stdout, cvx.installed_solvers()
     
     # Form and Solve the Problem
     prob = cvx.Problem(obj, constraints)
@@ -308,7 +310,7 @@ def core_model (global_dic, case_dic):
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-8, FeasibilityTol = 1e-6)
     
     if verbose:
-        print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
+        print ('system cost ',prob.value)
                 
     # -----------------------------------------------------------------------------
     
@@ -357,14 +359,14 @@ def core_model (global_dic, case_dic):
         result['ENERGY_STORAGE'] = energy_storage/numerics_demand_scaling
         
     if 'PGP_STORAGE' in system_components:
-        result['FIXED_PGP_STORAGE'] = np.asscalar(capacity_pgp_storage.value)/numerics_demand_scaling
+        result['CAPACITY_PGP_STORAGE'] = np.asscalar(capacity_pgp_storage.value)/numerics_demand_scaling
         result['CAPACITY_TO_PGP_STORAGE'] = np.asscalar(capacity_to_pgp_storage.value)/numerics_demand_scaling
         result['CAPACITY_FROM_PGP_STORAGE'] = np.asscalar(capacity_from_pgp_storage.value)/numerics_demand_scaling
         result['DISPATCH_TO_PGP_STORAGE'] = np.array(dispatch_to_pgp_storage.value).flatten()/numerics_demand_scaling
         result['DISPATCH_FROM_PGP_STORAGE'] = np.array(dispatch_from_pgp_storage.value).flatten()/numerics_demand_scaling
         result['ENERGY_PGP_STORAGE'] = np.array(energy_pgp_storage.value).flatten()/numerics_demand_scaling
     else:
-        result['FIXED_PGP_STORAGE'] = capacity_pgp_storage/numerics_demand_scaling
+        result['CAPACITY_PGP_STORAGE'] = capacity_pgp_storage/numerics_demand_scaling
         result['CAPACITY_TO_PGP_STORAGE'] = capacity_to_pgp_storage/numerics_demand_scaling
         result['CAPACITY_FROM_PGP_STORAGE'] = capacity_from_pgp_storage/numerics_demand_scaling
         result['DISPATCH_TO_PGP_STORAGE'] = dispatch_to_pgp_storage/numerics_demand_scaling

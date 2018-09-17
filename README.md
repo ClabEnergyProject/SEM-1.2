@@ -24,9 +24,9 @@ Copy that text and paste in in an Ubuntu window. (You might start these Ubuntu w
 	       > cd  /c/gurobi801/win64
 	       > python setup.py install
 
-8. Install cvxpy. For python3, cvxpy must be installed with pip. They recommend making a special virtual environment to allow different versions of things to run on the same machine, but I just installed into my general space.  Open up an Ubuntu window and type
+8. Install cvxpy, version 0.4.11. For python3, cvxpy must be installed with pip. They recommend making a special virtual environment to allow different versions of things to run on the same machine, but I just installed into my general space.  Open up an Anaconda window (I did it as Administrator) and type
 
-		> pip install cvxpy 
+		> pip install cvxpy==0.4.11 
 
 Check the installation with
 

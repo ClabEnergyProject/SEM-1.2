@@ -243,7 +243,7 @@ def postprocess_key_scalar_results( global_dic, case_dic_list, result_list ):
                     d['CAPACITY_WIND'],
                     d['CAPACITY_NUCLEAR'],
                     d['CAPACITY_STORAGE'],
-                    d['FIXED_PGP_STORAGE'],
+                    d['CAPACITY_PGP_STORAGE'],
                     d['CAPACITY_TO_PGP_STORAGE'],
                     d['CAPACITY_FROM_PGP_STORAGE'],
                     d['SYSTEM_COST'],
