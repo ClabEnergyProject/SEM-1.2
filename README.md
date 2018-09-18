@@ -17,7 +17,7 @@ The following is installation instructions for Windows 10 machines.
 
 		grbgetkey 2c8c6fa0-ad45-11e8-a2c6-0acd5117eeae
 
-Copy that text and paste in in an Ubuntu window. (You might start these Ubuntu windows as Administrator just to be on the safe side.)
+Copy that text and paste in in an Anaconda window. (You might start these Anaconda windows as Administrator just to be on the safe side.)
 
 7. Set up python link to Gurobi. Open up the Anaconda3 window as Administrator from the start menu.(Note this is a dos window, not a linux window.) And then type:
 
