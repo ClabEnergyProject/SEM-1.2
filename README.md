@@ -28,9 +28,9 @@ Copy that text and paste in in an Anaconda window. (You might start these Anacon
 
 		> pip install cvxpy==0.4.11 
 
-If this install fails on installing the ecos package, try the following line:
+If this install fails on installing the ecos package, try the following line in an Anaconda window:
 
-                > pip install ecos==2.0.7rc0
+                > conda install ecos
 		> pip install cvxpy==0.4.11
 		
 Check the installation with
