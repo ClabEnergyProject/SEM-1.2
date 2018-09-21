@@ -83,7 +83,7 @@ def save_vector_results_as_csv( global_dic, case_dic_list, result_list ):
         if len(case_dic['WIND_SERIES']) == 0:
             case_dic['WIND_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
         if len(case_dic['SOLAR_SERIES']) == 0:
-            case_dic['WIND_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
+            case_dic['SOLAR_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
             
         result = result_list[idx]
         
@@ -139,7 +139,7 @@ def save_vector_results_as_csv( global_dic, case_dic_list, result_list ):
         series_list.append( result['PRICE'].flatten() )
          
         output_file_name = case_dic['CASE_NAME']
-    
+        
         with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
             writer = csv.writer(output_file)
             writer.writerow(header_list)

@@ -131,6 +131,8 @@ def quick_look(pickle_file_name):
     for case_idx in range(num_cases):
         
         case_dic = case_dic_list[case_idx] # get the input data for case in question
+        num_time_periods = len(case_dic['DEMAND_SERIES'])
+        
         if verbose:
             print ( 'preparing case ',case_idx,' ', case_dic['CASE_NAME'])
         result_dic = result_list[case_idx] # get the results data for case in question
@@ -163,6 +165,7 @@ def quick_look(pickle_file_name):
         max_dispatch = np.max([sum(i) for i in zip(*results_matrix_dispatch)])
         input_data['max_dispatch'] = max_dispatch
         
+        input_data['NUM_TIME_PERIODS'] = num_time_periods
         input_data['results_matrix_dispatch'] = np.transpose(np.array(results_matrix_dispatch))
         input_data['legend_list_dispatch'] = legend_list_dispatch
         input_data['component_index_dispatch'] = component_index_dispatch
@@ -576,7 +579,8 @@ def plot_results_bar_1scenario (input_data):
 def prepare_plot_results_time_series_1scenario(input_data):
     
     # -------------------------------------------------------------------------
-    
+    num_time_periods = input_data['NUM_TIME_PERIODS']
+
     results_matrix_dispatch = input_data['results_matrix_dispatch']   
     component_index_dispatch = input_data['component_index_dispatch']
 
@@ -586,16 +590,16 @@ def prepare_plot_results_time_series_1scenario(input_data):
     plot_results_time_series_1scenario(input_data,1)  # basic results by hour
     
     input_data['page_title'] = 'daily averaging'
-    plot_results_time_series_1scenario(input_data,24) # basic results by day
+    plot_results_time_series_1scenario(input_data,min(num_time_periods,24)) # basic results by day
     
     input_data['page_title'] = '5-day averaging'
-    plot_results_time_series_1scenario(input_data,24*5) # basic results by week
+    plot_results_time_series_1scenario(input_data,min(num_time_periods,24*5)) # basic results by week
     
     # -------------------------------------------------------------------------
     # Find the week where storage dispatch is at its weekly max or min use
     
     for idx in range(results_matrix_dispatch.shape[1]):
-        plot_extreme_dispatch_results_time_series_1scenario(input_data, component_name_dispatch[idx],'max',24*5)
+        plot_extreme_dispatch_results_time_series_1scenario(input_data, component_name_dispatch[idx],'max',min(num_time_periods,24*5))
         
     return
    
@@ -919,6 +923,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 
     # -------------------------------------------------------------------------
     # Get the input data
+    num_time_periods = input_data['NUM_TIME_PERIODS']
     
     pdf_all = input_data['pdf_all']
     demand = input_data['DEMAND_SERIES']
@@ -1106,7 +1111,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     # -------------------------
     
-    temporal_scale = 24
+    temporal_scale = min(num_time_periods,24)
     x_data = np.arange(0, optimization_time_steps)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
@@ -1183,7 +1188,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     # -------------------------
     
-    temporal_scale = 24 * 7
+    temporal_scale = min(number_time_periods,24 * 7)
     x_data = np.arange(0, optimization_time_steps)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
