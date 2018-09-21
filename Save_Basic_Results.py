@@ -134,10 +134,13 @@ def save_vector_results_as_csv( global_dic, case_dic_list, result_list ):
         
         header_list += ['dispatch_unmet_demand (kW)']
         series_list.append( result['DISPATCH_UNMET_DEMAND'].flatten() )
+        
+        header_list += ['price ($/kWh)']
+        series_list.append( result['PRICE'].flatten() )
          
         output_file_name = case_dic['CASE_NAME']
     
-        with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w')) as output_file:
+        with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
             writer = csv.writer(output_file)
             writer.writerow(header_list)
             writer.writerows((np.asarray(series_list)).transpose())
@@ -279,7 +282,7 @@ def postprocess_key_scalar_results( global_dic, case_dic_list, result_list ):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         
-    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w',newline='')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(scalar_names)
         writer.writerows(scalar_table)
@@ -294,7 +297,7 @@ def out_csv(output_folder,output_file_name,names,table,verbose):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         
-    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w',newline='')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(names)
         writer.writerows(table)

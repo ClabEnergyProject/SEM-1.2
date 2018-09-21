@@ -299,6 +299,9 @@ def core_model (global_dic, case_dic):
     
     # print cvx.installed_solvers()
     # print >>orig_stdout, cvx.installed_solvers()
+    #print (constraints)
+    #print (fcn2min)
+    #print (system_components)
     
     # Form and Solve the Problem
     prob = cvx.Problem(obj, constraints)
@@ -310,7 +313,7 @@ def core_model (global_dic, case_dic):
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-8, FeasibilityTol = 1e-6)
     
     if verbose:
-        print ('system cost ',prob.value)
+        print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
                 
     # -----------------------------------------------------------------------------
     
@@ -318,6 +321,12 @@ def core_model (global_dic, case_dic):
             'SYSTEM_COST':prob.value/(numerics_cost_scaling * numerics_demand_scaling),
             'PROBLEM_STATUS':prob.status
             }
+    
+    result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling)
+    # note that hourly pricing can be determined from the dual of the constraint on energy balance
+    # The num_time_periods is in the above because the influence on the cost of an hour is much bigger then
+    # the impact of average cost over the period. The divide by the cost scaling corrects for the cost scaling.
+    
     
     if 'NATGAS' in system_components:
         result['CAPACITY_NATGAS'] = np.asscalar(capacity_natgas.value)/numerics_demand_scaling
