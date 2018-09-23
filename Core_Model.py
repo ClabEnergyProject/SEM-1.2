@@ -322,7 +322,7 @@ def core_model (global_dic, case_dic):
             'PROBLEM_STATUS':prob.status
             }
     
-    result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling)
+    result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling).flatten()
     # note that hourly pricing can be determined from the dual of the constraint on energy balance
     # The num_time_periods is in the above because the influence on the cost of an hour is much bigger then
     # the impact of average cost over the period. The divide by the cost scaling corrects for the cost scaling.

@@ -11,7 +11,7 @@ Functions defined
     func_graphics_dispatch_mix_technology_timeseries_1scenario()
     func_graphics_dispatch_var_Nscenarios()
     func_graphics_system_results_Nscenarios()
-    prepare_plot_results_time_series_1scenario() -- directly callable
+    call_plot_results_1scenario() -- directly callable
     func_optimization_results_system_results_Nscenarios() -- directly callable
     func_optimization_results_dispatch_var_Nscenarios() -- directly callable
 
@@ -42,7 +42,7 @@ History
             func_graphics_dispatch_var_Nscenarios()
             func_optimization_results_system_results_Nscenarios()
         changed packaging functions' names
-            func_graphics_time_series_results_1scenario -> prepare_plot_results_time_series_1scenario
+            func_graphics_time_series_results_1scenario -> call_plot_results_1scenario
             func_optimization_results_snapshot_Nscenarios -> func_optimization_results_system_results_Nscenarios
         changed the function plot_results_time_series_1scenario()
             from fixed ranges in time to dynamically select the weeks with the largest/smallest share of a technology
@@ -73,6 +73,7 @@ import copy
 from cycler import cycler
 from Supporting_Functions import func_find_period
 from Supporting_Functions import func_lines_plot
+from Supporting_Functions import func_lines_semilogy
 from Supporting_Functions import func_lines_2yaxes_plot
 from Supporting_Functions import func_stack_plot
 from Supporting_Functions import func_time_conversion
@@ -163,7 +164,12 @@ def quick_look(pickle_file_name):
             component_index_dispatch[component] = len(results_matrix_dispatch)-1 # row index for each component
         
         max_dispatch = np.max([sum(i) for i in zip(*results_matrix_dispatch)])
+        max_cost = np.max(case_dic['DEMAND_SERIES']*result_dic['PRICE'])
         input_data['max_dispatch'] = max_dispatch
+        input_data['max_cost'] = max_cost
+        
+        input_data['NUM_TIME_PERIODS'] = num_time_periods
+        input_data['PRICE'] = result_dic['PRICE']
         
         input_data['NUM_TIME_PERIODS'] = num_time_periods
         input_data['results_matrix_dispatch'] = np.transpose(np.array(results_matrix_dispatch))
@@ -236,10 +242,10 @@ def quick_look(pickle_file_name):
     for input_data in input_data_list:
         
 #        prepare_plot_results_bar_1scenario (input_data) # produce single case barchart plots
-        prepare_plot_results_time_series_1scenario (input_data) # produce single case time series plots
+        call_plot_results_1scenario (input_data) # produce single case time series plots
         
         if verbose:
-            print ( 'done with prepare_plot_results_time_series_1scenario for case '+input_data['CASE_NAME'])
+            print ( 'done with call_plot_results_1scenario for case '+input_data['CASE_NAME'])
             
             
     # ============= LOGIC FOR COMPARING CASES ==============================
@@ -251,7 +257,7 @@ def quick_look(pickle_file_name):
 #        func_optimization_results_dispatch_var_Nscenarios (input_data)
 #        if verbose:
 #            print ( 'func_optimization_results_dispatch_var_Nscenarios executed'
-#    prepare_plot_results_time_series_1scenario() -- directly callable
+#    call_plot_results_1scenario() -- directly callable
 #    func_optimization_results_system_results_Nscenarios() -- directly callable
 #    func_optimization_results_dispatch_var_Nscenarios() -- directly callable
          
@@ -384,8 +390,8 @@ def plot_results_bar_1scenario (input_data):
     # -------------
     
     
-    optimization_time_steps = demand.size
-    x_data = np.arange(0, optimization_time_steps)
+    num_time_periods = demand.size
+    x_data = np.arange(0, num_time_periods)
     
     # -------------
     
@@ -537,10 +543,10 @@ def plot_results_bar_1scenario (input_data):
     #pdf_each.savefig(figure1d)
     plt.close()
         
-        
+       
 #%%
 # -----------------------------------------------------------------------------
-# prepare_plot_results_time_series_1scenario()
+# call_plot_results_1scenario()
 #
 # Function: 
 #   Given the locations (directories or file paths), load the data, perform the
@@ -576,7 +582,7 @@ def plot_results_bar_1scenario (input_data):
 #       called the function, func_graphics_dispatch_mix_technology_timeseries_1scenario()
 #        
 # -----------------------------------------------------------------------------
-def prepare_plot_results_time_series_1scenario(input_data):
+def call_plot_results_1scenario(input_data):
     
     # -------------------------------------------------------------------------
     num_time_periods = input_data['NUM_TIME_PERIODS']
@@ -588,12 +594,15 @@ def prepare_plot_results_time_series_1scenario(input_data):
         
     input_data['page_title'] = 'raw output'
     plot_results_time_series_1scenario(input_data,1)  # basic results by hour
+    plot_results_price_1scenario(input_data,1)  # price results by hour
     
     input_data['page_title'] = 'daily averaging'
     plot_results_time_series_1scenario(input_data,min(num_time_periods,24)) # basic results by day
+    plot_results_price_1scenario(input_data,min(num_time_periods,24)) # price results by day
     
     input_data['page_title'] = '5-day averaging'
     plot_results_time_series_1scenario(input_data,min(num_time_periods,24*5)) # basic results by week
+    plot_results_price_1scenario(input_data,min(num_time_periods,24*5)) # price results by day
     
     # -------------------------------------------------------------------------
     # Find the week where storage dispatch is at its weekly max or min use
@@ -627,6 +636,360 @@ def plot_extreme_dispatch_results_time_series_1scenario(input_data,component_nam
             .format(study_output_1['value'],  (start_hour,end_hour))
             )
     plot_results_time_series_1scenario(input_data,1,start_hour,end_hour)  # to storage min for 2 weeks
+
+    
+       
+#%%
+#==============================================================================
+# plot_results_price_1scenario
+#
+# Purpose
+#   Generate price relevant figure
+#   
+#
+# Input
+#   A packaging dictionary variable: input_data, which contrains the following data
+#       [1] results_matrix_dispatch:  dispatch mix for a particular scenario
+#       [2] demand
+#   the following texts
+#       [3] legend_list
+#       [4] title_text
+#   and the following controls for graphical outputs
+#       [5] SAVE_FIGURES_TO_PDF:   logical variable [0/1]
+#       [6] directory_output:      a complete directory, ending with '/'
+#       [7] graphics_file_name
+#
+#   Data dimentions
+#       results_matrix_dispatch
+#           ROW dimension: optimization time steps
+#           COLUMN dimension: technology options (that dispatched energy)
+#       demand
+#           ROW dimension: optimization time steps
+#           Column dimension: none
+#       legend list
+#           Number of STRING items: technology options (that dispatched energy)
+#
+# Output
+#   6 figures in the console window.
+#   You can choose to save them to a PDF book or not.
+#
+# History
+#   Jun 4-5, 2018 started and finished
+#   Jun 21, 2018 
+#       fixed the bug caused by using the actual division rather than the default floor division.
+#       updated the time selection from predefined to dynamically determined.
+#
+# @Fan Tong
+#
+#    Jul 9, 2018 Convert to use with the base version of the Simple Energy Model
+# @Ken Caldeira
+#
+def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = None, end_hour = None ):
+
+    # Note hours_to_average is assumed to be an integer    
+    
+    # -------------------------------------------------------------------------
+    # Get the input data
+    
+    demand = input_data['DEMAND_SERIES']
+    price = copy.deepcopy(input_data['PRICE'])
+    results_matrix_dispatch = copy.deepcopy(input_data['results_matrix_dispatch'])
+    results_matrix_demand = copy.deepcopy(input_data['results_matrix_demand'])
+    results_matrix_curtailment = copy.deepcopy(input_data['results_matrix_curtailment'])
+    pdf_each = input_data['pdf_each']
+    legend_list_dispatch = input_data['legend_list_dispatch']
+    legend_list_demand = input_data['legend_list_demand']
+    legend_list_curtailment = input_data['legend_list_curtailment']
+    color_list_dispatch = input_data['color_list_dispatch']
+    color_list_demand = input_data['color_list_demand']
+    color_list_curtailment = input_data['color_list_curtailment']
+    case_name = input_data['CASE_NAME']
+
+    #NOTE: Averaging should occur before time subsetting
+    avg_label = ''
+    if hours_to_avg != None:
+        if hours_to_avg > 1:
+            avg_label = ' ' + str(hours_to_avg) + ' hr moving avg'
+            for i in range(results_matrix_dispatch.shape[1]):
+                results_matrix_dispatch [:,i] = func_time_conversion(results_matrix_dispatch[:,i],hours_to_avg)
+    
+            price = func_time_conversion(price,hours_to_avg)
+
+            demand = func_time_conversion(demand,hours_to_avg)
+            
+    if start_hour == None:
+        start_hour = 0
+    if end_hour == None:
+        end_hour = len(demand)
+
+    # -------------------------------------------------------------------------    
+    # -------------------------------------------------------------------------
+    # Define the plotting style
+    plt.close() # Just make sure nothing is open ...
+    regular_font = 5
+    small_font = 4
+    #plt.style.use('default')
+    plt.style.use('default')
+    # plt.style.use('bmh')
+    # plt.style.use('fivethirtyeight')
+    # plt.style.use('seaborn-white')
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
+    plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
+    plt.rcParams['font.size'] = regular_font
+    plt.rcParams['axes.labelsize'] = regular_font
+    plt.rcParams['axes.linewidth'] = 0.5
+    plt.rcParams['axes.labelweight'] = 'normal'
+    plt.rcParams['axes.titlesize'] = regular_font
+    plt.rcParams['xtick.labelsize'] = regular_font
+    plt.rcParams['ytick.labelsize'] = regular_font
+    plt.rcParams['legend.fontsize'] = small_font
+    plt.rcParams['figure.titlesize'] = regular_font
+    plt.rcParams['lines.linewidth'] = 0.5
+    plt.rcParams['grid.color'] = 'k'
+    plt.rcParams['grid.linestyle'] = ':'
+    plt.rcParams['grid.linewidth'] = 0.5
+    plt.rcParams['xtick.major.width'] = 0.5
+    plt.rcParams['xtick.major.size'] = 3
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.major.width'] = 0.5
+    plt.rcParams['ytick.major.size'] = 3
+    plt.rcParams['ytick.direction'] = 'in'
+        
+#    
+    figsize_oneplot = (6.5,9)
+    
+    # -------------------------------------------------------------------------
+    # Upper left will be a time series of price, upper right will be sorted by price high to low
+    
+    # -------------
+    
+    
+    num_time_periods = demand.size
+    x_data = np.arange(0, num_time_periods)
+    
+    # -------------
+    
+    figPrice = plt.figure(figsize=figsize_oneplot)
+    ax1a = figPrice.add_subplot(3,2,1)
+    ax1a.set_ylim(min(price), max(price))
+    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
+    
+    input_price_a = {
+        'x_data':           x_data[start_hour:end_hour], 
+#        'y_data':           results_matrix_dispatch,
+        #'y_data':           np.asarray(price[start_hour:end_hour]),
+        'y_data':           price[start_hour:end_hour],
+        'ax':               ax1a,
+        'x_label':          'Time (hour)',
+        'y_label':          '$/kWh',
+        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity price ($/kWh) '+avg_label,
+# If legend is not defined, no legend appears on plot
+# legend is provided by accompanying stacked area plot
+#        'legend':           legend_list_dispatch,  
+#        'legend_z':         'demand',
+        'line_width':       0.5,
+        'line_width_z':     0.2,
+        'grid_option':      0,
+        }        
+
+    func_lines_semilogy(input_price_a)
+     
+ #--------- upper right now do the same thing but sort by price from high to low.
+    input_price_b = copy.copy(input_price_a)
+    ax1b = figPrice.add_subplot(3,2,2)
+    input_price_b['x_data']= np.arange(end_hour-start_hour)
+    input_price_b['y_data']= np.sort(price[start_hour:end_hour])[::-1]
+    ax1b.set_ylim(min(price), max(price))
+    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
+     
+    input_price_b['ax'] = ax1b
+  
+    input_price_b['x_label'] = 'hour rank: 0 = highest price'
+    func_lines_semilogy(input_price_b)
+     
+# =============================================================================
+# =============================================================================
+# We just had two plots of price by time and price by price ranked hour order
+# Now, we should show contributions to cost of electricity (dispatch * price)
+# =============================================================================
+# =============================================================================
+     
+# -------------
+# =============================================================================
+    
+    ax1c = figPrice.add_subplot(3,2,3)
+    #ax1c.set_ylim([0, input_data['max_cost']])
+    ax1c.set_prop_cycle(cycler('color', color_list_dispatch))
+     
+    input_price_c = {
+         'x_data':           x_data[start_hour:end_hour], 
+ #        'y_data':           results_matrix_dispatch,
+         'y_data':           np.asarray(results_matrix_dispatch[start_hour:end_hour]*price[start_hour:end_hour,np.newaxis]),
+         'ax':               ax1c,
+         'x_label':          'Time (hour)',
+         'y_label':          '$/hr',
+         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCost of electricity sources '+avg_label,
+ # If legend is not defined, no legend appears on plot
+ # legend is provided by accompanying stacked area plot
+ #        'legend':           legend_list_dispatch,  
+ #        'legend_z':         'demand',
+         'line_width':       0.5,
+         'line_width_z':     0.2,
+         'grid_option':      0,
+         }        
+    
+    func_lines_plot(input_price_c)
+     
+     # -------------
+     
+ # If legend is not defined, no legend appears on plot
+ # legend is provided by accompanying stacked area plot
+ #        'legend':           legend_list_dispatch,  
+ # 
+     # Now add legend for stack plot
+     
+     #figure1b = plt.figure(figsize=figsize_oneplot)
+    input_price_d = copy.copy(input_price_c)
+    ax1d = figPrice.add_subplot(3,2,4)
+    #ax1d.set_ylim([0, input_data['max_cost']])
+    ax1d.set_prop_cycle(cycler('color', color_list_dispatch))
+     
+    input_price_d['ax'] = ax1d
+  
+    input_price_d['legend'] = legend_list_dispatch 
+ 
+    func_stack_plot(input_price_d)
+     
+ 
+ #     # -------------
+           
+      #figure1b = plt.figure(figsize=figsize_oneplot)
+      
+# #     # -------------  NOW DO DEMAND ---------------------
+# # 
+# #     #figure1c = plt.figure(figsize=figsize_oneplot)
+# #     ax1c = figPrice.add_subplot(3,2,3)
+# #     ax1c.set_prop_cycle(cycler('color', color_list_demand))
+# # 
+# #     inputs_demand = {
+# #         'x_data':           x_data[start_hour:end_hour], 
+# #         'y_data':           results_matrix_demand[start_hour:end_hour],
+# #         #'z_data':           demand,
+# #         'ax':               ax1c,
+# #         'x_label':          'Time (hour)',
+# #         'y_label':          'kW',
+# #         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
+# #         
+# # # Don't print ( legend on line plot by not having it defined in this dictionary
+# # #        'legend':           legend_list_demand,
+# #         #'legend_z':         'demand',
+# #         'line_width':       0.5,
+# #         #'line_width_z':     0.2,
+# #         'grid_option':      0,
+# #         } 
+# #           
+# #     ax1c.set_ylim([0, input_data['max_dispatch']])
+# # 
+# #     func_lines_plot(inputs_demand)
+# #     
+# #     # -------------
+# #     
+# #     #figure1d = plt.figure(figsize=figsize_oneplot)
+# #     ax1d = figPrice.add_subplot(3,2,4)
+# #     ax1d.set_prop_cycle(cycler('color', color_list_demand))
+# # 
+# #     inputs_demand['ax'] = ax1d
+# #     inputs_demand['legend'] = legend_list_demand
+# # 
+# #     ax1d.set_ylim([0, input_data['max_dispatch']])
+# #     
+# #     func_stack_plot(inputs_demand) 
+# #     
+# #     # -------------  NOW DO CURTAILMENT ---------------------
+# # 
+# #     #figure1c = plt.figure(figsize=figsize_oneplot)
+# #     ax1e = figPrice.add_subplot(3,2,5)
+# #     ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
+# # 
+# #     inputs_curtailment = {
+# #         'x_data':           x_data[start_hour:end_hour], 
+# #         'y_data':           results_matrix_curtailment[start_hour:end_hour],
+# #         #'z_data':           demand,
+# #         'ax':               ax1e,
+# #         'x_label':          'Time (hour)',
+# #         'y_label':          'kW',
+# #         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
+# #         
+# # # Don't print ( legend on line plot by not having it defined in this dictionary
+# # #        'legend':           legend_list_demand,
+# #         #'legend_z':         'demand',
+# #         'line_width':       0.5,
+# #         #'line_width_z':     0.2,
+# #         'grid_option':      0,
+# #         } 
+# #           
+# #     ax1e.set_ylim([0, input_data['max_dispatch']])
+# # 
+# #     func_lines_plot(inputs_curtailment)
+# #     
+# #     # -------------
+# #     
+# #     #figure1d = plt.figure(figsize=figsize_oneplot)
+# #     ax1f = figPrice.add_subplot(3,2,6)
+# #     ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
+# # 
+# #     inputs_curtailment['ax'] = ax1f
+# #     inputs_curtailment['legend'] = legend_list_curtailment
+# #     
+# #     ax1f.set_ylim([0, input_data['max_dispatch']])
+# # 
+# #     func_stack_plot(inputs_curtailment) 
+# # =============================================================================
+# 
+# =============================================================================
+    # -------------
+    
+    plt.suptitle(input_data['page_title'])
+    plt.tight_layout(rect=[0,0,0.75,0.975])
+    pdf_each.savefig(figPrice)
+    #plt.close()
+    
+    #pdf_each.savefig(figure1b)
+    #plt.close()
+    
+    #pdf_each.savefig(figure1c)
+    #plt.close()
+    
+    #pdf_each.savefig(figure1d)
+    plt.close()
+
+#%%   
+
+def plot_extreme_dispatch_results_time_series_1scenario(input_data,component_name,search_option,window_size):
+    
+    component_index_dispatch = input_data['component_index_dispatch']
+    component_index = component_index_dispatch[component_name]
+    
+    results_matrix_dispatch = input_data['results_matrix_dispatch']
+    
+    study_variable_dict = {
+            'window_size':      window_size,
+            'data':             results_matrix_dispatch[:,component_index], 
+            'print_option':     0,
+            'search_option':    search_option
+            }
+    
+    study_output_1 = func_find_period(study_variable_dict)    
+    start_hour = study_output_1['left_index']
+    end_hour = study_output_1['right_index']
+        
+    input_data['page_title'] = (
+            component_name + ' ('+search_option+') supplied {:.2f} kW avg to the grid during hours: {} '
+            .format(study_output_1['value'],  (start_hour,end_hour))
+            )
+    plot_results_time_series_1scenario(input_data,1,start_hour,end_hour)  # to storage min for 2 weeks
+    plot_results_price_1scenario(input_data,1,start_hour,end_hour) # price results by day
 
     
        
@@ -715,7 +1078,7 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
     if start_hour == None:
         start_hour = 0
     if end_hour == None:
-        end_hour = len(demand)-1
+        end_hour = len(demand)
 
     # -------------------------------------------------------------------------    
     # -------------------------------------------------------------------------
@@ -762,8 +1125,8 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
     # -------------
     
     
-    optimization_time_steps = demand.size
-    x_data = np.arange(0, optimization_time_steps)
+    num_time_periods = demand.size
+    x_data = np.arange(0, num_time_periods)
     
     # -------------
     
@@ -973,8 +1336,8 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     # -----------------------------
     
-    optimization_time_steps = results_matrix_dispatch.shape[0]
-    x_data = np.arange(0, optimization_time_steps)
+    num_time_periods = results_matrix_dispatch.shape[0]
+    x_data = np.arange(0, num_time_periods)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
@@ -1011,8 +1374,8 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 #    
 #    # -----------------------------
 #    
-##    optimization_time_steps = results_matrix_dispatch.shape[0]
-##    x_data = np.arange(0, optimization_time_steps)
+##    num_time_periods = results_matrix_dispatch.shape[0]
+##    x_data = np.arange(0, num_time_periods)
 ##    
 ##    results_matrix_dispatch1 = np.zeros(
 ##            results_matrix_dispatch.shape)
@@ -1049,7 +1412,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     
     # -----------------------------
     
-    # x_data = np.arange(0, optimization_time_steps)
+    # x_data = np.arange(0, num_time_periods)
     
     # -----------------------------
     
@@ -1081,7 +1444,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 #    
 #    # -------------------------
 #    
-##    x_data = np.arange(0, optimization_time_steps)
+##    x_data = np.arange(0, num_time_periods)
 #    
 #    # -------------------------
 #    
@@ -1112,7 +1475,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     # -------------------------
     
     temporal_scale = min(num_time_periods,24)
-    x_data = np.arange(0, optimization_time_steps)
+    x_data = np.arange(0, num_time_periods)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
@@ -1149,7 +1512,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 #    # -------------------------
 #    
 ##    temporal_scale = 24
-##    x_data = np.arange(0, optimization_time_steps/temporal_scale)
+##    x_data = np.arange(0, num_time_periods/temporal_scale)
 ##    
 ##    results_matrix_dispatch1 = np.zeros(
 ##            (int(results_matrix_dispatch.shape[0]/temporal_scale), 
@@ -1189,7 +1552,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     # -------------------------
     
     temporal_scale = min(number_time_periods,24 * 7)
-    x_data = np.arange(0, optimization_time_steps)
+    x_data = np.arange(0, num_time_periods)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
@@ -1227,7 +1590,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 #    # -------------------------
 #    
 ##    temporal_scale = 24 * 7
-##    x_data = np.arange(0, optimization_time_steps/temporal_scale)
+##    x_data = np.arange(0, num_time_periods/temporal_scale)
 ##    
 ##    results_matrix_dispatch1 = np.zeros(
 ##            (int(results_matrix_dispatch.shape[0]/temporal_scale), 
@@ -1829,12 +2192,12 @@ def func_optimization_results_dispatch_var_Nscenarios(input_data):
     model_results = temp_dict['model_results']
     
     component_index_dispatch = model_inputs['component_index_dispatch']
-    optimization_time_steps = len(model_inputs['demand'])
+    num_time_periods = len(model_inputs['demand'])
     
     # -------------------------------------------------------------------------
     
     results_matrix_dispatch = \
-        np.zeros([optimization_time_steps, len(scenario_list_number)])
+        np.zeros([num_time_periods, len(scenario_list_number)])
     
     for scenario_idx in range(len(scenario_list_number)):
 
