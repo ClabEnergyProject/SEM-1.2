@@ -159,7 +159,7 @@ def quick_look(pickle_file_name):
             if component == 'STORAGE' or component == 'PGP_STORAGE': 
                 addfrom = 'FROM_'
             results_matrix_dispatch.append(result_dic['DISPATCH_' + addfrom + component ])
-            legend_list_dispatch.append( 'VAR_' + addfrom + component +' kW' )
+            legend_list_dispatch.append( 'DISPATCH_' + addfrom + component +' kW' )
             color_list_dispatch.append(eval('color_' + component))
             component_index_dispatch[component] = len(results_matrix_dispatch)-1 # row index for each component
         
@@ -608,12 +608,13 @@ def call_plot_results_1scenario(input_data):
     # Find the week where storage dispatch is at its weekly max or min use
     
     for idx in range(results_matrix_dispatch.shape[1]):
-        plot_extreme_dispatch_results_time_series_1scenario(input_data, component_name_dispatch[idx],'max',min(num_time_periods,24*5))
+        plot_extreme_dispatch_results_1scenario(input_data, component_name_dispatch[idx],'max',min(num_time_periods,24*5))
         
     return
    
-
-def plot_extreme_dispatch_results_time_series_1scenario(input_data,component_name,search_option,window_size):
+#%%
+    
+def plot_extreme_dispatch_results_1scenario(input_data,component_name,search_option,window_size):
     
     component_index_dispatch = input_data['component_index_dispatch']
     component_index = component_index_dispatch[component_name]
@@ -707,13 +708,16 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
 
     #NOTE: Averaging should occur before time subsetting
     avg_label = ''
+    dispatch_cost_matrix = results_matrix_dispatch*price[:,np.newaxis]
     if hours_to_avg != None:
         if hours_to_avg > 1:
             avg_label = ' ' + str(hours_to_avg) + ' hr moving avg'
             for i in range(results_matrix_dispatch.shape[1]):
                 results_matrix_dispatch [:,i] = func_time_conversion(results_matrix_dispatch[:,i],hours_to_avg)
+                dispatch_cost_matrix [:,i] = func_time_conversion(dispatch_cost_matrix[:,i],hours_to_avg)
     
             price = func_time_conversion(price,hours_to_avg)
+            # Note that mean price is by time, and not demand weighted
 
             demand = func_time_conversion(demand,hours_to_avg)
             
@@ -721,7 +725,6 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
         start_hour = 0
     if end_hour == None:
         end_hour = len(demand)
-
     # -------------------------------------------------------------------------    
     # -------------------------------------------------------------------------
     # Define the plotting style
@@ -821,25 +824,25 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     ax1c = figPrice.add_subplot(3,2,3)
     #ax1c.set_ylim([0, input_data['max_cost']])
     ax1c.set_prop_cycle(cycler('color', color_list_dispatch))
-     
+    
     input_price_c = {
          'x_data':           x_data[start_hour:end_hour], 
  #        'y_data':           results_matrix_dispatch,
-         'y_data':           np.asarray(results_matrix_dispatch[start_hour:end_hour]*price[start_hour:end_hour,np.newaxis]),
+         'y_data':           dispatch_cost_matrix[start_hour:end_hour],
          'ax':               ax1c,
          'x_label':          'Time (hour)',
          'y_label':          '$/hr',
-         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCost of electricity sources '+avg_label,
+         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCost of dispatched electricity '+avg_label,
  # If legend is not defined, no legend appears on plot
  # legend is provided by accompanying stacked area plot
- #        'legend':           legend_list_dispatch,  
+         #'legend':           legend_list_dispatch,  
  #        'legend_z':         'demand',
          'line_width':       0.5,
-         'line_width_z':     0.2,
+         #'line_width_z':     0.2,
          'grid_option':      0,
          }        
     
-    func_lines_plot(input_price_c)
+    func_stack_plot(input_price_c)
      
      # -------------
      
@@ -855,9 +858,16 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     #ax1d.set_ylim([0, input_data['max_cost']])
     ax1d.set_prop_cycle(cycler('color', color_list_dispatch))
      
+    sort_order = np.argsort(price[start_hour:end_hour])[::-1]
     input_price_d['ax'] = ax1d
-  
-    input_price_d['legend'] = legend_list_dispatch 
+    input_price_d['x_data'] = np.arange(end_hour-start_hour)
+    input_price_d['x_label'] = 'hour rank: 0 = highest price'
+    input_price_d['y_data'] = results_matrix_dispatch [start_hour:end_hour][sort_order]
+    input_price_d['y_label'] = 'kW'
+    #input_price_d['z_data'] = demand[start_hour:end_hour],
+
+    input_price_d['title']= case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nDispatch sorted by electricity price '+avg_label
+    input_price_d['legend'] =  legend_list_dispatch
  
     func_stack_plot(input_price_d)
      
@@ -966,7 +976,7 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
 
 #%%   
 
-def plot_extreme_dispatch_results_time_series_1scenario(input_data,component_name,search_option,window_size):
+def plot_extreme_dispatch_results_1scenario(input_data,component_name,search_option,window_size):
     
     component_index_dispatch = input_data['component_index_dispatch']
     component_index = component_index_dispatch[component_name]
