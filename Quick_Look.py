@@ -74,6 +74,7 @@ from cycler import cycler
 from Supporting_Functions import func_find_period
 from Supporting_Functions import func_lines_plot
 from Supporting_Functions import func_lines_semilogy
+from Supporting_Functions import func_scatter_semilogy
 from Supporting_Functions import func_lines_2yaxes_plot
 from Supporting_Functions import func_stack_plot
 from Supporting_Functions import func_time_conversion
@@ -794,9 +795,10 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
         'line_width':       0.5,
         'line_width_z':     0.2,
         'grid_option':      0,
+        'y_scale':          "log"
         }        
 
-    func_lines_semilogy(input_price_a)
+    func_lines_plot(input_price_a)
      
  #--------- upper right now do the same thing but sort by price from high to low.
     input_price_b = copy.copy(input_price_a)
@@ -809,7 +811,7 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     input_price_b['ax'] = ax1b
   
     input_price_b['x_label'] = 'hour rank: 0 = highest price'
-    func_lines_semilogy(input_price_b)
+    func_lines_plot(input_price_b)
      
 # =============================================================================
 # =============================================================================

@@ -172,7 +172,7 @@ def preprocess_input(case_input_path_filename):
             'FIXED_COST_PGP_STORAGE',
             'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
             'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
-            'PGP_STORAGE_CHARGING_EFFICIENCY']
+            'PGP_STORAGE_CHARGING_EFFICIENCY','PGP_STORAGE_DECAY_RATE']
             ))
     
     keywords_real_notscaled = list(map(str.upper,
@@ -180,7 +180,9 @@ def preprocess_input(case_input_path_filename):
              'END_DAY','END_HOUR','END_MONTH',
             'END_YEAR',
             'START_DAY','START_HOUR','START_MONTH',
-            'START_YEAR']
+            'START_YEAR',
+            'PGP_STORAGE_CHARGING_EFFICIENCY','PGP_STORAGE_DECAY_RATE',
+            'STORAGE_CHARGING_EFFICIENCY','STORAGE_DECAY_RATE']
             ))
     
     #Capacity cost -- Cost per hour of capacity that must be incurred whether or 
@@ -211,13 +213,10 @@ def preprocess_input(case_input_path_filename):
     num_cases = len(case_data) - 1 # the 1 is for the keyword row
     global_dic['NUM_CASES'] = num_cases
 
-    #------DEFAULT VALUES ---------
+    #------ DEFAULT VALUES FOR global_dic ---------
     # For now, default for quicklook output is True
     global_dic['QUICK_LOOK'] = True
-    global_dic['NORMALIZE_DEMAND_TO_ONE'] = False # If True, normalize mean demand to 1.0
     # default global values to help with numerical issues
-    global_dic['NUMERICS_COST_SCALING'] = 1e+12 # multiplies all costs by a factor and then divides at end
-    global_dic['NUMERICS_DEMAND_SCALING'] = 1e+12 # multiplies demand by a factor and then divides all costs and capacities at end
     #------convert file input to dictionary of global data ---------
     for list_item in global_data:
         test_key = str.upper(list_item[0])
@@ -236,6 +235,14 @@ def preprocess_input(case_input_path_filename):
         
     # Parse all_cases_dic data
     all_cases_dic = {}
+    
+    #------ DEFAULT VALUES FOR global_dic ---------
+    # For now, default for quicklook output is True
+    all_cases_dic['NORMALIZE_DEMAND_TO_ONE'] = False # If True, normalize mean demand to 1.0
+    # default global values to help with numerical issues
+    all_cases_dic['NUMERICS_COST_SCALING'] = 1e+12 # multiplies all costs by a factor and then divides at end
+    all_cases_dic['NUMERICS_DEMAND_SCALING'] = 1e+12 # multiplies demand by a factor and then divides all costs and capacities at end
+
     for list_item in all_cases_data:
         test_key = str.upper(list_item[0])
         test_value = list_item[1]
@@ -310,7 +317,7 @@ def preprocess_input(case_input_path_filename):
                     global_dic['DATA_PATH'],
                     case_list_dic['DEMAND_FILE'][case_index]
                     )
-        if global_dic['NORMALIZE_DEMAND_TO_ONE']:
+        if case_list_dic['NORMALIZE_DEMAND_TO_ONE'][case_index]:
             demand_series_list_item = demand_series_list_item / np.average(demand_series_list_item)
         demand_series_list.append(demand_series_list_item)
         

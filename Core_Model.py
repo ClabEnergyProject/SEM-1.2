@@ -65,8 +65,8 @@ def core_model_loop (global_dic, case_dic_list):
 
 def core_model (global_dic, case_dic):
     verbose = global_dic['VERBOSE']
-    numerics_cost_scaling = global_dic['NUMERICS_COST_SCALING']
-    numerics_demand_scaling = global_dic['NUMERICS_DEMAND_SCALING']
+    numerics_cost_scaling = case_dic['NUMERICS_COST_SCALING']
+    numerics_demand_scaling = case_dic['NUMERICS_DEMAND_SCALING']
     if verbose:
         print ('Core_Model.py: processing case ',case_dic['CASE_NAME'])
     demand_series = np.array(case_dic['DEMAND_SERIES'])*numerics_demand_scaling 
@@ -100,6 +100,7 @@ def core_model (global_dic, case_dic):
     storage_charging_time       = case_dic['STORAGE_CHARGING_TIME']
     storage_decay_rate          = case_dic['STORAGE_DECAY_RATE'] # fraction of stored electricity lost each hour
     pgp_storage_charging_efficiency = case_dic['PGP_STORAGE_CHARGING_EFFICIENCY']
+    pgp_storage_decay_rate = case_dic['PGP_STORAGE_DECAY_RATE']
     
     system_components = case_dic['SYSTEM_COMPONENTS']
       
@@ -213,7 +214,9 @@ def core_model (global_dic, case_dic):
         for i in range(num_time_periods):
 
             constraints += [
-                    energy_storage[(i+1) % num_time_periods] == energy_storage[i] + storage_charging_efficiency * dispatch_to_storage[i] - dispatch_from_storage[i] - energy_storage[i]*storage_decay_rate
+                    energy_storage[(i+1) % num_time_periods] == 
+                        energy_storage[i] + storage_charging_efficiency * dispatch_to_storage[i] 
+                        - dispatch_from_storage[i] - energy_storage[i]*storage_decay_rate
                     ]
 
     else:
@@ -247,7 +250,7 @@ def core_model (global_dic, case_dic):
                 dispatch_to_pgp_storage <= capacity_to_pgp_storage,
                 dispatch_from_pgp_storage >= 0, # dispatch_to_storage is negative value
                 dispatch_from_pgp_storage <= capacity_from_pgp_storage,
-                dispatch_from_pgp_storage <= energy_pgp_storage, # you can't dispatch more from storage in a time step than is in the battery
+                dispatch_from_pgp_storage <= energy_pgp_storage * (1 - pgp_storage_decay_rate), # you can't dispatch more from storage in a time step than is in the battery
                                                                                     # This constraint is redundant
                 energy_pgp_storage >= 0,
                 energy_pgp_storage <= capacity_pgp_storage
@@ -263,7 +266,7 @@ def core_model (global_dic, case_dic):
             constraints += [
                     energy_pgp_storage[(i+1) % num_time_periods] == energy_pgp_storage[i] 
                     + pgp_storage_charging_efficiency * dispatch_to_pgp_storage[i] 
-                    - dispatch_from_pgp_storage[i] 
+                    - dispatch_from_pgp_storage[i]- energy_pgp_storage[i]*pgp_storage_decay_rate
                     ]
 
     else:

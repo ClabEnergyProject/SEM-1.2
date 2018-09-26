@@ -176,6 +176,7 @@ def postprocess_key_scalar_results( global_dic, case_dic_list, result_list ):
             'storage_charging_time (h)',
             'storage_decay_rate (1/h)',
             'pgp_storage_charging_efficiency',
+            'pgp_storage_decay_rate (1/h)',
             
             'mean demand (kW)',
             'capacity factor wind series (kW)',
@@ -233,6 +234,7 @@ def postprocess_key_scalar_results( global_dic, case_dic_list, result_list ):
                     d['STORAGE_CHARGING_TIME'],
                     d['STORAGE_DECAY_RATE'],
                     d['PGP_STORAGE_CHARGING_EFFICIENCY'],
+                    d['PGP_STORAGE_DECAY_RATE'],
                     
                     # mean of time series assumptions
                     np.average(d['DEMAND_SERIES']),
