@@ -73,8 +73,6 @@ import copy
 from cycler import cycler
 from Supporting_Functions import func_find_period
 from Supporting_Functions import func_lines_plot
-from Supporting_Functions import func_lines_semilogy
-from Supporting_Functions import func_scatter_semilogy
 from Supporting_Functions import func_lines_2yaxes_plot
 from Supporting_Functions import func_stack_plot
 from Supporting_Functions import func_time_conversion
