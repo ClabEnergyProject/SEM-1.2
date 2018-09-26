@@ -5,6 +5,9 @@ and fuels) without considering any spatial variation, policy, capacity markets, 
 <br>
 <b>=====  WISH LIST OF THINGS TO BE DONE ON THIS MODEL  =====</b>
 <br>
+
+The following is a wish list for improvements to our model and its usability:
+
 A. Some LIFO storage and PGP_storage analysis and figures as part of standard output.
 
 B. Reconfigure model to allow running more cases without needing more memory.
