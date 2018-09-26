@@ -4,7 +4,7 @@ and fuels) without considering any spatial variation, policy, capacity markets, 
 
 <br>
 <b>WISH LIST OF THINGS TO BE DONE ON THIS MODEL</b>
-
+<br>
 A. Some LIFO storage and PGP_storage analysis and figures as part of standard output.
 
 B. Reconfigure model to allow running more cases without needing more memory.
@@ -21,7 +21,7 @@ G. Make version that can be spread across CEES-Mazama.
 
 <br>
 <b>WINDOWS 10 INSTALLATION INSTRUCTIONS</b>
-
+<br>
 The following is installation instructions for Windows 10 machines.
 
 1. Use remove programs to remove all python2.x programs. This uninstalls Anaconda2.
