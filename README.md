@@ -20,7 +20,7 @@ F. Do a runtime analysis to speed up execution of Quick_Look.py
 G. Make version that can be spread across CEES-Mazama.
 
 <br>
-<b=====  WINDOWS 10 INSTALLATION INSTRUCTIONS  ===== </b>
+<b>=====  WINDOWS 10 INSTALLATION INSTRUCTIONS  ===== </b>
 <br>
 The following is installation instructions for Windows 10 machines.
 
