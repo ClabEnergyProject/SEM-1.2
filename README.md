@@ -5,11 +5,17 @@ and fuels) without considering any spatial variation, policy, capacity markets, 
 <b>WISH LIST OF THINGS TO BE DONE ON THIS MODEL</b>
 
 A. Some LIFO storage and PGP_storage analysis and figures as part of standard output.
+
 B. Reconfigure model to allow running more cases without needing more memory.
+
 C. Automate some checks on aberrant usage of storage (?)
+
 D. Make version with specified capacities.
+
 E. Add inter-case comparisons to Quick_Look.py
+
 F. Do a runtime analysis to speed up execution of Quick_Look.py
+
 G. Make version that can be spread across CEES-Mazama.
 
 <b>WINDOWS 10 INSTALLATION INSTRUCTIONS</b>
