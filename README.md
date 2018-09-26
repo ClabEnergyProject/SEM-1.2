@@ -3,7 +3,7 @@ Python 3.6 version of SEM-1. This is a Simple Energy Model that optimizes electr
 and fuels) without considering any spatial variation, policy, capacity markets, etc.
 
 <br>
-<b>=====  WISH LIST OF THINGS TO BE DONE ON THIS MODEL  =====/b>
+<b>=====  WISH LIST OF THINGS TO BE DONE ON THIS MODEL  =====</b>
 <br>
 A. Some LIFO storage and PGP_storage analysis and figures as part of standard output.
 
