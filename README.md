@@ -2,9 +2,7 @@
 Python 3.6 version of SEM-1. This is a Simple Energy Model that optimizes electricity (or electricity
 and fuels) without considering any spatial variation, policy, capacity markets, etc.
 
-=====================================================================================================
 *** WISH LIST OF THINGS TO BE DONE ON THIS MODEL ***
-=====================================================================================================
 
 A. Some LIFO storage and PGP_storage analysis and figures as part of standard output.
 B. Reconfigure model to allow running more cases without needing more memory.
@@ -14,9 +12,8 @@ E. Add inter-case comparisons to Quick_Look.py
 F. Do a runtime analysis to speed up execution of Quick_Look.py
 G. Make version that can be spread across CEES-Mazama.
 
-=====================================================================================================
 *** WINDOWS 10 INSTALLATION INSTRUCTIONS ***
-=====================================================================================================
+
 The following is installation instructions for Windows 10 machines.
 
 1. Use remove programs to remove all python2.x programs. This uninstalls Anaconda2.
