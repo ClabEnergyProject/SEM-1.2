@@ -266,283 +266,7 @@ def quick_look(pickle_file_name):
     text_file.close()
     if verbose:
         print ( 'files closed')
-
-      
-#%%
-#==============================================================================
-# plot_results_bar_1scenario
-#
-# Purpose
-#   Generate dispatch mix figures. Right now, there are N*4 figures.
-#       N=3 corresponds to different temporal resolutions: hourly, daily, weekly.
-#       4 corresponds to subplots for the same 'information' (time scale).
-#
-# Input
-#   A packaging dictionary variable: input_data, which contrains the following data
-#       [1] results_matrix_dispatch:  dispatch mix for a particular scenario
-#       [2] demand
-#   the following texts
-#       [3] legend_list
-#       [4] title_text
-#   and the following controls for graphical outputs
-#       [5] SAVE_FIGURES_TO_PDF:   logical variable [0/1]
-#       [6] directory_output:      a complete directory, ending with '/'
-#       [7] graphics_file_name
-#
-#   Data dimentions
-#       results_matrix_dispatch
-#           ROW dimension: optimization time steps
-#           COLUMN dimension: technology options (that dispatched energy)
-#       demand
-#           ROW dimension: optimization time steps
-#           Column dimension: none
-#       legend list
-#           Number of STRING items: technology options (that dispatched energy)
-#
-# Output
-#   6 figures in the console window.
-#   You can choose to save them to a PDF book or not.
-#
-# History
-#   Jun 4-5, 2018 started and finished
-#   Jun 21, 2018 
-#       fixed the bug caused by using the actual division rather than the default floor division.
-#       updated the time selection from predefined to dynamically determined.
-#
-# @Fan Tong
-#
-#    Jul 9, 2018 Convert to use with the base version of the Simple Energy Model
-# @Ken Caldeira
-#
-def plot_results_bar_1scenario (input_data):
-
-    # Note hours_to_average is assumed to be an integer    
     
-    # -------------------------------------------------------------------------
-    # Get the input data
-    system_components = input_data['SYSTEM_COMPONENTS']
-    
-    demand = input_data['DEMAND_SERIES']
-    results_matrix_dispatch = copy.deepcopy(input_data['results_matrix_dispatch'])
-    results_matrix_demand = copy.deepcopy(input_data['results_matrix_demand'])
-    results_matrix_curtailment = copy.deepcopy(input_data['results_matrix_curtailment'])
-    pdf_each = input_data['pdf_each']
-    legend_list_dispatch = input_data['legend_list_dispatch']
-    legend_list_demand = input_data['legend_list_demand']
-    legend_list_curtailment = input_data['legend_list_curtailment']
-    color_list_dispatch = input_data['color_list_dispatch']
-    color_list_demand = input_data['color_list_demand']
-    color_list_curtailment = input_data['color_list_curtailment']
-    case_name = input_data['CASE_NAME']
-
-    # -------------------------------------------------------------------------    
-    # -------------------------------------------------------------------------
-    # Define the plotting style
-    plt.close() # Just make sure nothing is open ...
-    regular_font = 5
-    small_font = 4
-    #plt.style.use('default')
-    plt.style.use('default')
-    # plt.style.use('bmh')
-    # plt.style.use('fivethirtyeight')
-    # plt.style.use('seaborn-white')
-    plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
-    plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
-    plt.rcParams['font.size'] = regular_font
-    plt.rcParams['axes.labelsize'] = regular_font
-    plt.rcParams['axes.linewidth'] = 0.5
-    plt.rcParams['axes.labelweight'] = 'normal'
-    plt.rcParams['axes.titlesize'] = regular_font
-    plt.rcParams['xtick.labelsize'] = regular_font
-    plt.rcParams['ytick.labelsize'] = regular_font
-    plt.rcParams['legend.fontsize'] = small_font
-    plt.rcParams['figure.titlesize'] = regular_font
-    plt.rcParams['lines.linewidth'] = 0.5
-    plt.rcParams['grid.color'] = 'k'
-    plt.rcParams['grid.linestyle'] = ':'
-    plt.rcParams['grid.linewidth'] = 0.5
-    plt.rcParams['xtick.major.width'] = 0.5
-    plt.rcParams['xtick.major.size'] = 3
-    plt.rcParams['xtick.direction'] = 'in'
-    plt.rcParams['ytick.major.width'] = 0.5
-    plt.rcParams['ytick.major.size'] = 3
-    plt.rcParams['ytick.direction'] = 'in'
-        
-#    
-    figsize_oneplot = (6.5,9)
-    
-    # Figures are: 
-    #  UL:fixed and variables [capacity and dispatch] costs (inputs) [power]
-    #  Ml: generation capacity and mean generation (results)
-    #  LL:fixed and variable costs (results)
-    
-    # UR: storage capacity [energy]
-    # MR: demand, energy to storage/PGPstorage (results)
-    # LR: storage cycles per year
-    
-    # -------------------------------------------------------------------------
-    # Figures 1 Hourly time series results
-    
-    # Four figures: 2 (dispatch, demand) * 2 (line plots, stack plots)
-    
-    # -------------
-    
-    
-    num_time_periods = demand.size
-    x_data = np.arange(0, num_time_periods)
-    
-    # -------------
-    
-    figure1a = plt.figure(figsize=figsize_oneplot)
-    
-    # first panel is bar chart of capacity and dispatch costs
-    
-    ax1a = figure1a.add_subplot(3,2,1)
-    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
-    
-    inputs_dispatch = {
-        'x_data':           legend_list_dispatch, 
-#        'y_data':           results_matrix_dispatch,
-        'y_data':           results_matrix_dispatch[start_hour:end_hour],
-        'z_data':           demand[start_hour:end_hour],
-        'ax':               ax1a,
-        'x_label':          'Time (hour)',
-        'y_label':          'kW',
-        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sources '+avg_label,
-# If legend is not defined, no legend appears on plot
-# legend is provided by accompanying stacked area plot
-#        'legend':           legend_list_dispatch,  
-#        'legend_z':         'demand',
-        'line_width':       0.5,
-        'line_width_z':     0.2,
-        'grid_option':      0,
-        }        
-
-    ax1a.set_ylim([0, input_data['max_dispatch']])
-    
-    func_lines_plot(inputs_dispatch)
-    
-    # -------------
-    
-# If legend is not defined, no legend appears on plot
-# legend is provided by accompanying stacked area plot
-#        'legend':           legend_list_dispatch,  
-# 
-    # Now add legend for stack plot
-    
-    #figure1b = plt.figure(figsize=figsize_oneplot)
-    ax1b = figure1a.add_subplot(3,2,2)
-    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
-    
-    inputs_dispatch['ax'] = ax1b
- 
-    inputs_dispatch['legend'] = legend_list_dispatch 
-    inputs_dispatch['legend_z'] = 'demand' 
-
-    ax1b.set_ylim([0, input_data['max_dispatch']])
-
-    func_stack_plot(inputs_dispatch)
-    
-    
-    # -------------  NOW DO DEMAND ---------------------
-
-    #figure1c = plt.figure(figsize=figsize_oneplot)
-    ax1c = figure1a.add_subplot(3,2,3)
-    ax1c.set_prop_cycle(cycler('color', color_list_demand))
-
-    inputs_demand = {
-        'x_data':           x_data[start_hour:end_hour], 
-        'y_data':           results_matrix_demand[start_hour:end_hour],
-        #'z_data':           demand,
-        'ax':               ax1c,
-        'x_label':          'Time (hour)',
-        'y_label':          'kW',
-        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
-        
-# Don't print ( legend on line plot by not having it defined in this dictionary
-#        'legend':           legend_list_demand,
-        #'legend_z':         'demand',
-        'line_width':       0.5,
-        #'line_width_z':     0.2,
-        'grid_option':      0,
-        } 
-          
-    ax1c.set_ylim([0, input_data['max_dispatch']])
-
-    func_lines_plot(inputs_demand)
-    
-    # -------------
-    
-    #figure1d = plt.figure(figsize=figsize_oneplot)
-    ax1d = figure1a.add_subplot(3,2,4)
-    ax1d.set_color_cycle(color_list_demand)
-    ax1d.set_prop_cycle(cycler('color', color_list_demand))
-
-    inputs_demand['ax'] = ax1d
-    inputs_demand['legend'] = legend_list_demand
-
-    ax1d.set_ylim([0, input_data['max_dispatch']])
-    
-    func_stack_plot(inputs_demand) 
-    
-    # -------------  NOW DO CURTAILMENT ---------------------
-
-    #figure1c = plt.figure(figsize=figsize_oneplot)
-    ax1e = figure1a.add_subplot(3,2,5)
-    ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
-
-    inputs_curtailment = {
-        'x_data':           x_data[start_hour:end_hour], 
-        'y_data':           results_matrix_curtailment[start_hour:end_hour],
-        #'z_data':           demand,
-        'ax':               ax1e,
-        'x_label':          'Time (hour)',
-        'y_label':          'kW',
-        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
-        
-# Don't print ( legend on line plot by not having it defined in this dictionary
-#        'legend':           legend_list_demand,
-        #'legend_z':         'demand',
-        'line_width':       0.5,
-        #'line_width_z':     0.2,
-        'grid_option':      0,
-        } 
-          
-    ax1e.set_ylim([0, input_data['max_dispatch']])
-
-    func_lines_plot(inputs_curtailment)
-    
-    # -------------
-    
-    #figure1d = plt.figure(figsize=figsize_oneplot)
-    ax1f = figure1a.add_subplot(3,2,6)
-    ax1f.set_color_cycle(color_list_curtailment)
-    ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
-
-    inputs_curtailment['ax'] = ax1f
-    inputs_curtailment['legend'] = legend_list_curtailment
-    
-    ax1f.set_ylim([0, input_data['max_dispatch']])
-
-    func_stack_plot(inputs_curtailment) 
-
-    # -------------
-    plt.suptitle(input_data['page_title'])
-    plt.tight_layout(rect=[0,0,0.75,0.975])
-    pdf_each.savefig(figure1a)
-    #plt.close()
-    
-    #pdf_each.savefig(figure1b)
-    #plt.close()
-    
-    #pdf_each.savefig(figure1c)
-    #plt.close()
-    
-    #pdf_each.savefig(figure1d)
-    plt.close()
-        
-       
 #%%
 # -----------------------------------------------------------------------------
 # call_plot_results_1scenario()
@@ -610,9 +334,9 @@ def call_plot_results_1scenario(input_data):
         plot_extreme_dispatch_results_1scenario(input_data, component_name_dispatch[idx],'max',min(num_time_periods,24*5))
         
     return
-   
-#%%
-    
+
+#%%   
+
 def plot_extreme_dispatch_results_1scenario(input_data,component_name,search_option,window_size):
     
     component_index_dispatch = input_data['component_index_dispatch']
@@ -636,8 +360,9 @@ def plot_extreme_dispatch_results_1scenario(input_data,component_name,search_opt
             .format(study_output_1['value'],  (start_hour,end_hour))
             )
     plot_results_time_series_1scenario(input_data,1,start_hour,end_hour)  # to storage min for 2 weeks
+    plot_results_price_1scenario(input_data,1,start_hour,end_hour) # price results by day
 
-    
+     
        
 #%%
 #==============================================================================
@@ -973,35 +698,7 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     
     #pdf_each.savefig(figure1d)
     plt.close()
-
-#%%   
-
-def plot_extreme_dispatch_results_1scenario(input_data,component_name,search_option,window_size):
-    
-    component_index_dispatch = input_data['component_index_dispatch']
-    component_index = component_index_dispatch[component_name]
-    
-    results_matrix_dispatch = input_data['results_matrix_dispatch']
-    
-    study_variable_dict = {
-            'window_size':      window_size,
-            'data':             results_matrix_dispatch[:,component_index], 
-            'print_option':     0,
-            'search_option':    search_option
-            }
-    
-    study_output_1 = func_find_period(study_variable_dict)    
-    start_hour = study_output_1['left_index']
-    end_hour = study_output_1['right_index']
-        
-    input_data['page_title'] = (
-            component_name + ' ('+search_option+') supplied {:.2f} kW avg to the grid during hours: {} '
-            .format(study_output_1['value'],  (start_hour,end_hour))
-            )
-    plot_results_time_series_1scenario(input_data,1,start_hour,end_hour)  # to storage min for 2 weeks
-    plot_results_price_1scenario(input_data,1,start_hour,end_hour) # price results by day
-
-    
+   
        
 #%%
 #==============================================================================
@@ -1282,7 +979,283 @@ def plot_results_time_series_1scenario (input_data, hours_to_avg = None, start_h
     
     #pdf_each.savefig(figure1d)
     plt.close()
+
+      
+#%%
+#==============================================================================
+# plot_results_bar_1scenario
+#
+# Purpose
+#   Generate dispatch mix figures. Right now, there are N*4 figures.
+#       N=3 corresponds to different temporal resolutions: hourly, daily, weekly.
+#       4 corresponds to subplots for the same 'information' (time scale).
+#
+# Input
+#   A packaging dictionary variable: input_data, which contrains the following data
+#       [1] results_matrix_dispatch:  dispatch mix for a particular scenario
+#       [2] demand
+#   the following texts
+#       [3] legend_list
+#       [4] title_text
+#   and the following controls for graphical outputs
+#       [5] SAVE_FIGURES_TO_PDF:   logical variable [0/1]
+#       [6] directory_output:      a complete directory, ending with '/'
+#       [7] graphics_file_name
+#
+#   Data dimentions
+#       results_matrix_dispatch
+#           ROW dimension: optimization time steps
+#           COLUMN dimension: technology options (that dispatched energy)
+#       demand
+#           ROW dimension: optimization time steps
+#           Column dimension: none
+#       legend list
+#           Number of STRING items: technology options (that dispatched energy)
+#
+# Output
+#   6 figures in the console window.
+#   You can choose to save them to a PDF book or not.
+#
+# History
+#   Jun 4-5, 2018 started and finished
+#   Jun 21, 2018 
+#       fixed the bug caused by using the actual division rather than the default floor division.
+#       updated the time selection from predefined to dynamically determined.
+#
+# @Fan Tong
+#
+#    Jul 9, 2018 Convert to use with the base version of the Simple Energy Model
+# @Ken Caldeira
+#
+def plot_results_bar_1scenario (input_data):
+
+    # Note hours_to_average is assumed to be an integer    
+    
+    # -------------------------------------------------------------------------
+    # Get the input data
+    system_components = input_data['SYSTEM_COMPONENTS']
+    
+    demand = input_data['DEMAND_SERIES']
+    results_matrix_dispatch = copy.deepcopy(input_data['results_matrix_dispatch'])
+    results_matrix_demand = copy.deepcopy(input_data['results_matrix_demand'])
+    results_matrix_curtailment = copy.deepcopy(input_data['results_matrix_curtailment'])
+    pdf_each = input_data['pdf_each']
+    legend_list_dispatch = input_data['legend_list_dispatch']
+    legend_list_demand = input_data['legend_list_demand']
+    legend_list_curtailment = input_data['legend_list_curtailment']
+    color_list_dispatch = input_data['color_list_dispatch']
+    color_list_demand = input_data['color_list_demand']
+    color_list_curtailment = input_data['color_list_curtailment']
+    case_name = input_data['CASE_NAME']
+
+    # -------------------------------------------------------------------------    
+    # -------------------------------------------------------------------------
+    # Define the plotting style
+    plt.close() # Just make sure nothing is open ...
+    regular_font = 5
+    small_font = 4
+    #plt.style.use('default')
+    plt.style.use('default')
+    # plt.style.use('bmh')
+    # plt.style.use('fivethirtyeight')
+    # plt.style.use('seaborn-white')
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
+    plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
+    plt.rcParams['font.size'] = regular_font
+    plt.rcParams['axes.labelsize'] = regular_font
+    plt.rcParams['axes.linewidth'] = 0.5
+    plt.rcParams['axes.labelweight'] = 'normal'
+    plt.rcParams['axes.titlesize'] = regular_font
+    plt.rcParams['xtick.labelsize'] = regular_font
+    plt.rcParams['ytick.labelsize'] = regular_font
+    plt.rcParams['legend.fontsize'] = small_font
+    plt.rcParams['figure.titlesize'] = regular_font
+    plt.rcParams['lines.linewidth'] = 0.5
+    plt.rcParams['grid.color'] = 'k'
+    plt.rcParams['grid.linestyle'] = ':'
+    plt.rcParams['grid.linewidth'] = 0.5
+    plt.rcParams['xtick.major.width'] = 0.5
+    plt.rcParams['xtick.major.size'] = 3
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.major.width'] = 0.5
+    plt.rcParams['ytick.major.size'] = 3
+    plt.rcParams['ytick.direction'] = 'in'
+        
+#    
+    figsize_oneplot = (6.5,9)
+    
+    # Figures are: 
+    #  UL:fixed and variables [capacity and dispatch] costs (inputs) [power]
+    #  Ml: generation capacity and mean generation (results)
+    #  LL:fixed and variable costs (results)
+    
+    # UR: storage capacity [energy]
+    # MR: demand, energy to storage/PGPstorage (results)
+    # LR: storage cycles per year
+    
+    # -------------------------------------------------------------------------
+    # Figures 1 Hourly time series results
+    
+    # Four figures: 2 (dispatch, demand) * 2 (line plots, stack plots)
+    
+    # -------------
+    
+    
+    num_time_periods = demand.size
+    x_data = np.arange(0, num_time_periods)
+    
+    # -------------
+    
+    figure1a = plt.figure(figsize=figsize_oneplot)
+    
+    # first panel is bar chart of capacity and dispatch costs
+    
+    ax1a = figure1a.add_subplot(3,2,1)
+    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
+    
+    inputs_dispatch = {
+        'x_data':           legend_list_dispatch, 
+#        'y_data':           results_matrix_dispatch,
+        'y_data':           results_matrix_dispatch[start_hour:end_hour],
+        'z_data':           demand[start_hour:end_hour],
+        'ax':               ax1a,
+        'x_label':          'Time (hour)',
+        'y_label':          'kW',
+        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sources '+avg_label,
+# If legend is not defined, no legend appears on plot
+# legend is provided by accompanying stacked area plot
+#        'legend':           legend_list_dispatch,  
+#        'legend_z':         'demand',
+        'line_width':       0.5,
+        'line_width_z':     0.2,
+        'grid_option':      0,
+        }        
+
+    ax1a.set_ylim([0, input_data['max_dispatch']])
+    
+    func_lines_plot(inputs_dispatch)
+    
+    # -------------
+    
+# If legend is not defined, no legend appears on plot
+# legend is provided by accompanying stacked area plot
+#        'legend':           legend_list_dispatch,  
+# 
+    # Now add legend for stack plot
+    
+    #figure1b = plt.figure(figsize=figsize_oneplot)
+    ax1b = figure1a.add_subplot(3,2,2)
+    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
+    
+    inputs_dispatch['ax'] = ax1b
  
+    inputs_dispatch['legend'] = legend_list_dispatch 
+    inputs_dispatch['legend_z'] = 'demand' 
+
+    ax1b.set_ylim([0, input_data['max_dispatch']])
+
+    func_stack_plot(inputs_dispatch)
+    
+    
+    # -------------  NOW DO DEMAND ---------------------
+
+    #figure1c = plt.figure(figsize=figsize_oneplot)
+    ax1c = figure1a.add_subplot(3,2,3)
+    ax1c.set_prop_cycle(cycler('color', color_list_demand))
+
+    inputs_demand = {
+        'x_data':           x_data[start_hour:end_hour], 
+        'y_data':           results_matrix_demand[start_hour:end_hour],
+        #'z_data':           demand,
+        'ax':               ax1c,
+        'x_label':          'Time (hour)',
+        'y_label':          'kW',
+        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
+        
+# Don't print ( legend on line plot by not having it defined in this dictionary
+#        'legend':           legend_list_demand,
+        #'legend_z':         'demand',
+        'line_width':       0.5,
+        #'line_width_z':     0.2,
+        'grid_option':      0,
+        } 
+          
+    ax1c.set_ylim([0, input_data['max_dispatch']])
+
+    func_lines_plot(inputs_demand)
+    
+    # -------------
+    
+    #figure1d = plt.figure(figsize=figsize_oneplot)
+    ax1d = figure1a.add_subplot(3,2,4)
+    ax1d.set_color_cycle(color_list_demand)
+    ax1d.set_prop_cycle(cycler('color', color_list_demand))
+
+    inputs_demand['ax'] = ax1d
+    inputs_demand['legend'] = legend_list_demand
+
+    ax1d.set_ylim([0, input_data['max_dispatch']])
+    
+    func_stack_plot(inputs_demand) 
+    
+    # -------------  NOW DO CURTAILMENT ---------------------
+
+    #figure1c = plt.figure(figsize=figsize_oneplot)
+    ax1e = figure1a.add_subplot(3,2,5)
+    ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
+
+    inputs_curtailment = {
+        'x_data':           x_data[start_hour:end_hour], 
+        'y_data':           results_matrix_curtailment[start_hour:end_hour],
+        #'z_data':           demand,
+        'ax':               ax1e,
+        'x_label':          'Time (hour)',
+        'y_label':          'kW',
+        'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
+        
+# Don't print ( legend on line plot by not having it defined in this dictionary
+#        'legend':           legend_list_demand,
+        #'legend_z':         'demand',
+        'line_width':       0.5,
+        #'line_width_z':     0.2,
+        'grid_option':      0,
+        } 
+          
+    ax1e.set_ylim([0, input_data['max_dispatch']])
+
+    func_lines_plot(inputs_curtailment)
+    
+    # -------------
+    
+    #figure1d = plt.figure(figsize=figsize_oneplot)
+    ax1f = figure1a.add_subplot(3,2,6)
+    ax1f.set_color_cycle(color_list_curtailment)
+    ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
+
+    inputs_curtailment['ax'] = ax1f
+    inputs_curtailment['legend'] = legend_list_curtailment
+    
+    ax1f.set_ylim([0, input_data['max_dispatch']])
+
+    func_stack_plot(inputs_curtailment) 
+
+    # -------------
+    plt.suptitle(input_data['page_title'])
+    plt.tight_layout(rect=[0,0,0.75,0.975])
+    pdf_each.savefig(figure1a)
+    #plt.close()
+    
+    #pdf_each.savefig(figure1b)
+    #plt.close()
+    
+    #pdf_each.savefig(figure1c)
+    #plt.close()
+    
+    #pdf_each.savefig(figure1d)
+    plt.close()
+        
+    
 #%%
 
 def get_results_matrix_column(results_matrix,component_list_index_dic,component):
