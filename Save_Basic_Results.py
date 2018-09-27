@@ -31,11 +31,12 @@ def save_basic_results(global_dic, case_dic_list, result_list ):
     # put raw results in file for later analysis
     for idx in range(len(result_list)):
         cdic = case_dic_list[idx]
-        rdic = result_list[idx]
-        sdic = storage_analysis(global_dic,cdic,rdic)
-        for key in sdic.keys():
-            rdic[key] = sdic[key]
-        result_list[idx] = rdic
+        if 'STORAGE' in cdic['SYSTEM_COMPONENTS']:
+            rdic = result_list[idx]
+            sdic = storage_analysis(global_dic,cdic,rdic)
+            for key in sdic.keys():
+                rdic[key] = sdic[key]
+            result_list[idx] = rdic
 
     #--------------------------------------------------------------------------
     verbose = global_dic['VERBOSE']
