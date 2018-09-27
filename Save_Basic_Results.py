@@ -18,17 +18,47 @@ import datetime
 import contextlib
 import pickle
 
-# Core function
-#   Linear programming
-#   Output postprocessing
+from Storage_Analysis import storage_analysis
 
-#    case_dic = { 
-#            'input_folder':input_folder, 
-#            'output_folder':output_folder, 
-#            'output_file_name':base_case_switch + "_" + case_switch+".csv",
-#            'base_case_switch':base_case_switch,
-#            'case_switch':case_switch
-#            }
+#%%
+def save_basic_results(global_dic, case_dic_list, result_list ):
+    
+    verbose = global_dic['VERBOSE']
+
+    #--------------------------------------------------------------------------
+    if verbose:
+        print ( 'Save_Basic_Results.py: Adding storage analysis to result_list')
+    # put raw results in file for later analysis
+    for idx in range(len(result_list)):
+        cdic = case_dic_list[idx]
+        rdic = result_list[idx]
+        sdic = storage_analysis(global_dic,cdic,rdic)
+        for key in sdic.keys():
+            rdic[key] = sdic[key]
+        result_list[idx] = rdic
+
+    #--------------------------------------------------------------------------
+    verbose = global_dic['VERBOSE']
+    if verbose:
+        print ( 'Save_Basic_Results.py: Pickling raw results')
+    # put raw results in file for later analysis
+    pickle_raw_results(global_dic, case_dic_list, result_list )
+    
+    #--------------------------------------------------------------------------
+    if verbose:
+        print ( 'Save_Basic_Results.py: saving vector results')
+    # Do the most basic scalar analysis
+    save_vector_results_as_csv(global_dic, case_dic_list, result_list )
+
+    #--------------------------------------------------------------------------
+    if verbose:
+        print ( 'Save_Basic_Results.py: saving key scalar results')
+    # Do the most basic scalar analysis
+    scalar_names,scalar_table = postprocess_key_scalar_results(global_dic, case_dic_list, result_list )
+    
+    return scalar_names,scalar_table
+
+#%%
 def pickle_raw_results( global_dic, case_dic_list, result_list ):
     
     output_path = global_dic['OUTPUT_PATH']
@@ -42,31 +72,13 @@ def pickle_raw_results( global_dic, case_dic_list, result_list ):
     with open(output_folder + "/" + output_file_name, 'wb') as db:
         pickle.dump([global_dic,case_dic_list,result_list], db, protocol=pickle.HIGHEST_PROTOCOL)
 
+#%%
 def merge_two_dicts(x, y):
     z = x.copy()   # start with x's keys and values
     z.update(y)    # modifies z with y's keys and values & returns None
     return z
 
-def save_basic_results(global_dic, case_dic_list, result_list ):
-    
-    verbose = global_dic['VERBOSE']
-    if verbose:
-        print ( 'Save_Basic_Results.py: Pickling raw results')
-    # put raw results in file for later analysis
-    pickle_raw_results(global_dic, case_dic_list, result_list )
-    
-    if verbose:
-        print ( 'Save_Basic_Results.py: saving vector results')
-    # Do the most basic scalar analysis
-    save_vector_results_as_csv(global_dic, case_dic_list, result_list )
-    
-    if verbose:
-        print ( 'Save_Basic_Results.py: saving key scalar results')
-    # Do the most basic scalar analysis
-    scalar_names,scalar_table = postprocess_key_scalar_results(global_dic, case_dic_list, result_list )
-    
-    return scalar_names,scalar_table
-
+#%%
 # save results by case
 def save_vector_results_as_csv( global_dic, case_dic_list, result_list ):
     
