@@ -155,8 +155,9 @@ def storage_analysis(global_dic,case_dic,result_dic):
             "max_storage_time":       max_storage_time,
             "elec_cost_elec_storage":   elec_cost_elec_storage,
             "var_cost_elec_storage":    var_cost_elec_storage,
+            "net_cost_elec_storage":    net_cost_elec_storage,
             "revenue_elec_storage":     revenue_elec_storage,
-            "net_revenue":              net_revenue.all,
+            "net_revenue":              net_revenue,
             "net_revenue_perkWh":       net_revenue_perkWh,
             "storage_cost_perkWh":      storage_cost_perkWh
             }
