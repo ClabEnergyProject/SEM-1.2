@@ -1016,7 +1016,7 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
         'y_scale':          "linear"
         }        
 
-    func_scatter_plot(input_storage_a)
+    func_lines_plot(input_storage_a)
      
  #--------- upper right now show headroom needed sorted from high to low.
     input_storage_b = copy.copy(input_storage_a)
@@ -1061,7 +1061,7 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
         'y_scale':          "linear"
         }        
 
-    func_scatter_plot(input_storage_c)
+    func_lines_plot(input_storage_c)
     
     sort_args = np.argsort(price[start_hour:end_hour])[::-1]
      
