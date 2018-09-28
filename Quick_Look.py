@@ -1010,13 +1010,13 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 # legend is provided by accompanying stacked area plot
 #        'legend':           legend_list_dispatch,  
 #        'legend_z':         'demand',
-        'line_width':       0.5,
+        'line_width':       0.1,
         'line_width_z':     0.2,
         'grid_option':      0,
-        'y_scale':          "log"
+        'y_scale':          "linear"
         }        
 
-    func_lines_plot(input_storage_a)
+    func_scatter_plot(input_storage_a)
      
  #--------- upper right now show headroom needed sorted from high to low.
     input_storage_b = copy.copy(input_storage_a)
@@ -1055,13 +1055,13 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 # legend is provided by accompanying stacked area plot
 #        'legend':           legend_list_dispatch,  
 #        'legend_z':         'demand',
-        'line_width':       0.5,
+        'line_width':       0.1,
         'line_width_z':     0.2,
         'grid_option':      0,
-        'y_scale':          "log"
+        'y_scale':          "linear"
         }        
 
-    func_lines_plot(input_storage_c)
+    func_scatter_plot(input_storage_c)
     
     sort_args = np.argsort(price[start_hour:end_hour])[::-1]
      
