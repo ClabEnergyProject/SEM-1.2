@@ -37,6 +37,11 @@ import cvxpy as cvx
 import datetime
 import numpy as np
 
+from Storage_Analysis import storage_analysis
+
+from Save_Basic_Results import save_vector_results_as_csv
+from Save_Basic_Results import pickle_raw_results
+
 # Core function
 #   Linear programming
 #   Output postprocessing
@@ -49,17 +54,29 @@ def core_model_loop (global_dic, case_dic_list):
         print ('Core_Model.py: Entering core model loop')
     num_cases = len(case_dic_list)
     
-    result_list = [dict() for x in range(num_cases)]
     for case_index in range(num_cases):
 
         if verbose:
             today = datetime.datetime.now()
             print ('solving ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
-        result_list[case_index] = core_model (global_dic, case_dic_list[case_index])                                            
+            
+        result_dic = core_model (global_dic, case_dic_list[case_index])
+                                           
         if verbose:
             today = datetime.datetime.now()
             print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
-    return result_list
+        
+        # put raw results in file for later analysis
+        if 'STORAGE' in case_dic_list[case_index]['SYSTEM_COMPONENTS']:
+            sdic = storage_analysis(global_dic,case_dic_list[case_index],result_dic)
+            for key in sdic.keys():
+                result_dic[key] = sdic[key]
+            
+        if verbose:
+            print ('writing out results for case ',case_dic_list[case_index]['CASE_NAME'])
+            save_vector_results_as_csv( global_dic, case_dic_list[case_index], result_dic )
+            pickle_raw_results( global_dic, case_dic_list[case_index], result_dic )
+    return 
 
 # -----------------------------------------------------------------------------
 
@@ -105,6 +122,9 @@ def core_model (global_dic, case_dic):
     system_components = case_dic['SYSTEM_COMPONENTS']
       
     num_time_periods = len(demand_series)
+    
+    #    discount_rate = 1.07**(1/(365.24*24))
+    #    discount_vector = discount_rate**-np.arange(num_time_periods)
 
     # -------------------------------------------------------------------------
         
@@ -319,6 +339,7 @@ def core_model (global_dic, case_dic):
         print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
                 
     # -----------------------------------------------------------------------------
+
     
     result={
             'SYSTEM_COST':prob.value/(numerics_cost_scaling * numerics_demand_scaling),

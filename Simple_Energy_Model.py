@@ -31,10 +31,11 @@ print ('Simple_Energy_Model: Pre-processing input')
 global_dic,case_dic_list = preprocess_input(case_input_path_filename)
 
 print ('Simple_Energy_Model: Executing core model loop')
-result_list = core_model_loop (global_dic, case_dic_list)
+core_model_loop (global_dic, case_dic_list)
 
 print ('Simple_Energy_Model: Saving basic results')
-scalar_names,scalar_table = save_basic_results(global_dic, case_dic_list, result_list)
+# Note that results for individual cases are output from core_model_loop
+scalar_names,scalar_table = save_basic_results(global_dic, case_dic_list)
 
 if global_dic['POSTPROCESS']:
     print ('Simple_Energy_Model: Post-processing results')
@@ -43,6 +44,6 @@ if global_dic['POSTPROCESS']:
 if global_dic['QUICK_LOOK']:
     print ('Simple_Energy_Model: Preparing quick look at results')
     pickle_file_name = './Output_Data/'+global_dic['GLOBAL_NAME']+'/'+global_dic['GLOBAL_NAME']+'.pickle'
-    quick_look(pickle_file_name)  # Fan's new postprocessing
+    quick_look(global_dic, case_dic_list)  # Fan's new postprocessing
     
 

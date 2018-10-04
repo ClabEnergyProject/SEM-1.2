@@ -231,7 +231,7 @@ def preprocess_input(case_input_path_filename):
     verbose = global_dic['VERBOSE']
 #    print ( global_dic
     if verbose:
-        print ( 'Preprocess_Input.py: Preparing case input')
+        print ( 'Preprocess_Input.py: Preparing case input for ',global_dic['GLOBAL_NAME'])
         
     # Parse all_cases_dic data
     all_cases_dic = {}

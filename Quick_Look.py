@@ -80,18 +80,31 @@ from Supporting_Functions import func_time_conversion
 from Supporting_Functions import func_load_optimization_results
 from matplotlib.backends.backend_pdf import PdfPages
 
+from Save_Basic_Results import read_pickle_raw_results
 
+#%%
+def make_result_dic_list(global_dic, case_dic_list):
+
+    result_dic_list = []
+    for idx in range(len(case_dic_list)):
+        result_dic = read_pickle_raw_results(global_dic,case_dic_list[idx])
+        result_dic_list.append(result_dic)
+    
+    return result_dic_list
+    
+
+#%%
 #==============================================================================
 
 
-def quick_look(pickle_file_name):
+def quick_look(global_dic, case_dic_list):
     
-    with open(pickle_file_name, 'rb') as db:
-        global_dic,case_dic_list,result_list = pickle.load( db )
-        
     verbose = global_dic['VERBOSE']
+
+    result_dic_list = make_result_dic_list(global_dic, case_dic_list)
+        
     if verbose:
-        print ( 'pickle file '+ pickle_file_name+' read' )
+        print ( 'pickle files read' )
         
     # --------------- define and open output files -------------------------
     
@@ -136,7 +149,7 @@ def quick_look(pickle_file_name):
         
         if verbose:
             print ( 'preparing case ',case_idx,' ', case_dic['CASE_NAME'])
-        result_dic = result_list[case_idx] # get the results data for case in question
+        result_dic = result_dic_list[case_idx] # get the results data for case in question
         
         input_data = copy.copy(case_dic) # Dictionary for input into graphing functions will be superset of case_dic and result_dic
         input_data.update(result_dic)  # input_data is now the union of case_dic and result_dic
@@ -1013,10 +1026,13 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
         'line_width':       0.1,
         'line_width_z':     0.2,
         'grid_option':      0,
-        'y_scale':          "linear"
+        'y_scale':          "log"
         }        
 
-    func_lines_plot(input_storage_a)
+    #    print ('input_storage_a')
+    #    for key in input_storage_a.keys():
+    #        print (key,input_storage_a[key])
+    #    func_lines_plot(input_storage_a)
      
  #--------- upper right now show headroom needed sorted from high to low.
     input_storage_b = copy.copy(input_storage_a)
@@ -1029,6 +1045,11 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
     input_storage_b['ax'] = ax1b
   
     input_storage_b['x_label'] = 'hour rank: 0 = highest price'
+    
+    #    print ('input_storage_b')
+    #    for key in input_storage_b.keys():
+    #        print (key,input_storage_b[key])
+
     func_lines_plot(input_storage_b)
      
 # =============================================================================
