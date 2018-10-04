@@ -296,20 +296,20 @@ def call_plot_results_1scenario(input_data):
     input_data['page_title'] = 'raw output'
     plot_results_dispatch_1scenario(input_data,1)  # basic results by hour
     plot_results_price_1scenario(input_data,1)  # price results by hour
-    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-        plot_results_storage_1scenario(input_data,1)
+#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+#        plot_results_storage_1scenario(input_data,1)
     
     input_data['page_title'] = 'daily averaging'
     plot_results_dispatch_1scenario(input_data,min(num_time_periods,24)) # basic results by day
     plot_results_price_1scenario(input_data,min(num_time_periods,24)) # price results by day
-    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-        plot_results_storage_1scenario(input_data,min(num_time_periods,24))
+#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+#        plot_results_storage_1scenario(input_data,min(num_time_periods,24))
     
     input_data['page_title'] = '5-day averaging'
     plot_results_dispatch_1scenario(input_data,min(num_time_periods,24*5)) # basic results by week
     plot_results_price_1scenario(input_data,min(num_time_periods,24*5)) # price results by day
-    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-        plot_results_storage_1scenario(input_data,min(num_time_periods,24*5))
+#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+#        plot_results_storage_1scenario(input_data,min(num_time_periods,24*5))
     
     # -------------------------------------------------------------------------
     # Find the week where storage dispatch is at its weekly max or min use
@@ -403,8 +403,8 @@ def plot_results_dispatch_1scenario (input_data, hours_to_avg = None, start_hour
     # plt.style.use('bmh')
     # plt.style.use('fivethirtyeight')
     # plt.style.use('seaborn-white')
-    plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
+    #plt.rcParams['font.family'] = 'serif'
+    #plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
     plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
     plt.rcParams['font.size'] = regular_font
     plt.rcParams['axes.labelsize'] = regular_font
@@ -642,8 +642,8 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     # plt.style.use('bmh')
     # plt.style.use('fivethirtyeight')
     # plt.style.use('seaborn-white')
-    plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
+    #plt.rcParams['font.family'] = 'serif'
+    #plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
     plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
     plt.rcParams['font.size'] = regular_font
     plt.rcParams['axes.labelsize'] = regular_font
@@ -967,8 +967,8 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
     # plt.style.use('bmh')
     # plt.style.use('fivethirtyeight')
     # plt.style.use('seaborn-white')
-    plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
+    #plt.rcParams['font.family'] = 'serif'
+    #plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
     plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
     plt.rcParams['font.size'] = regular_font
     plt.rcParams['axes.labelsize'] = regular_font
@@ -1310,8 +1310,8 @@ def plot_results_bar_1scenario (input_data):
     # plt.style.use('bmh')
     # plt.style.use('fivethirtyeight')
     # plt.style.use('seaborn-white')
-    plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
+    #plt.rcParams['font.family'] = 'serif'
+    #plt.rcParams['font.serif'] =  'Helvetica ' #'Palatino' # 'Ubuntu'
     plt.rcParams['font.monospace'] = 'Helvetica Mono' #'Palatino Mono' # 'Ubuntu'
     plt.rcParams['font.size'] = regular_font
     plt.rcParams['axes.labelsize'] = regular_font
