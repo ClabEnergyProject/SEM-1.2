@@ -46,7 +46,7 @@ OUTPUT_PATH,Output_Data,OUTPUT_PATH is where the output folder will be created f
 ,,,,,,,,,,,,,,,,,
 VERBOSE,TRUE,"Print output to standard output while process (TRUE is good for interactive, FALSE is good for running lots of things in batch)",,,,,,,,,,,,,,,
 POSTPROCESS,FALSE,POSTPROCESS is True if you want standard output files. This variable must be stpecified,,,,,,,,,,,,,,,
-QUICKLOOK,TRUE,QUICKLOOK is true if you want to use the newer postprocessing system.,,,,,,,,,,,,,,,
+QUICK_LOOK,TRUE,QUICK_LOOK is true if you want to use the newer postprocessing system.,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,

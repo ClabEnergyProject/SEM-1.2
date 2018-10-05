@@ -83,25 +83,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 from Save_Basic_Results import read_pickle_raw_results
 
 #%%
-def make_result_dic_list(global_dic, case_dic_list):
-
-    result_dic_list = []
-    for idx in range(len(case_dic_list)):
-        result_dic = read_pickle_raw_results(global_dic,case_dic_list[idx])
-        result_dic_list.append(result_dic)
-    
-    return result_dic_list
-    
-
-#%%
-#==============================================================================
 
 
 def quick_look(global_dic, case_dic_list):
     
     verbose = global_dic['VERBOSE']
-
-    result_dic_list = make_result_dic_list(global_dic, case_dic_list)
         
     if verbose:
         print ( 'pickle files read' )
@@ -141,7 +127,6 @@ def quick_look(global_dic, case_dic_list):
     
     # ============= CREATE LIST OF input_data DICTIONARIES FOR PLOTTING PROGRAMS =========
     
-    input_data_list = [] # list of input_data dictionaries
     for case_idx in range(num_cases):
         
         case_dic = case_dic_list[case_idx] # get the input data for case in question
@@ -149,7 +134,7 @@ def quick_look(global_dic, case_dic_list):
         
         if verbose:
             print ( 'preparing case ',case_idx,' ', case_dic['CASE_NAME'])
-        result_dic = result_dic_list[case_idx] # get the results data for case in question
+        result_dic = read_pickle_raw_results(global_dic, case_dic) # get the results data for case in question
         
         input_data = copy.copy(case_dic) # Dictionary for input into graphing functions will be superset of case_dic and result_dic
         input_data.update(result_dic)  # input_data is now the union of case_dic and result_dic
@@ -243,16 +228,10 @@ def quick_look(global_dic, case_dic_list):
         input_data['color_list_curtailment'] = color_list_curtailment
         input_data['component_list_curtailment'] = curtailment_dic.keys()
         
-        #----------------------------------------------------------------------
-        input_data_list.append(input_data)
-    if verbose:
-        print ( 'input_data dictionaries created for plotting programs')
-        
+        #----------------------------------------------------------------------        
         # end of section to generate list of input_data dictionaries
 
-    # ========== CREATE PLOTS =========
-  
-    for input_data in input_data_list:
+
         
 #        prepare_plot_results_bar_1scenario (input_data) # produce single case barchart plots
         call_plot_results_1scenario (input_data) # produce single case time series plots
@@ -260,19 +239,6 @@ def quick_look(global_dic, case_dic_list):
         if verbose:
             print ( 'done with call_plot_results_1scenario for case '+input_data['CASE_NAME'])
             
-            
-    # ============= LOGIC FOR COMPARING CASES ==============================
-    
-    
-#        func_optimization_results_system_results_Nscenarios (input_data) # produce weeks of the most extreme values
-#        if verbose:
-#            print ( 'func_optimization_results_system_results_Nscenarios executed'
-#        func_optimization_results_dispatch_var_Nscenarios (input_data)
-#        if verbose:
-#            print ( 'func_optimization_results_dispatch_var_Nscenarios executed'
-#    call_plot_results_1scenario() -- directly callable
-#    func_optimization_results_system_results_Nscenarios() -- directly callable
-#    func_optimization_results_dispatch_var_Nscenarios() -- directly callable
          
     # close files
     pdf_all.close()
@@ -280,6 +246,17 @@ def quick_look(global_dic, case_dic_list):
     text_file.close()
     if verbose:
         print ( 'files closed')
+
+#%%
+def make_result_dic_list(global_dic, case_dic_list):
+
+    result_dic_list = []
+    for idx in range(len(case_dic_list)):
+        result_dic = read_pickle_raw_results(global_dic,case_dic_list[idx])
+        result_dic_list.append(result_dic)
+    
+    return result_dic_list
+    
     
 #%%
 
@@ -345,8 +322,8 @@ def plot_extreme_dispatch_results_1scenario(input_data,component_name,search_opt
             )
     plot_results_dispatch_1scenario(input_data,1,start_hour,end_hour)  # to storage min for 2 weeks
     plot_results_price_1scenario(input_data,1,start_hour,end_hour) # price results by day
-    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-        plot_results_storage_1scenario(input_data,1,start_hour,end_hour)
+#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+#        plot_results_storage_1scenario(input_data,1,start_hour,end_hour)
        
 #%%
 
@@ -441,17 +418,16 @@ def plot_results_dispatch_1scenario (input_data, hours_to_avg = None, start_hour
     x_data = np.arange(0, num_time_periods)
     
     # -------------
-    
-    figure1a = plt.figure(figsize=figsize_oneplot)
-    ax1a = figure1a.add_subplot(3,2,1)
-    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
+    figDispatch, axs = plt.subplots(3, 2,figsize=figsize_oneplot)
+
+    axs[0,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     inputs_dispatch = {
         'x_data':           x_data[start_hour:end_hour], 
 #        'y_data':           results_matrix_dispatch,
         'y_data':           results_matrix_dispatch[start_hour:end_hour],
         'z_data':           demand[start_hour:end_hour],
-        'ax':               ax1a,
+        'ax':               axs[0,0],
         'x_label':          'Time (hour)',
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sources '+avg_label,
@@ -464,43 +440,35 @@ def plot_results_dispatch_1scenario (input_data, hours_to_avg = None, start_hour
         'grid_option':      0,
         }        
 
-    ax1a.set_ylim([0, input_data['max_dispatch']])
+    axs[0,0].set_ylim([0, input_data['max_dispatch']])
     
     func_lines_plot(inputs_dispatch)
     
     # -------------
     
-# If legend is not defined, no legend appears on plot
-# legend is provided by accompanying stacked area plot
-#        'legend':           legend_list_dispatch,  
-# 
-    # Now add legend for stack plot
+
+    axs[0,1].set_prop_cycle(cycler('color', color_list_dispatch))
     
-    #figure1b = plt.figure(figsize=figsize_oneplot)
-    ax1b = figure1a.add_subplot(3,2,2)
-    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
-    
-    inputs_dispatch['ax'] = ax1b
+    inputs_dispatch['ax'] = axs[0,1]
  
     inputs_dispatch['legend'] = legend_list_dispatch 
     inputs_dispatch['legend_z'] = 'demand' 
 
-    ax1b.set_ylim([0, input_data['max_dispatch']])
+    axs[0,1].set_ylim([0, input_data['max_dispatch']])
 
     func_stack_plot(inputs_dispatch)
     
     
     # -------------  NOW DO DEMAND ---------------------
 
-    #figure1c = plt.figure(figsize=figsize_oneplot)
-    ax1c = figure1a.add_subplot(3,2,3)
-    ax1c.set_prop_cycle(cycler('color', color_list_demand))
+
+    axs[1,0].set_prop_cycle(cycler('color', color_list_demand))
 
     inputs_demand = {
         'x_data':           x_data[start_hour:end_hour], 
         'y_data':           results_matrix_demand[start_hour:end_hour],
         #'z_data':           demand,
-        'ax':               ax1c,
+        'ax':               axs[1,0],
         'x_label':          'Time (hour)',
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
@@ -513,34 +481,31 @@ def plot_results_dispatch_1scenario (input_data, hours_to_avg = None, start_hour
         'grid_option':      0,
         } 
           
-    ax1c.set_ylim([0, input_data['max_dispatch']])
+    axs[1,0].set_ylim([0, input_data['max_dispatch']])
 
     func_lines_plot(inputs_demand)
     
     # -------------
     
-    #figure1d = plt.figure(figsize=figsize_oneplot)
-    ax1d = figure1a.add_subplot(3,2,4)
-    ax1d.set_prop_cycle(cycler('color', color_list_demand))
 
-    inputs_demand['ax'] = ax1d
+    axs[1,1].set_prop_cycle(cycler('color', color_list_demand))
+
+    inputs_demand['ax'] = axs[1,1]
     inputs_demand['legend'] = legend_list_demand
 
-    ax1d.set_ylim([0, input_data['max_dispatch']])
+    axs[1,1].set_ylim([0, input_data['max_dispatch']])
     
     func_stack_plot(inputs_demand) 
     
     # -------------  NOW DO CURTAILMENT ---------------------
 
-    #figure1c = plt.figure(figsize=figsize_oneplot)
-    ax1e = figure1a.add_subplot(3,2,5)
-    ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
+    axs[2,0].set_prop_cycle(cycler('color', color_list_curtailment))
 
     inputs_curtailment = {
         'x_data':           x_data[start_hour:end_hour], 
         'y_data':           results_matrix_curtailment[start_hour:end_hour],
         #'z_data':           demand,
-        'ax':               ax1e,
+        'ax':               axs[2,0],
         'x_label':          'Time (hour)',
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
@@ -553,36 +518,27 @@ def plot_results_dispatch_1scenario (input_data, hours_to_avg = None, start_hour
         'grid_option':      0,
         } 
           
-    ax1e.set_ylim([0, input_data['max_dispatch']])
+    axs[2,0].set_ylim([0, input_data['max_dispatch']])
 
     func_lines_plot(inputs_curtailment)
     
     # -------------
     
-    #figure1d = plt.figure(figsize=figsize_oneplot)
-    ax1f = figure1a.add_subplot(3,2,6)
-    ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
 
-    inputs_curtailment['ax'] = ax1f
+    axs[2,1].set_prop_cycle(cycler('color', color_list_curtailment))
+
+    inputs_curtailment['ax'] = axs[2,1]
     inputs_curtailment['legend'] = legend_list_curtailment
     
-    ax1f.set_ylim([0, input_data['max_dispatch']])
+    axs[2,1].set_ylim([0, input_data['max_dispatch']])
 
     func_stack_plot(inputs_curtailment) 
 
     # -------------
     plt.suptitle(input_data['page_title'])
     plt.tight_layout(rect=[0,0,0.75,0.975])
-    pdf_each.savefig(figure1a)
-    #plt.close()
-    
-    #pdf_each.savefig(figure1b)
-    #plt.close()
-    
-    #pdf_each.savefig(figure1c)
-    #plt.close()
-    
-    #pdf_each.savefig(figure1d)
+    pdf_each.savefig(figDispatch)
+
     plt.close()
 
        
@@ -679,17 +635,17 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     
     # -------------
     
-    figPrice = plt.figure(figsize=figsize_oneplot)
-    ax1a = figPrice.add_subplot(3,2,1)
-    ax1a.set_ylim(min(price), max(price))
-    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
+    figPrice, axs = plt.subplots(3, 2,figsize=figsize_oneplot)
+    
+    axs[0,0].set_ylim(min(price), max(price))
+    axs[0,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     input_price_a = {
         'x_data':           x_data[start_hour:end_hour], 
 #        'y_data':           results_matrix_dispatch,
         #'y_data':           np.asarray(price[start_hour:end_hour]),
         'y_data':           price[start_hour:end_hour],
-        'ax':               ax1a,
+        'ax':               axs[0,0],
         'x_label':          'Time (hour)',
         'y_label':          '$/kWh',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity price ($/kWh) '+avg_label,
@@ -707,13 +663,13 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
      
  #--------- upper right now do the same thing but sort by price from high to low.
     input_price_b = copy.copy(input_price_a)
-    ax1b = figPrice.add_subplot(3,2,2)
+
     input_price_b['x_data']= np.arange(end_hour-start_hour)
     input_price_b['y_data']= np.sort(price[start_hour:end_hour])[::-1]
-    ax1b.set_ylim(min(price), max(price))
-    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
+    axs[0,1].set_ylim(min(price), max(price))
+    axs[0,1].set_prop_cycle(cycler('color', color_list_dispatch))
      
-    input_price_b['ax'] = ax1b
+    input_price_b['ax'] = axs[0,1]
   
     input_price_b['x_label'] = 'hour rank: 0 = highest price'
     func_lines_plot(input_price_b)
@@ -728,15 +684,14 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
 # -------------
 # =============================================================================
     
-    ax1c = figPrice.add_subplot(3,2,3)
-    #ax1c.set_ylim([0, input_data['max_cost']])
-    ax1c.set_prop_cycle(cycler('color', color_list_dispatch))
+    #axs[1,0].set_ylim([0, input_data['max_cost']])
+    axs[1,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     input_price_c = {
          'x_data':           x_data[start_hour:end_hour], 
  #        'y_data':           results_matrix_dispatch,
          'y_data':           dispatch_cost_matrix[start_hour:end_hour],
-         'ax':               ax1c,
+         'ax':               axs[1,0],
          'x_label':          'Time (hour)',
          'y_label':          '$/hr',
          'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCost of dispatched electricity '+avg_label,
@@ -761,12 +716,12 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
      
      #figure1b = plt.figure(figsize=figsize_oneplot)
     input_price_d = copy.copy(input_price_c)
-    ax1d = figPrice.add_subplot(3,2,4)
-    #ax1d.set_ylim([0, input_data['max_cost']])
-    ax1d.set_prop_cycle(cycler('color', color_list_dispatch))
+
+    #axs[1,1].set_ylim([0, input_data['max_cost']])
+    axs[1,1].set_prop_cycle(cycler('color', color_list_dispatch))
      
     sort_order = np.argsort(price[start_hour:end_hour])[::-1]
-    input_price_d['ax'] = ax1d
+    input_price_d['ax'] = axs[1,1]
     input_price_d['x_data'] = np.arange(end_hour-start_hour)
     input_price_d['x_label'] = 'hour rank: 0 = highest price'
     input_price_d['y_data'] = results_matrix_dispatch [start_hour:end_hour][sort_order]
@@ -786,14 +741,14 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
 # #     # -------------  NOW DO DEMAND ---------------------
 # # 
 # #     #figure1c = plt.figure(figsize=figsize_oneplot)
-# #     ax1c = figPrice.add_subplot(3,2,3)
-# #     ax1c.set_prop_cycle(cycler('color', color_list_demand))
+# #     axs[1,0] = figPrice.add_subplot(3,2,3)
+# #     axs[1,0].set_prop_cycle(cycler('color', color_list_demand))
 # # 
 # #     inputs_demand = {
 # #         'x_data':           x_data[start_hour:end_hour], 
 # #         'y_data':           results_matrix_demand[start_hour:end_hour],
 # #         #'z_data':           demand,
-# #         'ax':               ax1c,
+# #         'ax':               axs[1,0],
 # #         'x_label':          'Time (hour)',
 # #         'y_label':          'kW',
 # #         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
@@ -806,34 +761,34 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
 # #         'grid_option':      0,
 # #         } 
 # #           
-# #     ax1c.set_ylim([0, input_data['max_dispatch']])
+# #     axs[1,0].set_ylim([0, input_data['max_dispatch']])
 # # 
 # #     func_lines_plot(inputs_demand)
 # #     
 # #     # -------------
 # #     
 # #     #figure1d = plt.figure(figsize=figsize_oneplot)
-# #     ax1d = figPrice.add_subplot(3,2,4)
-# #     ax1d.set_prop_cycle(cycler('color', color_list_demand))
+# #     axs[1,1] = figPrice.add_subplot(3,2,4)
+# #     axs[1,1].set_prop_cycle(cycler('color', color_list_demand))
 # # 
-# #     inputs_demand['ax'] = ax1d
+# #     inputs_demand['ax'] = axs[1,1]
 # #     inputs_demand['legend'] = legend_list_demand
 # # 
-# #     ax1d.set_ylim([0, input_data['max_dispatch']])
+# #     axs[1,1].set_ylim([0, input_data['max_dispatch']])
 # #     
 # #     func_stack_plot(inputs_demand) 
 # #     
 # #     # -------------  NOW DO CURTAILMENT ---------------------
 # # 
 # #     #figure1c = plt.figure(figsize=figsize_oneplot)
-# #     ax1e = figPrice.add_subplot(3,2,5)
-# #     ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
+# #     axs[2,0] = figPrice.add_subplot(3,2,5)
+# #     axs[2,0].set_prop_cycle(cycler('color', color_list_curtailment))
 # # 
 # #     inputs_curtailment = {
 # #         'x_data':           x_data[start_hour:end_hour], 
 # #         'y_data':           results_matrix_curtailment[start_hour:end_hour],
 # #         #'z_data':           demand,
-# #         'ax':               ax1e,
+# #         'ax':               axs[2,0],
 # #         'x_label':          'Time (hour)',
 # #         'y_label':          'kW',
 # #         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
@@ -846,20 +801,20 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
 # #         'grid_option':      0,
 # #         } 
 # #           
-# #     ax1e.set_ylim([0, input_data['max_dispatch']])
+# #     axs[2,0].set_ylim([0, input_data['max_dispatch']])
 # # 
 # #     func_lines_plot(inputs_curtailment)
 # #     
 # #     # -------------
 # #     
 # #     #figure1d = plt.figure(figsize=figsize_oneplot)
-# #     ax1f = figPrice.add_subplot(3,2,6)
-# #     ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
+# #     axs[2,1] = figPrice.add_subplot(3,2,6)
+# #     axs[2,1].set_prop_cycle(cycler('color', color_list_curtailment))
 # # 
-# #     inputs_curtailment['ax'] = ax1f
+# #     inputs_curtailment['ax'] = axs[2,1]
 # #     inputs_curtailment['legend'] = legend_list_curtailment
 # #     
-# #     ax1f.set_ylim([0, input_data['max_dispatch']])
+# #     axs[2,1].set_ylim([0, input_data['max_dispatch']])
 # # 
 # #     func_stack_plot(inputs_curtailment) 
 # # =============================================================================
@@ -1004,10 +959,10 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
     
     # -------------
     
-    figStorage = plt.figure(figsize=figsize_oneplot)
-    ax1a = figStorage.add_subplot(3,2,1)
-    ax1a.set_ylim(min(price), max(price))
-    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
+    figStorage, axs = plt.subplots(3, 2,figsize=figsize_oneplot)
+    
+    axs[0,0].set_ylim(min(price), max(price))
+    axs[0,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     input_storage_a = {
         'x_data':           x_data[start_hour:end_hour], 
@@ -1015,7 +970,7 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
         #'y_data':           np.asarray(price[start_hour:end_hour]),
         'y_data':           np.transpose(np.array((energy_storage[start_hour:end_hour],
                                       max_headroom[start_hour:end_hour]))),
-        'ax':               ax1a,
+        'ax':               axs[0,0],
         'x_label':          'Time (hour)',
         'y_label':          'kWh',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nEnergy storage and headroom needed (kWh) '+avg_label,
@@ -1036,13 +991,13 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
      
  #--------- upper right now show headroom needed sorted from high to low.
     input_storage_b = copy.copy(input_storage_a)
-    ax1b = figStorage.add_subplot(3,2,2)
+
     input_storage_b['x_data']= np.sort(max_headroom[start_hour:end_hour])[::-1]
     input_storage_b['y_data']= 1+np.arange(end_hour-start_hour)
-    #ax1b.set_ylim(min(price), max(price))
-    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
+    #axs[0,1].set_ylim(min(price), max(price))
+    axs[0,1].set_prop_cycle(cycler('color', color_list_dispatch))
      
-    input_storage_b['ax'] = ax1b
+    input_storage_b['ax'] = axs[0,1]
   
     input_storage_b['x_label'] = 'hour rank: 0 = highest price'
     
@@ -1059,16 +1014,15 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 # =============================================================================
 # =============================================================================
      
-    ax1c = figStorage.add_subplot(3,2,3)
-    ax1c.set_ylim(min(price), max(price))
-    ax1c.set_prop_cycle(cycler('color', color_list_dispatch))
+    axs[1,0].set_ylim(min(price), max(price))
+    axs[1,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     input_storage_c = {
         'x_data':           net_cost_elec_storage[start_hour:end_hour], 
 #        'y_data':           results_matrix_dispatch,
         #'y_data':           np.asarray(price[start_hour:end_hour]),
         'y_data':           price[start_hour:end_hour],
-        'ax':               ax1a,
+        'ax':               axs[0,0],
         'x_label':          'Time (hour)',
         'y_label':          'kWh',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nSales price vs storage cost ($/kWh) '+avg_label,
@@ -1089,14 +1043,14 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
  #--------- upper right now show headroom needed sorted from high to low.
 
     input_storage_d = copy.copy(input_storage_a)
-    ax1d = figStorage.add_subplot(3,2,4)
+
     input_storage_d['x_data']= np.arange(end_hour-start_hour)
     input_storage_d['y_data']= np.transpose(np.array((dispatch_to_storage[start_hour:end_hour][sort_args],
                                       dispatch_from_storage[start_hour:end_hour][sort_args])))
-    #ax1b.set_ylim(min(price), max(price))
-    ax1d.set_prop_cycle(cycler('color', color_list_dispatch))
+    #axs[0,1].set_ylim(min(price), max(price))
+    axs[1,1].set_prop_cycle(cycler('color', color_list_dispatch))
      
-    input_storage_d['ax'] = ax1b
+    input_storage_d['ax'] = axs[0,1]
   
     input_storage_d['x_label'] = 'hour rank: 0 = highest price'
     func_lines_plot(input_storage_d)
@@ -1111,12 +1065,12 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 #      
 #      #figure1b = plt.figure(figsize=figsize_oneplot)
 #     input_price_d = copy.copy(input_price_c)
-#     ax1d = figStorage.add_subplot(3,2,4)
-#     #ax1d.set_ylim([0, input_data['max_cost']])
-#     ax1d.set_prop_cycle(cycler('color', color_list_dispatch))
+#     axs[1,1] = figStorage.add_subplot(3,2,4)
+#     #axs[1,1].set_ylim([0, input_data['max_cost']])
+#     axs[1,1].set_prop_cycle(cycler('color', color_list_dispatch))
 #      
 #     sort_order = np.argsort(price[start_hour:end_hour])[::-1]
-#     input_price_d['ax'] = ax1d
+#     input_price_d['ax'] = axs[1,1]
 #     input_price_d['x_data'] = np.arange(end_hour-start_hour)
 #     input_price_d['x_label'] = 'hour rank: 0 = highest price'
 #     input_price_d['y_data'] = results_matrix_dispatch [start_hour:end_hour][sort_order]
@@ -1137,14 +1091,14 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 # #     # -------------  NOW DO DEMAND ---------------------
 # # 
 # #     #figure1c = plt.figure(figsize=figsize_oneplot)
-# #     ax1c = figStorage.add_subplot(3,2,3)
-# #     ax1c.set_prop_cycle(cycler('color', color_list_demand))
+# #     axs[1,0] = figStorage.add_subplot(3,2,3)
+# #     axs[1,0].set_prop_cycle(cycler('color', color_list_demand))
 # # 
 # #     inputs_demand = {
 # #         'x_data':           x_data[start_hour:end_hour], 
 # #         'y_data':           results_matrix_demand[start_hour:end_hour],
 # #         #'z_data':           demand,
-# #         'ax':               ax1c,
+# #         'ax':               axs[1,0],
 # #         'x_label':          'Time (hour)',
 # #         'y_label':          'kW',
 # #         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
@@ -1157,34 +1111,34 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 # #         'grid_option':      0,
 # #         } 
 # #           
-# #     ax1c.set_ylim([0, input_data['max_dispatch']])
+# #     axs[1,0].set_ylim([0, input_data['max_dispatch']])
 # # 
 # #     func_lines_plot(inputs_demand)
 # #     
 # #     # -------------
 # #     
 # #     #figure1d = plt.figure(figsize=figsize_oneplot)
-# #     ax1d = figStorage.add_subplot(3,2,4)
-# #     ax1d.set_prop_cycle(cycler('color', color_list_demand))
+# #     axs[1,1] = figStorage.add_subplot(3,2,4)
+# #     axs[1,1].set_prop_cycle(cycler('color', color_list_demand))
 # # 
-# #     inputs_demand['ax'] = ax1d
+# #     inputs_demand['ax'] = axs[1,1]
 # #     inputs_demand['legend'] = legend_list_demand
 # # 
-# #     ax1d.set_ylim([0, input_data['max_dispatch']])
+# #     axs[1,1].set_ylim([0, input_data['max_dispatch']])
 # #     
 # #     func_stack_plot(inputs_demand) 
 # #     
 # #     # -------------  NOW DO CURTAILMENT ---------------------
 # # 
 # #     #figure1c = plt.figure(figsize=figsize_oneplot)
-# #     ax1e = figStorage.add_subplot(3,2,5)
-# #     ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
+# #     axs[2,0] = figStorage.add_subplot(3,2,5)
+# #     axs[2,0].set_prop_cycle(cycler('color', color_list_curtailment))
 # # 
 # #     inputs_curtailment = {
 # #         'x_data':           x_data[start_hour:end_hour], 
 # #         'y_data':           results_matrix_curtailment[start_hour:end_hour],
 # #         #'z_data':           demand,
-# #         'ax':               ax1e,
+# #         'ax':               axs[2,0],
 # #         'x_label':          'Time (hour)',
 # #         'y_label':          'kW',
 # #         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
@@ -1197,20 +1151,20 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 # #         'grid_option':      0,
 # #         } 
 # #           
-# #     ax1e.set_ylim([0, input_data['max_dispatch']])
+# #     axs[2,0].set_ylim([0, input_data['max_dispatch']])
 # # 
 # #     func_lines_plot(inputs_curtailment)
 # #     
 # #     # -------------
 # #     
 # #     #figure1d = plt.figure(figsize=figsize_oneplot)
-# #     ax1f = figStorage.add_subplot(3,2,6)
-# #     ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
+# #     axs[2,1] = figStorage.add_subplot(3,2,6)
+# #     axs[2,1].set_prop_cycle(cycler('color', color_list_curtailment))
 # # 
-# #     inputs_curtailment['ax'] = ax1f
+# #     inputs_curtailment['ax'] = axs[2,1]
 # #     inputs_curtailment['legend'] = legend_list_curtailment
 # #     
-# #     ax1f.set_ylim([0, input_data['max_dispatch']])
+# #     axs[2,1].set_ylim([0, input_data['max_dispatch']])
 # # 
 # #     func_stack_plot(inputs_curtailment) 
 # # =============================================================================
@@ -1358,19 +1312,18 @@ def plot_results_bar_1scenario (input_data):
     
     # -------------
     
-    figure1a = plt.figure(figsize=figsize_oneplot)
+    figDispatch, axs = plt.subplots(3, 2,figsize=figsize_oneplot)
     
     # first panel is bar chart of capacity and dispatch costs
     
-    ax1a = figure1a.add_subplot(3,2,1)
-    ax1a.set_prop_cycle(cycler('color', color_list_dispatch))
+    axs[0,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     inputs_dispatch = {
         'x_data':           legend_list_dispatch, 
 #        'y_data':           results_matrix_dispatch,
         'y_data':           results_matrix_dispatch[start_hour:end_hour],
         'z_data':           demand[start_hour:end_hour],
-        'ax':               ax1a,
+        'ax':               axs[0,0],
         'x_label':          'Time (hour)',
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sources '+avg_label,
@@ -1383,7 +1336,7 @@ def plot_results_bar_1scenario (input_data):
         'grid_option':      0,
         }        
 
-    ax1a.set_ylim([0, input_data['max_dispatch']])
+    axs[0,0].set_ylim([0, input_data['max_dispatch']])
     
     func_lines_plot(inputs_dispatch)
     
@@ -1394,32 +1347,28 @@ def plot_results_bar_1scenario (input_data):
 #        'legend':           legend_list_dispatch,  
 # 
     # Now add legend for stack plot
+
+    axs[0,1].set_prop_cycle(cycler('color', color_list_dispatch))
     
-    #figure1b = plt.figure(figsize=figsize_oneplot)
-    ax1b = figure1a.add_subplot(3,2,2)
-    ax1b.set_prop_cycle(cycler('color', color_list_dispatch))
-    
-    inputs_dispatch['ax'] = ax1b
+    inputs_dispatch['ax'] = axs[0,1]
  
     inputs_dispatch['legend'] = legend_list_dispatch 
     inputs_dispatch['legend_z'] = 'demand' 
 
-    ax1b.set_ylim([0, input_data['max_dispatch']])
+    axs[0,1].set_ylim([0, input_data['max_dispatch']])
 
     func_stack_plot(inputs_dispatch)
     
     
     # -------------  NOW DO DEMAND ---------------------
 
-    #figure1c = plt.figure(figsize=figsize_oneplot)
-    ax1c = figure1a.add_subplot(3,2,3)
-    ax1c.set_prop_cycle(cycler('color', color_list_demand))
+    axs[1,0].set_prop_cycle(cycler('color', color_list_demand))
 
     inputs_demand = {
         'x_data':           x_data[start_hour:end_hour], 
         'y_data':           results_matrix_demand[start_hour:end_hour],
         #'z_data':           demand,
-        'ax':               ax1c,
+        'ax':               axs[1,0],
         'x_label':          'Time (hour)',
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nElectricity sinks '+avg_label,
@@ -1432,35 +1381,35 @@ def plot_results_bar_1scenario (input_data):
         'grid_option':      0,
         } 
           
-    ax1c.set_ylim([0, input_data['max_dispatch']])
+    axs[1,0].set_ylim([0, input_data['max_dispatch']])
 
     func_lines_plot(inputs_demand)
     
     # -------------
     
     #figure1d = plt.figure(figsize=figsize_oneplot)
-    ax1d = figure1a.add_subplot(3,2,4)
-    ax1d.set_color_cycle(color_list_demand)
-    ax1d.set_prop_cycle(cycler('color', color_list_demand))
 
-    inputs_demand['ax'] = ax1d
+    axs[1,1].set_color_cycle(color_list_demand)
+    axs[1,1].set_prop_cycle(cycler('color', color_list_demand))
+
+    inputs_demand['ax'] = axs[1,1]
     inputs_demand['legend'] = legend_list_demand
 
-    ax1d.set_ylim([0, input_data['max_dispatch']])
+    axs[1,1].set_ylim([0, input_data['max_dispatch']])
     
     func_stack_plot(inputs_demand) 
     
     # -------------  NOW DO CURTAILMENT ---------------------
 
     #figure1c = plt.figure(figsize=figsize_oneplot)
-    ax1e = figure1a.add_subplot(3,2,5)
-    ax1e.set_prop_cycle(cycler('color', color_list_curtailment))
+
+    axs[2,0].set_prop_cycle(cycler('color', color_list_curtailment))
 
     inputs_curtailment = {
         'x_data':           x_data[start_hour:end_hour], 
         'y_data':           results_matrix_curtailment[start_hour:end_hour],
         #'z_data':           demand,
-        'ax':               ax1e,
+        'ax':               axs[2,0],
         'x_label':          'Time (hour)',
         'y_label':          'kW',
         'title':            case_name +' hour '+str(start_hour)+' to '+str(end_hour)+'\nCurtailment '+avg_label,
@@ -1473,28 +1422,26 @@ def plot_results_bar_1scenario (input_data):
         'grid_option':      0,
         } 
           
-    ax1e.set_ylim([0, input_data['max_dispatch']])
+    axs[2,0].set_ylim([0, input_data['max_dispatch']])
 
     func_lines_plot(inputs_curtailment)
     
     # -------------
     
-    #figure1d = plt.figure(figsize=figsize_oneplot)
-    ax1f = figure1a.add_subplot(3,2,6)
-    ax1f.set_color_cycle(color_list_curtailment)
-    ax1f.set_prop_cycle(cycler('color', color_list_curtailment))
+    axs[2,1].set_color_cycle(color_list_curtailment)
+    axs[2,1].set_prop_cycle(cycler('color', color_list_curtailment))
 
-    inputs_curtailment['ax'] = ax1f
+    inputs_curtailment['ax'] = axs[2,1]
     inputs_curtailment['legend'] = legend_list_curtailment
     
-    ax1f.set_ylim([0, input_data['max_dispatch']])
+    axs[2,1].set_ylim([0, input_data['max_dispatch']])
 
     func_stack_plot(inputs_curtailment) 
 
     # -------------
     plt.suptitle(input_data['page_title'])
     plt.tight_layout(rect=[0,0,0.75,0.975])
-    pdf_each.savefig(figure1a)
+    pdf_each.savefig(figDispatch)
     #plt.close()
     
     #pdf_each.savefig(figure1b)
@@ -1621,12 +1568,12 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
 #    # -----------------------------
 #    
 #    figure1b = plt.figure(figsize=figsize_oneplot)
-#    ax1b = figure1b.add_subplot(111)
+#    axs[0,1] = figure1b.add_subplot(111)
 #    
 #    inputs = {
 #            'x_data':       x_data, 
 #            'y_data':       results_matrix_dispatch1/np.average(demand),
-#            'ax':           ax1b,
+#            'ax':           axs[0,1],
 #            'x_label':      'Time (hour in the year)',
 #            'y_label':      'Dispatched energy\n(hourly-average demand)',
 #            'title':        title_text,
@@ -1986,11 +1933,11 @@ def func_graphics_system_results_Nscenarios (input_data):
         'grid_option':      0,
         }
     
-    [ax1, ax1b] = func_lines_2yaxes_plot(inputs_dispatch_1)
+    [ax1, axs[0,1]] = func_lines_2yaxes_plot(inputs_dispatch_1)
     
     ax1.set_xscale('log', nonposx='clip')
     ax1.set_yscale('log', nonposx='clip')
-    ax1b.set_yscale('log', nonposx='clip')
+    axs[0,1].set_yscale('log', nonposx='clip')
     
     pdf_all.savefig(figure1)
     #plt.close()
