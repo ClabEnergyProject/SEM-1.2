@@ -273,20 +273,20 @@ def call_plot_results_1scenario(input_data):
     input_data['page_title'] = 'raw output'
     plot_results_dispatch_1scenario(input_data,1)  # basic results by hour
     plot_results_price_1scenario(input_data,1)  # price results by hour
-#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-#        plot_results_storage_1scenario(input_data,1)
+    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+        plot_results_storage_1scenario(input_data,1)
     
     input_data['page_title'] = 'daily averaging'
     plot_results_dispatch_1scenario(input_data,min(num_time_periods,24)) # basic results by day
     plot_results_price_1scenario(input_data,min(num_time_periods,24)) # price results by day
-#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-#        plot_results_storage_1scenario(input_data,min(num_time_periods,24))
+    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+        plot_results_storage_1scenario(input_data,min(num_time_periods,24))
     
     input_data['page_title'] = '5-day averaging'
     plot_results_dispatch_1scenario(input_data,min(num_time_periods,24*5)) # basic results by week
     plot_results_price_1scenario(input_data,min(num_time_periods,24*5)) # price results by day
-#    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
-#        plot_results_storage_1scenario(input_data,min(num_time_periods,24*5))
+    if 'STORAGE' in input_data['SYSTEM_COMPONENTS']:
+        plot_results_storage_1scenario(input_data,min(num_time_periods,24*5))
     
     # -------------------------------------------------------------------------
     # Find the week where storage dispatch is at its weekly max or min use
@@ -415,7 +415,7 @@ def plot_results_dispatch_1scenario (input_data, hours_to_avg = None, start_hour
     
     
     num_time_periods = demand.size
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange( num_time_periods)
     
     # -------------
     figDispatch, axs = plt.subplots(3, 2,figsize=figsize_oneplot)
@@ -631,7 +631,7 @@ def plot_results_price_1scenario (input_data, hours_to_avg = None, start_hour = 
     
     
     num_time_periods = demand.size
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange( num_time_periods)
     
     # -------------
     
@@ -955,7 +955,7 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
     
     
     num_time_periods = demand.size
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange( num_time_periods)
     
     # -------------
     
@@ -987,7 +987,7 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
     #    print ('input_storage_a')
     #    for key in input_storage_a.keys():
     #        print (key,input_storage_a[key])
-    #    func_lines_plot(input_storage_a)
+    func_lines_plot(input_storage_a)
      
  #--------- upper right now show headroom needed sorted from high to low.
     input_storage_b = copy.copy(input_storage_a)
@@ -1018,7 +1018,8 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
     axs[1,0].set_prop_cycle(cycler('color', color_list_dispatch))
     
     input_storage_c = {
-        'x_data':           net_cost_elec_storage[start_hour:end_hour], 
+        'x_data':           x_data[start_hour:end_hour], 
+#        'x_data':           net_cost_elec_storage[start_hour:end_hour], 
 #        'y_data':           results_matrix_dispatch,
         #'y_data':           np.asarray(price[start_hour:end_hour]),
         'y_data':           price[start_hour:end_hour],
@@ -1308,7 +1309,7 @@ def plot_results_bar_1scenario (input_data):
     
     
     num_time_periods = demand.size
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange(num_time_periods)
     
     # -------------
     
@@ -1518,7 +1519,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     # -----------------------------
     
     num_time_periods = results_matrix_dispatch.shape[0]
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange( num_time_periods)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
@@ -1656,7 +1657,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     # -------------------------
     
     temporal_scale = min(num_time_periods,24)
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange( num_time_periods)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     
@@ -1733,7 +1734,7 @@ def func_graphics_dispatch_var_Nscenarios (input_data):
     # -------------------------
     
     temporal_scale = min(number_time_periods,24 * 7)
-    x_data = np.arange(0, num_time_periods)
+    x_data = np.arange( num_time_periods)
     
     results_matrix_dispatch1 = np.zeros(results_matrix_dispatch.shape)
     

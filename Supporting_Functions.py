@@ -485,6 +485,7 @@ def func_bar_plot(input_data):
 # -----------------------------------------------------------------------------
 
 def func_lines_plot(input_data):
+
     
     x_data = input_data['x_data']
     y_data = input_data['y_data']
