@@ -74,8 +74,9 @@ def core_model_loop (global_dic, case_dic_list):
             
         if verbose:
             print ('writing out results for case ',case_dic_list[case_index]['CASE_NAME'])
-            save_vector_results_as_csv( global_dic, case_dic_list[case_index], result_dic )
-            pickle_raw_results( global_dic, case_dic_list[case_index], result_dic )
+            
+        save_vector_results_as_csv( global_dic, case_dic_list[case_index], result_dic )
+        pickle_raw_results( global_dic, case_dic_list[case_index], result_dic )
     return 
 
 # -----------------------------------------------------------------------------

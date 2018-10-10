@@ -5,6 +5,8 @@ Created on Wed Sep 26 17:12:02 2018
 @author: kcaldeira
 """
 import numpy as np
+
+
     
 #%% LIFO stack storage calculation
 
@@ -20,6 +22,7 @@ import numpy as np
 #  <revenue_elec_storage> revenue from electricity sold from storage in each hour
     
 def storage_analysis(global_dic,case_dic,result_dic):
+    epsilon = 1e-8
 
     var_cost_to_storage = case_dic['VAR_COST_TO_STORAGE']
     var_cost_from_storage = case_dic['VAR_COST_FROM_STORAGE']
@@ -33,7 +36,7 @@ def storage_analysis(global_dic,case_dic,result_dic):
     
     num_time_periods = price.size
         
-    zero_idx = np.where(energy_storage == 0.0)[0][-1] # find index of last time storage was empty
+    zero_idx = np.where(energy_storage < epsilon )[0][-1] # find index of last time storage was empty
 
     lifo_stack = [[-1,0,0,0]] # start off with nothing
     

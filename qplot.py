@@ -62,7 +62,7 @@ def findval(val,vec):
 #qplot([1,2,3],([[4,5,6],[7,8,9]]))
 #qscatter([1,2,3],([[4,5,6],[7,8,9]]))
 
-hr = np.sort(result_dic['max_headroom'])[::-1]
-aa = np.array([findval(x,hr) for x in np.arange(1e-8,2.000001,0.01).tolist()])
+#hr = np.sort(result_dic['max_headroom'])[::-1]
+#aa = np.array([findval(x,hr) for x in np.arange(1e-8,2.000001,0.01).tolist()])
 
     
