@@ -56,10 +56,18 @@ If this install fails on installing the ecos package, try the following line in 
 
                 > conda install ecos
 		> pip install cvxpy==0.4.11
-		
+
+<b>Additional notes on installing cvxpy</b> (Mengyao)
+
+If you get error messages for not having (or having the correct versions of) ecos, scs, or cvxcanon, try the following command (<a href="https://anaconda.org/sebp/cvxpy">Anaconda Cloud</a>): 
+
+                > conda install -c sebp cvxpy==0.4.11
+
+This command should automatically download / install the right packages needed for cvxpy ("-c CHANNEL" specifies additional channels to search for packages; sebp is a contributer on Anaconda Cloud).
+
 Check the installation with
 
-			   > nosetests cvxpy 
+		> nosetests cvxpy 
 
 9. Download and run python3 version of the Simple Energy Model -- SEM-1.1: https://github.com/ClabEnergyProject/SEM-1.1
 -- Open case_input.xlsx in excel. Make the cases you want (by altering base case or ratios to base case), and then save sheet as case_input.csv.
