@@ -96,6 +96,7 @@ The following is installation instructions for MacOS 10.13 machines.
 7. Set up python link to Gurobi. Open up the Anaconda3 terminal window as Administrator from the start menu. And then type: 
 
 	> conda config --add channels http://conda.anaconda.org/gurobi
+	
 	> conda install gurobi
 
 8. Install cvxpy, version 0.4.11. For python3, cvxpy must be installed with pip. Open up an Anaconda window (I did it as Administrator) and type  
