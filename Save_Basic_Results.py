@@ -28,6 +28,7 @@ def pickle_raw_results( global_dic, case_dic, result_dic ):
     case_name = case_dic['CASE_NAME']
     
     output_folder = output_path + '/' + global_name
+    
     output_file_name = global_name + '_' + case_name + '.pickle'
     
     if not os.path.exists(output_folder):
@@ -44,6 +45,7 @@ def read_pickle_raw_results( global_dic, case_dic ):
     case_name = case_dic['CASE_NAME']
     
     output_folder = output_path + '/' + global_name
+    
     output_file_name = global_name + '_' + case_name + '.pickle'
     
     with open(output_folder + "/" + output_file_name, 'rb') as db:
@@ -108,14 +110,14 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     series_list.append( case_dic['DEMAND_SERIES'] )
     
     header_list += ['solar capacity factor (kW)']
-    series_list.append( np.array(case_dic['SOLAR_SERIES']))
-    
-    header_list += ['dispatch_solar (kW per unit deployed)']
-    series_list.append( result_dic['DISPATCH_SOLAR'].flatten() )     
+    series_list.append( np.array(case_dic['SOLAR_SERIES']))    
     
     header_list += ['wind capacity factor (kW per unit deployed)']
     series_list.append( np.array(case_dic['WIND_SERIES']))
 
+    header_list += ['dispatch_solar (kW per unit deployed)']
+    series_list.append( result_dic['DISPATCH_SOLAR'].flatten() ) 
+    
     header_list += ['dispatch wind (kW)']
     series_list.append( result_dic['DISPATCH_WIND'].flatten() )
     
@@ -145,6 +147,15 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     
     header_list += ['dispatch_unmet_demand (kW)']
     series_list.append( result_dic['DISPATCH_UNMET_DEMAND'].flatten() )
+    
+    header_list += ['cutailment_solar (kW)']
+    series_list.append( result_dic['CURTAILMENT_SOLAR'].flatten() )
+    
+    header_list += ['cutailment_wind (kW)']
+    series_list.append( result_dic['CURTAILMENT_WIND'].flatten() )
+    
+    header_list += ['cutailment_nuclear (kW)']
+    series_list.append( result_dic['CURTAILMENT_NUCLEAR'].flatten() )
     
     header_list += ['price ($/kWh)']
     series_list.append( result_dic['PRICE'].flatten() )
@@ -215,7 +226,9 @@ def save_basic_results( global_dic, case_dic_list ):
             'energy_pgp_storage (kWh)',
             'dispatch_unmet_demand (kW)'
             
-            
+            'curtailment_solar (kW)',
+            'curtailment_wind (kW)',
+            'curtailment_nuclear (kW)'
             ]
 
     scalar_table = []
@@ -255,7 +268,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(case_dic['DEMAND_SERIES']),
                     np.average(case_dic['WIND_SERIES']),
                     np.average(case_dic['SOLAR_SERIES']),
-                    
+                                    
                     # scalar results
                     
                     result_dic['CAPACITY_NATGAS'],
@@ -281,7 +294,11 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(result_dic['DISPATCH_TO_PGP_STORAGE']),
                     np.average(result_dic['DISPATCH_FROM_PGP_STORAGE']),
                     np.average(result_dic['ENERGY_PGP_STORAGE']),
-                    np.average(result_dic['DISPATCH_UNMET_DEMAND'])
+                    np.average(result_dic['DISPATCH_UNMET_DEMAND']),
+                    
+                    np.average(result_dic['CURTAILMENT_SOLAR']),
+                    np.average(result_dic['CURTAILMENT_WIND']),
+                    np.average(result_dic['CURTAILMENT_NUCLEAR'])
                     
                     
              ]
@@ -293,12 +310,13 @@ def save_basic_results( global_dic, case_dic_list ):
     today = datetime.datetime.now()
     todayString = str(today.year) + str(today.month).zfill(2) + str(today.day).zfill(2) + '_' + \
         str(today.hour).zfill(2) + str(today.minute).zfill(2) + str(today.second).zfill(2)
+    
     output_file_name = global_name + '_' + todayString
     
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-        
-    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w',newline='')) as output_file:
+    
+	with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(scalar_names)
         writer.writerows(scalar_table)
@@ -313,7 +331,7 @@ def out_csv(output_folder,output_file_name,names,table,verbose):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         
-    with contextlib.closing(open(output_folder + "/" + output_file_name +'.csv', 'w',newline='')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(names)
         writer.writerows(table)
