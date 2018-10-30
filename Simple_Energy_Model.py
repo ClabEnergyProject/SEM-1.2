@@ -16,6 +16,9 @@ from Postprocess_Results import post_process
 #from Postprocess_Results_kc180214 import postprocess_key_scalar_results,merge_two_dicts
 from Save_Basic_Results import save_basic_results
 from Quick_Look import quick_look
+
+from shutil import copy2
+import os
  
 # directory = 'D:/M/WORK/'
 #root_directory = '/Users/kcaldeira/Google Drive/simple energy system model/Kens version/'
@@ -30,12 +33,38 @@ case_input_path_filename = './case_input.csv'
 print ('Simple_Energy_Model: Pre-processing input')
 global_dic,case_dic_list = preprocess_input(case_input_path_filename)
 
+# -----------------------------------------------------------------------------
+
+# copy the input data file to the output folder
+
+output_folder = global_dic['OUTPUT_PATH'] + '/' + global_dic['GLOBAL_NAME']
+
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+    
+copy2(case_input_path_filename, output_folder)
+
+# -----------------------------------------------------------------------------
+
 print ('Simple_Energy_Model: Executing core model loop')
 core_model_loop (global_dic, case_dic_list)
 
 print ('Simple_Energy_Model: Saving basic results')
 # Note that results for individual cases are output from core_model_loop
 scalar_names,scalar_table = save_basic_results(global_dic, case_dic_list)
+
+# -----------------------------------------------------------------------------
+
+# copy the Gurobi log file to the output folder
+#   The Verbose field in SOLVE function in CORE_MODEL.PY determined if a gurobi.log is generated.
+#   delete the gurobi log to eliminate cumulations from previous runs.
+
+if os.path.exists("./gurobi.log"):    
+   copy2("./gurobi.log", output_folder)
+   os.remove("./gurobi.log")
+
+# -----------------------------------------------------------------------------
+
 
 if global_dic['POSTPROCESS']:
     print ('Simple_Energy_Model: Post-processing results')
@@ -45,5 +74,3 @@ if global_dic['QUICK_LOOK']:
     print ('Simple_Energy_Model: Preparing quick look at results')
     pickle_file_name = './Output_Data/'+global_dic['GLOBAL_NAME']+'/'+global_dic['GLOBAL_NAME']+'.pickle'
     quick_look(global_dic, case_dic_list)  # Fan's new postprocessing
-    
-
