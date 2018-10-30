@@ -61,22 +61,31 @@ def core_model_loop (global_dic, case_dic_list):
             print ('solving ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
             
         result_dic = core_model (global_dic, case_dic_list[case_index])
-                                           
-        if verbose:
-            today = datetime.datetime.now()
-            print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
         
-        # put raw results in file for later analysis
-        if 'STORAGE' in case_dic_list[case_index]['SYSTEM_COMPONENTS']:
-            sdic = storage_analysis(global_dic,case_dic_list[case_index],result_dic)
-            for key in sdic.keys():
-                result_dic[key] = sdic[key]
+        if result_dic['SYSTEM_COST'] > 0:
+                                   
+            if verbose:
+                today = datetime.datetime.now()
+                print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
             
+            # put raw results in file for later analysis
+            if 'STORAGE' in case_dic_list[case_index]['SYSTEM_COMPONENTS']:
+                sdic = storage_analysis(global_dic,case_dic_list[case_index],result_dic)
+                for key in sdic.keys():
+                    result_dic[key] = sdic[key]
+        
+        else:
+                
+            if verbose:
+                today = datetime.datetime.now()
+                print ('failed to solve  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
+        
         if verbose:
             print ('writing out results for case ',case_dic_list[case_index]['CASE_NAME'])
             
         save_vector_results_as_csv( global_dic, case_dic_list[case_index], result_dic )
         pickle_raw_results( global_dic, case_dic_list[case_index], result_dic )
+        
     return 
 
 # -----------------------------------------------------------------------------
@@ -84,7 +93,8 @@ def core_model_loop (global_dic, case_dic_list):
 def core_model (global_dic, case_dic):
     verbose = global_dic['VERBOSE']
     numerics_cost_scaling = case_dic['NUMERICS_COST_SCALING']
-    numerics_demand_scaling = case_dic['NUMERICS_DEMAND_SCALING']
+    numerics_demand_scaling = case_dic['NUMERICS_DEMAND_SCALING']    
+    
     if verbose:
         print ('Core_Model.py: processing case ',case_dic['CASE_NAME'])
     demand_series = np.array(case_dic['DEMAND_SERIES'])*numerics_demand_scaling 
@@ -330,88 +340,141 @@ def core_model (global_dic, case_dic):
     # Form and Solve the Problem
     prob = cvx.Problem(obj, constraints)
 #    prob.solve(solver = 'GUROBI')
-    #prob.solve(solver = 'GUROBI',BarConvTol = 1e-11, feasibilityTol = 1e-6, NumericFocus = 3)
-    prob.solve(solver = 'GUROBI')
+    #prob.solve(solver = 'GUROBI',BarConvTol = 1e-11, feasibilityTol = 1e-6, NumericFocus = 3)    
+    
+    try:
+  
+#       solver_parameter = {
+#            'OutputFlag': 0,
+#            }
+
+      # Ask solvers to automatically output log files. The log file for Gurobi is "gurobi.log".  
+      #  prob.solve(solver = 'GUROBI', verbose = True)
+        prob.solve(solver = 'GUROBI')
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-11, feasibilityTol = 1e-9)
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-10, feasibilityTol = 1e-8)
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-8, FeasibilityTol = 1e-6)
     
-    if verbose:
-        print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
-                
-    # -----------------------------------------------------------------------------
+    except cvx.error.SolverError as e:
 
-    
-    result={
-            'SYSTEM_COST':prob.value/(numerics_cost_scaling * numerics_demand_scaling),
+        print('Solver error encounterd!', e)
+        
+        result = {
+            'SYSTEM_COST': -1,
             'PROBLEM_STATUS':prob.status
             }
-    
-    result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling).flatten()
-    # note that hourly pricing can be determined from the dual of the constraint on energy balance
-    # The num_time_periods is in the above because the influence on the cost of an hour is much bigger then
-    # the impact of average cost over the period. The divide by the cost scaling corrects for the cost scaling.
-    
-    
-    if 'NATGAS' in system_components:
-        result['CAPACITY_NATGAS'] = np.asscalar(capacity_natgas.value)/numerics_demand_scaling
-        result['DISPATCH_NATGAS'] = np.array(dispatch_natgas.value).flatten()/numerics_demand_scaling
-    else:
-        result['CAPACITY_NATGAS'] = capacity_natgas/numerics_demand_scaling
-        result['DISPATCH_NATGAS'] = dispatch_natgas/numerics_demand_scaling
-
-    if 'SOLAR' in system_components:
-        result['CAPACITY_SOLAR'] = np.asscalar(capacity_solar.value)/numerics_demand_scaling
-        result['DISPATCH_SOLAR'] = np.array(dispatch_solar.value).flatten()/numerics_demand_scaling
-    else:
-        result['CAPACITY_SOLAR'] = capacity_solar/numerics_demand_scaling
-        result['DISPATCH_SOLAR'] = dispatch_solar/numerics_demand_scaling
-
-    if 'WIND' in system_components:
-        result['CAPACITY_WIND'] = np.asscalar(capacity_wind.value)/numerics_demand_scaling
-        result['DISPATCH_WIND'] = np.array(dispatch_wind.value).flatten()/numerics_demand_scaling
-    else:
-        result['CAPACITY_WIND'] = capacity_wind/numerics_demand_scaling
-        result['DISPATCH_WIND'] = dispatch_wind/numerics_demand_scaling
-
-    if 'NUCLEAR' in system_components:
-        result['CAPACITY_NUCLEAR'] = np.asscalar(capacity_nuclear.value)/numerics_demand_scaling
-        result['DISPATCH_NUCLEAR'] = np.array(dispatch_nuclear.value).flatten()/numerics_demand_scaling
-    else:
-        result['CAPACITY_NUCLEAR'] = capacity_nuclear/numerics_demand_scaling
-        result['DISPATCH_NUCLEAR'] = dispatch_nuclear/numerics_demand_scaling
-
-    if 'STORAGE' in system_components:
-        result['CAPACITY_STORAGE'] = np.asscalar(capacity_storage.value)/numerics_demand_scaling
-        result['DISPATCH_TO_STORAGE'] = np.array(dispatch_to_storage.value).flatten()/numerics_demand_scaling
-        result['DISPATCH_FROM_STORAGE'] = np.array(dispatch_from_storage.value).flatten()/numerics_demand_scaling
-        result['ENERGY_STORAGE'] = np.array(energy_storage.value).flatten()/numerics_demand_scaling
-    else:
-        result['CAPACITY_STORAGE'] = capacity_storage/numerics_demand_scaling
-        result['DISPATCH_TO_STORAGE'] = dispatch_to_storage/numerics_demand_scaling
-        result['DISPATCH_FROM_STORAGE'] = dispatch_from_storage/numerics_demand_scaling
-        result['ENERGY_STORAGE'] = energy_storage/numerics_demand_scaling
+                
+        result['CAPACITY_NATGAS'] = -1
+        result['CAPACITY_SOLAR'] = -1
+        result['CAPACITY_WIND'] = -1
+        result['CAPACITY_NUCLEAR'] = -1
+        result['CAPACITY_STORAGE'] = -1
+        result['CAPACITY_PGP_STORAGE'] = -1
+        result['CAPACITY_TO_PGP_STORAGE'] = -1
+        result['CAPACITY_FROM_PGP_STORAGE'] = -1
         
-    if 'PGP_STORAGE' in system_components:
-        result['CAPACITY_PGP_STORAGE'] = np.asscalar(capacity_pgp_storage.value)/numerics_demand_scaling
-        result['CAPACITY_TO_PGP_STORAGE'] = np.asscalar(capacity_to_pgp_storage.value)/numerics_demand_scaling
-        result['CAPACITY_FROM_PGP_STORAGE'] = np.asscalar(capacity_from_pgp_storage.value)/numerics_demand_scaling
-        result['DISPATCH_TO_PGP_STORAGE'] = np.array(dispatch_to_pgp_storage.value).flatten()/numerics_demand_scaling
-        result['DISPATCH_FROM_PGP_STORAGE'] = np.array(dispatch_from_pgp_storage.value).flatten()/numerics_demand_scaling
-        result['ENERGY_PGP_STORAGE'] = np.array(energy_pgp_storage.value).flatten()/numerics_demand_scaling
-    else:
-        result['CAPACITY_PGP_STORAGE'] = capacity_pgp_storage/numerics_demand_scaling
-        result['CAPACITY_TO_PGP_STORAGE'] = capacity_to_pgp_storage/numerics_demand_scaling
-        result['CAPACITY_FROM_PGP_STORAGE'] = capacity_from_pgp_storage/numerics_demand_scaling
-        result['DISPATCH_TO_PGP_STORAGE'] = dispatch_to_pgp_storage/numerics_demand_scaling
-        result['DISPATCH_FROM_PGP_STORAGE'] = dispatch_from_pgp_storage/numerics_demand_scaling
-        result['ENERGY_PGP_STORAGE'] = energy_pgp_storage/numerics_demand_scaling
+        result['PRICE'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_NATGAS'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_SOLAR'] = -1 * np.ones(demand_series.size) 
+        result['DISPATCH_WIND'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_NUCLEAR'] = -1 * np.ones(demand_series.size)
+        result['CURTAILMENT_SOLAR'] = -1 * np.ones(demand_series.size) 
+        result['CURTAILMENT_WIND'] = -1 * np.ones(demand_series.size)
+        result['CURTAILMENT_NUCLEAR'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_TO_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_FROM_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['ENERGY_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_TO_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_FROM_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['ENERGY_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_UNMET_DEMAND'] = -1 * np.ones(demand_series.size)
+        
+    else:        
+    
+        if verbose:
+            print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
+                    
+        # -----------------------------------------------------------------------------
+    
+        
+        result={
+                'SYSTEM_COST':prob.value/(numerics_cost_scaling * numerics_demand_scaling),
+                'PROBLEM_STATUS':prob.status
+                }
+        
+        result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling).flatten()
+        # note that hourly pricing can be determined from the dual of the constraint on energy balance
+        # The num_time_periods is in the above because the influence on the cost of an hour is much bigger then
+        # the impact of average cost over the period. The divide by the cost scaling corrects for the cost scaling.
         
         
-    if 'UNMET_DEMAND' in system_components:
-        result['DISPATCH_UNMET_DEMAND'] = np.array(dispatch_unmet_demand.value).flatten()/numerics_demand_scaling
-    else:
-        result['DISPATCH_UNMET_DEMAND'] = dispatch_unmet_demand/numerics_demand_scaling
+        if 'NATGAS' in system_components:
+            result['CAPACITY_NATGAS'] = np.asscalar(capacity_natgas.value)/numerics_demand_scaling
+            result['DISPATCH_NATGAS'] = np.array(dispatch_natgas.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_NATGAS'] = capacity_natgas/numerics_demand_scaling
+            result['DISPATCH_NATGAS'] = dispatch_natgas/numerics_demand_scaling
+    
+        if 'SOLAR' in system_components:
+            result['CAPACITY_SOLAR'] = np.asscalar(capacity_solar.value)/numerics_demand_scaling
+            result['DISPATCH_SOLAR'] = np.array(dispatch_solar.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_SOLAR'] = capacity_solar/numerics_demand_scaling
+            result['DISPATCH_SOLAR'] = dispatch_solar/numerics_demand_scaling
+    
+        result['CURTAILMENT_SOLAR'] = \
+            result['CAPACITY_SOLAR'] * solar_series - result['DISPATCH_SOLAR']
+    
+        if 'WIND' in system_components:
+            result['CAPACITY_WIND'] = np.asscalar(capacity_wind.value)/numerics_demand_scaling
+            result['DISPATCH_WIND'] = np.array(dispatch_wind.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_WIND'] = capacity_wind/numerics_demand_scaling
+            result['DISPATCH_WIND'] = dispatch_wind/numerics_demand_scaling
+    
+        result['CURTAILMENT_WIND'] = \
+            result['CAPACITY_WIND'] * wind_series - result['DISPATCH_WIND']
+    
+        if 'NUCLEAR' in system_components:
+            result['CAPACITY_NUCLEAR'] = np.asscalar(capacity_nuclear.value)/numerics_demand_scaling
+            result['DISPATCH_NUCLEAR'] = np.array(dispatch_nuclear.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_NUCLEAR'] = capacity_nuclear/numerics_demand_scaling
+            result['DISPATCH_NUCLEAR'] = dispatch_nuclear/numerics_demand_scaling
+    
+        result['CURTAILMENT_NUCLEAR'] = \
+            result['CAPACITY_NUCLEAR'] * np.ones(num_time_periods) - result['DISPATCH_NUCLEAR']
+    
+        if 'STORAGE' in system_components:
+            result['CAPACITY_STORAGE'] = np.asscalar(capacity_storage.value)/numerics_demand_scaling
+            result['DISPATCH_TO_STORAGE'] = np.array(dispatch_to_storage.value).flatten()/numerics_demand_scaling
+            result['DISPATCH_FROM_STORAGE'] = np.array(dispatch_from_storage.value).flatten()/numerics_demand_scaling
+            result['ENERGY_STORAGE'] = np.array(energy_storage.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_STORAGE'] = capacity_storage/numerics_demand_scaling
+            result['DISPATCH_TO_STORAGE'] = dispatch_to_storage/numerics_demand_scaling
+            result['DISPATCH_FROM_STORAGE'] = dispatch_from_storage/numerics_demand_scaling
+            result['ENERGY_STORAGE'] = energy_storage/numerics_demand_scaling
+            
+        if 'PGP_STORAGE' in system_components:
+            result['CAPACITY_PGP_STORAGE'] = np.asscalar(capacity_pgp_storage.value)/numerics_demand_scaling
+            result['CAPACITY_TO_PGP_STORAGE'] = np.asscalar(capacity_to_pgp_storage.value)/numerics_demand_scaling
+            result['CAPACITY_FROM_PGP_STORAGE'] = np.asscalar(capacity_from_pgp_storage.value)/numerics_demand_scaling
+            result['DISPATCH_TO_PGP_STORAGE'] = np.array(dispatch_to_pgp_storage.value).flatten()/numerics_demand_scaling
+            result['DISPATCH_FROM_PGP_STORAGE'] = np.array(dispatch_from_pgp_storage.value).flatten()/numerics_demand_scaling
+            result['ENERGY_PGP_STORAGE'] = np.array(energy_pgp_storage.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_PGP_STORAGE'] = capacity_pgp_storage/numerics_demand_scaling
+            result['CAPACITY_TO_PGP_STORAGE'] = capacity_to_pgp_storage/numerics_demand_scaling
+            result['CAPACITY_FROM_PGP_STORAGE'] = capacity_from_pgp_storage/numerics_demand_scaling
+            result['DISPATCH_TO_PGP_STORAGE'] = dispatch_to_pgp_storage/numerics_demand_scaling
+            result['DISPATCH_FROM_PGP_STORAGE'] = dispatch_from_pgp_storage/numerics_demand_scaling
+            result['ENERGY_PGP_STORAGE'] = energy_pgp_storage/numerics_demand_scaling
+                        
+        if 'UNMET_DEMAND' in system_components:
+            result['DISPATCH_UNMET_DEMAND'] = np.array(dispatch_unmet_demand.value).flatten()/numerics_demand_scaling
+        else:
+            result['DISPATCH_UNMET_DEMAND'] = dispatch_unmet_demand/numerics_demand_scaling
         
 
     return result
