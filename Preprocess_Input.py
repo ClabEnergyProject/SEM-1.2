@@ -390,7 +390,7 @@ def preprocess_input(case_input_path_filename):
             if case_list_dic['FIXED_COST_WIND'][case_index] >= 0 and case_list_dic['VAR_COST_WIND'][case_index] >= 0 :
                 component_list.append('WIND')
                                                 
-        if 'FIXED_COST_NATGAS' in have_keys:
+        if 'FIXED_COST_SOLAR' in have_keys:
             if case_list_dic['FIXED_COST_SOLAR'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR'][case_index] >= 0 :
                 component_list.append('SOLAR')
                                                 
