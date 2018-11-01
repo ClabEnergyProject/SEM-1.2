@@ -422,7 +422,7 @@ def preprocess_input(case_input_path_filename):
     for case_index in range(num_cases):
         if case_list_dic['CO2_PRICE'][case_index] != 0.0:
             
-            system_components = case_list_dic['SYSTEM_COMPONENTS']
+            system_components = case_list_dic['SYSTEM_COMPONENTS'][case_index]
             
             if 'NUCLEAR' in system_components:
                 case_list_dic['FIXED_COST_NUCLEAR'][case_index] = (case_list_dic['FIXED_COST_NUCLEAR'][case_index] 
