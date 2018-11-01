@@ -124,6 +124,9 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['dispatch_natgas (kW)']
     series_list.append( result_dic['DISPATCH_NATGAS'].flatten() )
     
+    header_list += ['dispatch_natgas_ccs (kW)']
+    series_list.append( result_dic['DISPATCH_NATGAS_CCS'].flatten() )
+    
     header_list += ['dispatch_nuclear (kW)']
     series_list.append( result_dic['DISPATCH_NUCLEAR'].flatten() )
     
@@ -177,6 +180,7 @@ def save_basic_results( global_dic, case_dic_list ):
     scalar_names = [
             'case name',
             'fixed_cost_natgas ($/kW/h)',
+            'fixed_cost_natgas_ccs ($/kW/h)',
             'fixed_cost_solar ($/kW/h)',
             'fixed_cost_wind ($/kW/h)',
             'fixed_cost_nuclear ($/kW/h)',
@@ -184,6 +188,7 @@ def save_basic_results( global_dic, case_dic_list ):
             'fixed_cost_pgp_storage (($/h)/kWh)',
             
             'var_cost_natgas ($/kWh)',
+            'var_cost_natgas_ccs ($/kWh)',
             'var_cost_solar ($/kWh)',
             'var_cost_wind ($/kWh)',
             'var_cost_nuclear ($/kWh)',
@@ -204,6 +209,7 @@ def save_basic_results( global_dic, case_dic_list ):
             'capacity factor solar series (kW)',
             
             'capacity_natgas (kW)',
+            'capacity_natgas_ccs (kW)',
             'capacity_solar (kW)',
             'capacity_wind (kW)',
             'capacity_nuclear (kW)',
@@ -215,6 +221,7 @@ def save_basic_results( global_dic, case_dic_list ):
             'problem_status',
             
             'dispatch_natgas (kW)',
+            'dispatch_natgas_ccs (kW)',
             'dispatch_solar (kW)',
             'dispatch_wind (kW)',
             'dispatch_nuclear (kW)',
@@ -242,6 +249,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     # assumptions
                     
                     case_dic['FIXED_COST_NATGAS'],
+                    case_dic['FIXED_COST_NATGAS_CCS'],
                     case_dic['FIXED_COST_SOLAR'],
                     case_dic['FIXED_COST_WIND'],
                     case_dic['FIXED_COST_NUCLEAR'],
@@ -249,6 +257,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['FIXED_COST_PGP_STORAGE'],
                     
                     case_dic['VAR_COST_NATGAS'],
+                    case_dic['VAR_COST_NATGAS_CCS'],
                     case_dic['VAR_COST_SOLAR'],
                     case_dic['VAR_COST_WIND'],
                     case_dic['VAR_COST_NUCLEAR'],
@@ -272,6 +281,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     # scalar results
                     
                     result_dic['CAPACITY_NATGAS'],
+                    result_dic['CAPACITY_NATGAS_CCS'],
                     result_dic['CAPACITY_SOLAR'],
                     result_dic['CAPACITY_WIND'],
                     result_dic['CAPACITY_NUCLEAR'],
@@ -285,6 +295,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     # mean of time series results                
                                 
                     np.average(result_dic['DISPATCH_NATGAS']),
+                    np.average(result_dic['DISPATCH_NATGAS_CCS']),
                     np.average(result_dic['DISPATCH_SOLAR']),
                     np.average(result_dic['DISPATCH_WIND']),
                     np.average(result_dic['DISPATCH_NUCLEAR']),
@@ -316,7 +327,7 @@ def save_basic_results( global_dic, case_dic_list ):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     
-	with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(scalar_names)
         writer.writerows(scalar_table)
