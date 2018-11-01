@@ -316,7 +316,7 @@ def save_basic_results( global_dic, case_dic_list ):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     
-	with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
+    with contextlib.closing(open(output_folder + "/" + output_file_name + '.csv', 'w',newline='')) as output_file:
         writer = csv.writer(output_file)
         writer.writerow(scalar_names)
         writer.writerows(scalar_table)
