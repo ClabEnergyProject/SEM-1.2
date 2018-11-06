@@ -104,6 +104,7 @@ def core_model (global_dic, case_dic):
     
     # Fixed costs are assumed to be per time period (1 hour)
     fixed_cost_natgas = case_dic['FIXED_COST_NATGAS']*numerics_cost_scaling
+    fixed_cost_natgas_ccs = case_dic['FIXED_COST_NATGAS_CCS']*numerics_cost_scaling
     fixed_cost_solar = case_dic['FIXED_COST_SOLAR']*numerics_cost_scaling
     fixed_cost_wind = case_dic['FIXED_COST_WIND']*numerics_cost_scaling
     fixed_cost_nuclear = case_dic['FIXED_COST_NUCLEAR']*numerics_cost_scaling
@@ -114,6 +115,7 @@ def core_model (global_dic, case_dic):
 
     # Variable costs are assumed to be kWh
     var_cost_natgas = case_dic['VAR_COST_NATGAS']*numerics_cost_scaling
+    var_cost_natgas_ccs = case_dic['VAR_COST_NATGAS_CCS']*numerics_cost_scaling
     var_cost_solar = case_dic['VAR_COST_SOLAR']*numerics_cost_scaling
     var_cost_wind = case_dic['VAR_COST_WIND']*numerics_cost_scaling
     var_cost_nuclear = case_dic['VAR_COST_NUCLEAR']*numerics_cost_scaling
@@ -161,6 +163,7 @@ def core_model (global_dic, case_dic):
     
     # UnmetDemand = unmet demand/load = [kWh]
     
+    max_demand = np.max(demand_series)
     fcn2min = 0
     constraints = []
 
@@ -170,6 +173,7 @@ def core_model (global_dic, case_dic):
         dispatch_natgas = cvx.Variable(num_time_periods)
         constraints += [
                 capacity_natgas >= 0,
+                capacity_natgas <= max_demand,
                 dispatch_natgas >= 0,
                 dispatch_natgas <= capacity_natgas
                 ]
@@ -177,6 +181,21 @@ def core_model (global_dic, case_dic):
     else:
         capacity_natgas = 0
         dispatch_natgas = np.zeros(num_time_periods)
+        
+#---------------------- natural gas with CCS -----------------------------------    
+    if 'NATGAS_CCS' in system_components:
+        capacity_natgas_ccs = cvx.Variable(1)
+        dispatch_natgas_ccs = cvx.Variable(num_time_periods)
+        constraints += [
+                capacity_natgas_ccs >= 0,
+                capacity_natgas_ccs <= max_demand,
+                dispatch_natgas_ccs >= 0,
+                dispatch_natgas_ccs <= capacity_natgas_ccs
+                ]
+        fcn2min += capacity_natgas_ccs * fixed_cost_natgas_ccs + cvx.sum_entries(dispatch_natgas_ccs * var_cost_natgas_ccs)/num_time_periods
+    else:
+        capacity_natgas_ccs = 0
+        dispatch_natgas_ccs = np.zeros(num_time_periods)
         
 #---------------------- solar ------------------------------------------    
     if 'SOLAR' in system_components:
@@ -212,6 +231,7 @@ def core_model (global_dic, case_dic):
         dispatch_nuclear = cvx.Variable(num_time_periods)
         constraints += [
                 capacity_nuclear >= 0,
+                capacity_nuclear <= max_demand,
                 dispatch_nuclear >= 0, 
                 dispatch_nuclear <= capacity_nuclear 
                 ]
@@ -321,8 +341,15 @@ def core_model (global_dic, case_dic):
   
 #---------------------- dispatch energy balance constraint ------------------------------------------    
     constraints += [
-            dispatch_natgas + dispatch_solar + dispatch_wind + dispatch_nuclear + dispatch_from_storage + dispatch_from_pgp_storage + dispatch_unmet_demand  == 
-                demand_series + dispatch_to_storage + dispatch_to_pgp_storage
+            dispatch_natgas 
+            + dispatch_natgas_ccs 
+            + dispatch_solar 
+            + dispatch_wind 
+            + dispatch_nuclear 
+            + dispatch_from_storage 
+            + dispatch_from_pgp_storage 
+            + dispatch_unmet_demand  
+            == demand_series + dispatch_to_storage + dispatch_to_pgp_storage
             ]    
     
     # -----------------------------------------------------------------------------
@@ -365,6 +392,7 @@ def core_model (global_dic, case_dic):
             }
                 
         result['CAPACITY_NATGAS'] = -1
+        result['CAPACITY_NATGAS_CCS'] = -1
         result['CAPACITY_SOLAR'] = -1
         result['CAPACITY_WIND'] = -1
         result['CAPACITY_NUCLEAR'] = -1
@@ -375,6 +403,7 @@ def core_model (global_dic, case_dic):
         
         result['PRICE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_NATGAS'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_NATGAS_CCS'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_SOLAR'] = -1 * np.ones(demand_series.size) 
         result['DISPATCH_WIND'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_NUCLEAR'] = -1 * np.ones(demand_series.size)
@@ -414,6 +443,13 @@ def core_model (global_dic, case_dic):
         else:
             result['CAPACITY_NATGAS'] = capacity_natgas/numerics_demand_scaling
             result['DISPATCH_NATGAS'] = dispatch_natgas/numerics_demand_scaling
+    
+        if 'NATGAS_CCS' in system_components:
+            result['CAPACITY_NATGAS_CCS'] = np.asscalar(capacity_natgas_ccs.value)/numerics_demand_scaling
+            result['DISPATCH_NATGAS_CCS'] = np.array(dispatch_natgas_ccs.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_NATGAS_CCS'] = capacity_natgas_ccs/numerics_demand_scaling
+            result['DISPATCH_NATGAS_CCS'] = dispatch_natgas_ccs/numerics_demand_scaling
     
         if 'SOLAR' in system_components:
             result['CAPACITY_SOLAR'] = np.asscalar(capacity_solar.value)/numerics_demand_scaling

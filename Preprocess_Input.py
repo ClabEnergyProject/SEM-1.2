@@ -16,19 +16,20 @@ It generates a result containing <global_dic> and <case_dic_list>
 
 Each dictionary in <case_dic_list> ALWAYS contains:
     
-    'SYSTEM_COMPONENTS' -- LIST OF COMPONENTS, CHOICES ARE: 'WIND','SOLAR', 'NATGAS','NUCLEAR','STORAGE', 'PGP_STORAGE', 'UNMET'
+    'SYSTEM_COMPONENTS' -- LIST OF COMPONENTS, CHOICES ARE: 'WIND','SOLAR', 
+                 'NATGAS','NATGAS_CCS','NUCLEAR','STORAGE', 'PGP_STORAGE', 'UNMET'
     'DEMAND_SERIES' -- TIME SERIES OF DEMAND DATA
     
 Each dictionary in <case_dic_list> OPTIONALLY contains:
     
            ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
              'END_DAY','END_HOUR','END_MONTH',
-            'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_SOLAR','FIXED_COST_WIND',
+            'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_NATGAS_CCS','FIXED_COST_SOLAR','FIXED_COST_WIND',
             'FIXED_COST_NUCLEAR','FIXED_COST_STORAGE',
             'START_DAY','START_HOUR','START_MONTH',
             'START_YEAR','STORAGE_CHARGING_EFFICIENCY',
             'VAR_COST_STORAGE','VAR_COST_TO_STORAGE',
-            'VAR_COST_NATGAS','VAR_COST_SOLAR','STORAGE_DECAY_RATE',
+            'VAR_COST_NATGAS','VAR_COST_NATGAS_CCS','VAR_COST_SOLAR','STORAGE_DECAY_RATE',
             'VAR_COST_WIND','VAR_COST_NUCLEAR','VAR_COST_UNMET_DEMAND',
             'STORAGE_CHARGING_TIME',
             'FIXED_COST_PGP_STORAGE',
@@ -160,13 +161,15 @@ def preprocess_input(case_input_path_filename):
     
     keywords_real = list(map(str.upper,
             ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
-             'END_DAY','END_HOUR','END_MONTH',
-            'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_SOLAR','FIXED_COST_WIND',
+             'END_DAY','END_HOUR','END_MONTH','CO2_PRICE',
+            'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_NATGAS_CCS','FIXED_COST_SOLAR','FIXED_COST_WIND',
             'FIXED_COST_NUCLEAR','FIXED_COST_STORAGE',
+            'FIXED_CO2_NATGAS','FIXED_CO2_NATGAS_CCS','FIXED_CO2_NUCLEAR','FIXED_CO2_WIND','FIXED_CO2_SOLAR',
+            'VAR_CO2_NATGAS','VAR_CO2_NATGAS_CCS','VAR_CO2_NUCLEAR','VAR_CO2_WIND','VAR_CO2_SOLAR',
             'START_DAY','START_HOUR','START_MONTH',
             'START_YEAR','STORAGE_CHARGING_EFFICIENCY',
             'VAR_COST_FROM_STORAGE','VAR_COST_TO_STORAGE',
-            'VAR_COST_NATGAS','VAR_COST_SOLAR','STORAGE_DECAY_RATE',
+            'VAR_COST_NATGAS','VAR_COST_NATGAS_CCS','VAR_COST_SOLAR','STORAGE_DECAY_RATE',
             'VAR_COST_WIND','VAR_COST_NUCLEAR','VAR_COST_UNMET_DEMAND',
             'STORAGE_CHARGING_TIME',
             'FIXED_COST_PGP_STORAGE',
@@ -239,6 +242,7 @@ def preprocess_input(case_input_path_filename):
     #------ DEFAULT VALUES FOR global_dic ---------
     # For now, default for quicklook output is True
     all_cases_dic['NORMALIZE_DEMAND_TO_ONE'] = False # If True, normalize mean demand to 1.0
+    all_cases_dic['CO2_PRICE'] = 0.0 # If True, normalize mean demand to 1.0
     # default global values to help with numerical issues
     all_cases_dic['NUMERICS_COST_SCALING'] = 1e+12 # multiplies all costs by a factor and then divides at end
     all_cases_dic['NUMERICS_DEMAND_SCALING'] = 1e+12 # multiplies demand by a factor and then divides all costs and capacities at end
@@ -386,6 +390,10 @@ def preprocess_input(case_input_path_filename):
             if case_list_dic['FIXED_COST_NATGAS'][case_index] >= 0 and case_list_dic['VAR_COST_NATGAS'][case_index] >= 0 :
                 component_list.append('NATGAS')
                                                 
+        if 'FIXED_COST_NATGAS_CCS' in have_keys:
+            if case_list_dic['FIXED_COST_NATGAS_CCS'][case_index] >= 0 and case_list_dic['VAR_COST_NATGAS_CCS'][case_index] >= 0 :
+                component_list.append('NATGAS_CCS')
+                                                
         if 'FIXED_COST_WIND' in have_keys:
             if case_list_dic['FIXED_COST_WIND'][case_index] >= 0 and case_list_dic['VAR_COST_WIND'][case_index] >= 0 :
                 component_list.append('WIND')
@@ -409,6 +417,46 @@ def preprocess_input(case_input_path_filename):
                                 
         list_of_component_lists.append(component_list)
     case_list_dic['SYSTEM_COMPONENTS'] = list_of_component_lists
+    
+# update fixed and variable costs to reflect carbon prices
+    for case_index in range(num_cases):
+        if case_list_dic['CO2_PRICE'][case_index] != 0.0:
+            
+            system_components = case_list_dic['SYSTEM_COMPONENTS'][case_index]
+            
+            if 'NUCLEAR' in system_components:
+                case_list_dic['FIXED_COST_NUCLEAR'][case_index] = (case_list_dic['FIXED_COST_NUCLEAR'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_NUCLEAR'][case_index])
+                case_list_dic['VAR_COST_NUCLEAR'][case_index] = (case_list_dic['VAR_COST_NUCLEAR'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_NUCLEAR'][case_index])
+                                                    
+            if 'NATGAS' in system_components:
+                case_list_dic['FIXED_COST_NATGAS'][case_index] = (case_list_dic['FIXED_COST_NATGAS'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_NATGAS'][case_index])
+                case_list_dic['VAR_COST_NATGAS'][case_index] = (case_list_dic['VAR_COST_NATGAS'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_NATGAS'][case_index])
+                                                    
+            if 'NATGAS_CCS' in system_components:
+                case_list_dic['FIXED_COST_NATGAS_CCS'][case_index] = (case_list_dic['FIXED_COST_NATGAS_CCS'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_NATGAS_CCS'][case_index])
+                case_list_dic['VAR_COST_NATGAS_CCS'][case_index] = (case_list_dic['VAR_COST_NATGAS_CCS'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_NATGAS_CCS'][case_index])
+                                                    
+            if 'WIND' in system_components:
+                case_list_dic['FIXED_COST_WIND'][case_index] = (case_list_dic['FIXED_COST_WIND'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_WIND'][case_index])
+                case_list_dic['VAR_COST_WIND'][case_index] = (case_list_dic['VAR_COST_WIND'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_WIND'][case_index])
+                                                    
+            if 'SOLAR' in system_components:
+                case_list_dic['FIXED_COST_SOLAR'][case_index] = (case_list_dic['FIXED_COST_SOLAR'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_SOLAR'][case_index])
+                case_list_dic['VAR_COST_SOLAR'][case_index] = (case_list_dic['VAR_COST_SOLAR'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_SOLAR'][case_index])
+            
+            print  (case_list_dic['VAR_COST_NATGAS'][case_index] , case_list_dic['CO2_PRICE'][case_index],case_list_dic['VAR_CO2_NATGAS'][case_index])
+            
+
     
     #Now case_dic is a dictionary of lists. We want to turn it into a list
     # of dictionaries.  The method for doing this is taken from:

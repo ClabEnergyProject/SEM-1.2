@@ -61,7 +61,11 @@ scalar_names,scalar_table = save_basic_results(global_dic, case_dic_list)
 
 if os.path.exists("./gurobi.log"):    
    copy2("./gurobi.log", output_folder)
-   os.remove("./gurobi.log")
+   try:
+       os.remove("./gurobi.log")
+   except:
+       print ('gurboi.log not erased')
+     
 
 # -----------------------------------------------------------------------------
 

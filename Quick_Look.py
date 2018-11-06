@@ -113,6 +113,7 @@ def quick_look(global_dic, case_dic_list):
     # --------------- define colors for plots --------------------- 
     color_DEMAND = 'black'
     color_NATGAS  = 'red' # not explicitly referenced but referenced through eval()
+    color_NATGAS_CCS  = 'brown' # not explicitly referenced but referenced through eval()
     color_SOLAR   = 'orange' # not explicitly referenced but referenced through eval()
     color_WIND    = 'blue' # not explicitly referenced but referenced through eval()
     color_NUCLEAR = 'green' # not explicitly referenced but referenced through eval()
@@ -122,7 +123,7 @@ def quick_look(global_dic, case_dic_list):
     color_UNMET_DEMAND =  'gray' # not explicitly referenced but referenced through eval()
     
     num_cases = len (case_dic_list) # number of cases
-    # 'SYSTEM_COMPONENTS' -- LIST OF COMPONENTS, CHOICES ARE: 'WIND','SOLAR', 'NATGAS','NUCLEAR','STORAGE', 'PGP_STORAGE', 'UNMET'    
+    # 'SYSTEM_COMPONENTS' -- LIST OF COMPONENTS, CHOICES ARE: 'WIND','SOLAR', 'NATGAS','NATGAS_CCS','NUCLEAR','STORAGE', 'PGP_STORAGE', 'UNMET'    
     # Loop around and make output for individual cases  
     
     # ============= CREATE LIST OF input_data DICTIONARIES FOR PLOTTING PROGRAMS =========
@@ -2442,6 +2443,9 @@ def compute_curtailment(case_dic, result_dic):
             
         elif component == 'NATGAS':
             curtailment_dic['NATGAS'] = np.array(result_dic['CAPACITY_NATGAS']) - np.array(result_dic['DISPATCH_NATGAS'])
+            
+        elif component == 'NATGAS_CCS':
+            curtailment_dic['NATGAS_CCS'] = np.array(result_dic['CAPACITY_NATGAS_CCS']) - np.array(result_dic['DISPATCH_NATGAS_CCS'])
             
         elif component == 'NUCLEAR':
             curtailment_dic['NUCLEAR'] = np.array(result_dic['CAPACITY_NUCLEAR']) - np.array(result_dic['DISPATCH_NUCLEAR'])
