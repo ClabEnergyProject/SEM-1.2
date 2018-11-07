@@ -9,3 +9,5 @@
 <b>-- Command line execution:</b> Create a form of the model where you can just type "sem case_input.csv" from the command line and run SEM with that case_input.csv file. This would allow having different names for the csv files and would also let SEM run without opening Spyder or some similar front end. This is probably a first step before parallelizing SEM.
 
 <b>-- Get SEM running on clusters:</b> Create something that would allow hundreds or thousands of simulations to be run simultaneously on a cluster.
+
+<b>-- Cross-case quicklook output:</b> Right now, the quicklook output looks only at a single case. We need to create some standardized quicklook figures that compare dispatch, capacities, etc, across cases.
