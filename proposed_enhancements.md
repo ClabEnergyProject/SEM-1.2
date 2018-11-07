@@ -16,7 +16,7 @@
 
 <b>MODEL ENHANCEMENTS</b>
 
-<b>-- Ramp rate constraints:<b/> This need only be done if someone wants to investigate value of ramp rate.
+<b>-- Ramp rate constraints:</b> This need only be done if someone wants to investigate value of ramp rate.
   
 <b>-- Load shifting:</b> Represent shifting of loads in time be creating a kind of battery that can have negative charge.
 
