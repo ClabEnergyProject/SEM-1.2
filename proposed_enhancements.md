@@ -1,1 +1,11 @@
 # Proposed Enhancements to SEM
+
+<b>-- Derived values:</b> Create separate code between core_model.py and save_basic_results.py that would calculate derived values such as curtailments for each generation technologies, carbon emissions, etc
+
+<b>-- Storage solution check:</b> Create code that would look at the solution and make sure there was no obviously aberrant behavior of dispatch to or from storage
+
+<b>-- Specified capacities:</b> All users to enter capacity values as option keywords in case_input.py so that (some or all) capacities are specified rather than computed.
+
+<b>-- Command line execution:</b> Create a form of the model where you can just type "sem case_input.csv" from the command line and run SEM with that case_input.csv file. This would allow having different names for the csv files and would also let SEM run without opening Spyder or some similar front end. This is probably a first step before parallelizing SEM.
+
+<b>-- Get SEM running on clusters:</b> Create something that would allow hundreds or thousands of simulations to be run simultaneously on a cluster.
