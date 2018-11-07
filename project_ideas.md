@@ -2,8 +2,6 @@
 
 Proposed model applications (each one could be a separate peer-reviewed paper)
 
-Review paper on assumed costs and model results for energy mix
-
 <b>Scenarios development </b>
 
 ELECTRIC SECTOR ONLY: Create N baseline reference scenarios that can be used in all future techno-economic assessments (expected N in the range of 3 to 5?). Consider normalizing costs in all scenarios so that the baseline total system cost is the same in each scenario (i.e., other values could be interpreted as % change in total system cost).
@@ -19,6 +17,8 @@ Markov approach to scenarios development: Choose baseline parameters representin
 Expert elicitation approach to scenarios development: Ask experts to predict future costs of different technologies. Perform simulations where expert assessments of future costs are mixed and matched. Perform cluster analysis on results to examine structures of resulting optimal energy systems. Pick representative members from each cluster to use as baseline scenarios.
 
 <b>General project ideas</b>
+
+Review paper on assumed costs and model results for energy mix
 
 Value of innovation. Against the backdrop of the 100,000 Markov simulations (or if basins of attractions exist, then representative energy system architectures) from the previous ideas, look at the distribution of partial derivatives of system cost to each parameter value. Which innovations help a little bit in almost every possible future? Which help a lot in a narrow range of futures? What has to be true for that innovation to have high value? [Basic idea is that something like ability to time shift demand would have value in almost any conceivable future, whereas a 1% reduction of cost of CCS would only have value in futures where CCS is already playing a substantial role?]
 
