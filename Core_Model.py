@@ -34,6 +34,7 @@ Time
 
 
 import cvxpy as cvx
+import time
 import datetime
 import numpy as np
 
@@ -162,6 +163,8 @@ def core_model (global_dic, case_dic):
     # DISPATCH_FROM_STORAGE_dispatch = Discharging energy flow for energy storage (grid <- storage) = [kW]
     
     # UnmetDemand = unmet demand/load = [kWh]
+    
+    start_time = time.time()    # timer starts
     
     max_demand = np.max(demand_series)
     fcn2min = 0
@@ -381,7 +384,9 @@ def core_model (global_dic, case_dic):
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-11, feasibilityTol = 1e-9)
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-10, feasibilityTol = 1e-8)
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-8, FeasibilityTol = 1e-6)
-    
+        
+        end_time = time.time()  # timer ends
+  
     except cvx.error.SolverError as e:
 
         print('Solver error encounterd!', e)
@@ -422,7 +427,8 @@ def core_model (global_dic, case_dic):
     
         if verbose:
             print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
-                    
+            print ('runtime: ', (end_time - start_time), 'seconds')
+         
         # -----------------------------------------------------------------------------
     
         
