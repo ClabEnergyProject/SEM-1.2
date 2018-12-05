@@ -25,7 +25,7 @@ import os
 #whoami = subprocess.check_output('whoami')
 #if whoami == 'kcaldeira-carbo\\kcaldeira\r\n':
 #    case_input_path_filename = '/Users/kcaldeira/Google Drive/git/SEM-1/case_input.csv'
-case_input_path_filename = './case_input_EIA_test.csv'
+case_input_path_filename = './case_input.csv'
 
 # -----------------------------------------------------------------------------
 # =============================================================================
