@@ -460,33 +460,30 @@ def core_model (global_dic, case_dic):
         if 'SOLAR' in system_components:
             result['CAPACITY_SOLAR'] = np.asscalar(capacity_solar.value)/numerics_demand_scaling
             result['DISPATCH_SOLAR'] = np.array(dispatch_solar.value).flatten()/numerics_demand_scaling
+            result['CURTAILMENT_SOLAR'] = result['CAPACITY_SOLAR'] * solar_series - result['DISPATCH_SOLAR']
         else:
             result['CAPACITY_SOLAR'] = capacity_solar/numerics_demand_scaling
             result['DISPATCH_SOLAR'] = dispatch_solar/numerics_demand_scaling
-    
-        result['CURTAILMENT_SOLAR'] = \
-            result['CAPACITY_SOLAR'] * solar_series - result['DISPATCH_SOLAR']
+            result['CURTAILMENT_SOLAR'] = (capacity_solar-dispatch_solar)/numerics_demand_scaling 
     
         if 'WIND' in system_components:
             result['CAPACITY_WIND'] = np.asscalar(capacity_wind.value)/numerics_demand_scaling
             result['DISPATCH_WIND'] = np.array(dispatch_wind.value).flatten()/numerics_demand_scaling
+            result['CURTAILMENT_WIND'] = result['CAPACITY_WIND'] * wind_series - result['DISPATCH_WIND']
         else:
             result['CAPACITY_WIND'] = capacity_wind/numerics_demand_scaling
             result['DISPATCH_WIND'] = dispatch_wind/numerics_demand_scaling
-    
-        result['CURTAILMENT_WIND'] = \
-            result['CAPACITY_WIND'] * wind_series - result['DISPATCH_WIND']
+            result['CURTAILMENT_WIND'] = (capacity_wind-dispatch_wind)/numerics_demand_scaling
     
         if 'NUCLEAR' in system_components:
             result['CAPACITY_NUCLEAR'] = np.asscalar(capacity_nuclear.value)/numerics_demand_scaling
             result['DISPATCH_NUCLEAR'] = np.array(dispatch_nuclear.value).flatten()/numerics_demand_scaling
+            result['CURTAILMENT_NUCLEAR'] = result['CAPACITY_NUCLEAR'] * np.ones(num_time_periods) - result['DISPATCH_NUCLEAR']
         else:
             result['CAPACITY_NUCLEAR'] = capacity_nuclear/numerics_demand_scaling
             result['DISPATCH_NUCLEAR'] = dispatch_nuclear/numerics_demand_scaling
-    
-        result['CURTAILMENT_NUCLEAR'] = \
-            result['CAPACITY_NUCLEAR'] * np.ones(num_time_periods) - result['DISPATCH_NUCLEAR']
-    
+            result['CURTAILMENT_NUCLEAR'] = (capacity_nuclear-dispatch_nuclear)/numerics_demand_scaling  
+          
         if 'STORAGE' in system_components:
             result['CAPACITY_STORAGE'] = np.asscalar(capacity_storage.value)/numerics_demand_scaling
             result['DISPATCH_TO_STORAGE'] = np.array(dispatch_to_storage.value).flatten()/numerics_demand_scaling
