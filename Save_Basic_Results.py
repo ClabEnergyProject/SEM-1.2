@@ -106,7 +106,7 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['time (hr)']
     series_list.append( np.arange(len(case_dic['DEMAND_SERIES'])))
     
-    header_list += ['demand (kW)']
+    header_list += ['demand (MW)']
     series_list.append( case_dic['DEMAND_SERIES'] )
     
     header_list += ['solar capacity factor (-)']
@@ -115,49 +115,49 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['wind capacity factor (-)']
     series_list.append( np.array(case_dic['WIND_SERIES']))
 
-    header_list += ['dispatch natgas (kW)']
+    header_list += ['dispatch natgas (MW)']
     series_list.append( result_dic['DISPATCH_NATGAS'].flatten() )
     
-    header_list += ['dispatch natgas ccs (kW)']
+    header_list += ['dispatch natgas ccs (MW)']
     series_list.append( result_dic['DISPATCH_NATGAS_CCS'].flatten() )
     
-    header_list += ['dispatch solar (kW)']
+    header_list += ['dispatch solar (MW)']
     series_list.append( result_dic['DISPATCH_SOLAR'].flatten() ) 
     
-    header_list += ['dispatch wind (kW)']
+    header_list += ['dispatch wind (MW)']
     series_list.append( result_dic['DISPATCH_WIND'].flatten() )
     
-    header_list += ['dispatch nuclear (kW)']
+    header_list += ['dispatch nuclear (MW)']
     series_list.append( result_dic['DISPATCH_NUCLEAR'].flatten() )
     
-    header_list += ['dispatch to storage (kW)']
+    header_list += ['dispatch to storage (MW)']
     series_list.append( result_dic['DISPATCH_TO_STORAGE'].flatten() )
     
-    header_list += ['dispatch from storage (kW)']
+    header_list += ['dispatch from storage (MW)']
     series_list.append( result_dic['DISPATCH_FROM_STORAGE'].flatten() )  # THere is no FROM in dispatch results
 
-    header_list += ['energy storage (kWh)']
+    header_list += ['energy storage (MWh)']
     series_list.append( result_dic['ENERGY_STORAGE'].flatten() )
   
-    header_list += ['dispatch to pgp storage (kW)']
+    header_list += ['dispatch to pgp storage (MW)']
     series_list.append( result_dic['DISPATCH_TO_PGP_STORAGE'].flatten() )
     
-    header_list += ['dispatch pgp storage (kW)']
+    header_list += ['dispatch pgp storage (MW)']
     series_list.append( result_dic['DISPATCH_FROM_PGP_STORAGE'].flatten() )
 
-    header_list += ['energy pgp storage (kWh)']
+    header_list += ['energy pgp storage (MWh)']
     series_list.append( result_dic['ENERGY_PGP_STORAGE'].flatten() )
     
-    header_list += ['dispatch unmet demand (kW)']
+    header_list += ['dispatch unmet demand (MW)']
     series_list.append( result_dic['DISPATCH_UNMET_DEMAND'].flatten() )
     
-    header_list += ['cutailment solar (kW)']
+    header_list += ['cutailment solar (MW)']
     series_list.append( result_dic['CURTAILMENT_SOLAR'].flatten() )
     
-    header_list += ['cutailment wind (kW)']
+    header_list += ['cutailment wind (MW)']
     series_list.append( result_dic['CURTAILMENT_WIND'].flatten() )
     
-    header_list += ['cutailment nuclear (kW)']
+    header_list += ['cutailment nuclear (MW)']
     series_list.append( result_dic['CURTAILMENT_NUCLEAR'].flatten() )
     
     header_list += ['price ($/kWh)']
@@ -204,38 +204,38 @@ def save_basic_results( global_dic, case_dic_list ):
             'pgp storage charging efficiency',
             'pgp storage decay rate (1/h)',
             
-            'mean demand (kW)',
+            'mean demand (MW)',
             'capacity factor solar series (-)',
             'capacity factor wind series (-)',
             
-            'capacity natgas (kW)',
-            'capacity natgas ccs (kW)',
-            'capacity solar (kW)',
-            'capacity wind (kW)',
-            'capacity nuclear (kW)',
-            'capacity storage (kWh)',
-            'capacity pgp storage (kWh)',
-            'capacity to pgp storage (kW)',
-            'capacity from pgp storage (kW)',
+            'capacity natgas (MW)',
+            'capacity natgas ccs (MW)',
+            'capacity solar (MW)',
+            'capacity wind (MW)',
+            'capacity nuclear (MW)',
+            'capacity storage (MWh)',
+            'capacity pgp storage (MWh)',
+            'capacity to pgp storage (MW)',
+            'capacity from pgp storage (MW)',
             'system cost ($/kW/h)', # assuming demand normalized to 1 kW
             'problem status',
             
-            'dispatch natgas (kW)',
-            'dispatch natgas ccs (kW)',
-            'dispatch solar (kW)',
-            'dispatch wind (kW)',
-            'dispatch nuclear (kW)',
-            'dispatch to storage (kW)',
-            'dispatch from storage (kW)',
-            'energy storage (kWh)',
-            'dispatch to pgp storage (kW)',
-            'dispatch pgp storage (kW)',
-            'energy pgp storage (kWh)',
-            'dispatch unmet demand (kW)',
+            'dispatch natgas (MW)',
+            'dispatch natgas ccs (MW)',
+            'dispatch solar (MW)',
+            'dispatch wind (MW)',
+            'dispatch nuclear (MW)',
+            'dispatch to storage (MW)',
+            'dispatch from storage (MW)',
+            'energy storage (MWh)',
+            'dispatch to pgp storage (MW)',
+            'dispatch pgp storage (MW)',
+            'energy pgp storage (MWh)',
+            'dispatch unmet demand (MW)',
             
-            'curtailment solar (kW)',
-            'curtailment wind (kW)',
-            'curtailment nuclear (kW)'
+            'curtailment solar (MW)',
+            'curtailment wind (MW)',
+            'curtailment nuclear (MW)'
             ]
 
     scalar_table = []
