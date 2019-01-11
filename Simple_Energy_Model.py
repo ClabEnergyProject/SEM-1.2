@@ -19,13 +19,17 @@ from Quick_Look import quick_look
 
 from shutil import copy2
 import os
+import sys
  
 # directory = 'D:/M/WORK/'
 #root_directory = '/Users/kcaldeira/Google Drive/simple energy system model/Kens version/'
 #whoami = subprocess.check_output('whoami')
 #if whoami == 'kcaldeira-carbo\\kcaldeira\r\n':
 #    case_input_path_filename = '/Users/kcaldeira/Google Drive/git/SEM-1/case_input.csv'
-case_input_path_filename = './case_input.csv'
+if len(sys.argv) == 1:
+    case_input_path_filename = './case_input.csv'
+else:
+    case_input_path_filename = sys.argv[1]
 
 # -----------------------------------------------------------------------------
 # =============================================================================
