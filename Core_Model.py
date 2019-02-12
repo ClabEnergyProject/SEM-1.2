@@ -96,8 +96,8 @@ def core_model (global_dic, case_dic):
     numerics_cost_scaling = case_dic['NUMERICS_COST_SCALING']
     numerics_demand_scaling = case_dic['NUMERICS_DEMAND_SCALING']    
     
-    if verbose:
-        print ('Core_Model.py: processing case ',case_dic['CASE_NAME'])
+    #if verbose:
+    #    print ('Core_Model.py: processing case ',case_dic['CASE_NAME'])
     demand_series = np.array(case_dic['DEMAND_SERIES'])*numerics_demand_scaling 
     solar_series = case_dic['SOLAR_SERIES'] # Assumed to be normalized per kW capacity
     wind_series = case_dic['WIND_SERIES'] # Assumed to be normalized per kW capacity
@@ -172,11 +172,16 @@ def core_model (global_dic, case_dic):
 
 #---------------------- natural gas ------------------------------------------    
     if 'NATGAS' in system_components:
-        capacity_natgas = cvx.Variable(1)
+        if(case_dic['CAPACITY_NATGAS']<0):
+            capacity_natgas = cvx.Variable(1) # calculate natgas capacity
+            constraints += [
+                capacity_natgas >= 0,
+                capacity_natgas <= max_demand]
+        else:
+            capacity_natgas = case_dic['CAPACITY_NATGAS'] * numerics_demand_scaling
+            
         dispatch_natgas = cvx.Variable(num_time_periods)
         constraints += [
-                capacity_natgas >= 0,
-                capacity_natgas <= max_demand,
                 dispatch_natgas >= 0,
                 dispatch_natgas <= capacity_natgas
                 ]
@@ -187,11 +192,16 @@ def core_model (global_dic, case_dic):
         
 #---------------------- natural gas with CCS -----------------------------------    
     if 'NATGAS_CCS' in system_components:
-        capacity_natgas_ccs = cvx.Variable(1)
+        if(case_dic['CAPACITY_NATGAS_CCS']<0):
+            capacity_natgas_ccs = cvx.Variable(1) # calculate natgas capacity
+            constraints += [
+                capacity_natgas_ccs >= 0,
+                capacity_natgas_ccs <= max_demand]
+        else:
+            capacity_natgas_ccs = case_dic['CAPACITY_NATGAS_CCS'] * numerics_demand_scaling
+            
         dispatch_natgas_ccs = cvx.Variable(num_time_periods)
         constraints += [
-                capacity_natgas_ccs >= 0,
-                capacity_natgas_ccs <= max_demand,
                 dispatch_natgas_ccs >= 0,
                 dispatch_natgas_ccs <= capacity_natgas_ccs
                 ]
@@ -202,10 +212,15 @@ def core_model (global_dic, case_dic):
         
 #---------------------- solar ------------------------------------------    
     if 'SOLAR' in system_components:
-        capacity_solar = cvx.Variable(1)
+        if(case_dic['CAPACITY_SOLAR']<0):
+            capacity_solar = cvx.Variable(1) # calculate SOLAR capacity
+            constraints += [
+                capacity_solar >= 0]
+        else:
+            capacity_solar = case_dic['CAPACITY_SOLAR'] * numerics_demand_scaling
+            
         dispatch_solar = cvx.Variable(num_time_periods)
         constraints += [
-                capacity_solar >= 0,
                 dispatch_solar >= 0, 
                 dispatch_solar <= capacity_solar * solar_series 
                 ]
@@ -216,10 +231,15 @@ def core_model (global_dic, case_dic):
         
 #---------------------- wind ------------------------------------------    
     if 'WIND' in system_components:
-        capacity_wind = cvx.Variable(1)
+        if(case_dic['CAPACITY_WIND']<0):
+            capacity_wind = cvx.Variable(1) # calculate SOLAR capacity
+            constraints += [
+                capacity_wind >= 0]
+        else:
+            capacity_wind = case_dic['CAPACITY_WIND'] * numerics_demand_scaling
+            
         dispatch_wind = cvx.Variable(num_time_periods)
         constraints += [
-                capacity_wind >= 0,
                 dispatch_wind >= 0, 
                 dispatch_wind <= capacity_wind * wind_series 
                 ]
@@ -230,11 +250,16 @@ def core_model (global_dic, case_dic):
         
 #---------------------- nuclear ------------------------------------------    
     if 'NUCLEAR' in system_components:
-        capacity_nuclear = cvx.Variable(1)
+        if(case_dic['CAPACITY_NUCLEAR']<0):
+            capacity_nuclear = cvx.Variable(1) # calculate SOLAR capacity
+            constraints += [
+                capacity_nuclear >= 0,
+                capacity_nuclear <= max_demand]
+        else:
+            capacity_nuclear = case_dic['CAPACITY_NUCLEAR'] * numerics_demand_scaling
+            
         dispatch_nuclear = cvx.Variable(num_time_periods)
         constraints += [
-                capacity_nuclear >= 0,
-                capacity_nuclear <= max_demand,
                 dispatch_nuclear >= 0, 
                 dispatch_nuclear <= capacity_nuclear 
                 ]
@@ -245,12 +270,17 @@ def core_model (global_dic, case_dic):
         
 #---------------------- storage ------------------------------------------    
     if 'STORAGE' in system_components:
-        capacity_storage = cvx.Variable(1)
+        if(case_dic['CAPACITY_STORAGE']<0):
+            capacity_storage = cvx.Variable(1) # calculate SOLAR capacity
+            constraints += [
+                capacity_storage >= 0]
+        else:
+            capacity_storage = case_dic['CAPACITY_STORAGE'] * numerics_demand_scaling
+            
         dispatch_to_storage = cvx.Variable(num_time_periods)
         dispatch_from_storage = cvx.Variable(num_time_periods)
         energy_storage = cvx.Variable(num_time_periods)
         constraints += [
-                capacity_storage >= 0,
                 dispatch_to_storage >= 0, 
                 dispatch_to_storage <= capacity_storage / storage_charging_time,
                 dispatch_from_storage >= 0, # dispatch_to_storage is negative value
@@ -290,16 +320,31 @@ def core_model (global_dic, case_dic):
 #   2. dispatch from storage (power)
 #
     if 'PGP_STORAGE' in system_components:
-        capacity_pgp_storage = cvx.Variable(1)  # energy storage capacity in kWh (i.e., tank size)
-        capacity_to_pgp_storage = cvx.Variable(1) # maximum power input / output (in kW) fuel cell / electrolyzer size
-        capacity_from_pgp_storage = cvx.Variable(1) # maximum power input / output (in kW) fuel cell / electrolyzer size
+        if(case_dic['CAPACITY_PGP_STORAGE']<0):
+            capacity_pgp_storage = cvx.Variable(1) # calculate pgp storage capacity
+            constraints += [
+                capacity_pgp_storage >= 0]
+        else:
+            capacity_pgp_storage = case_dic['CAPACITY_PGP_STORAGE'] * numerics_demand_scaling
+            
+        if(case_dic['CAPACITY_TO_PGP_STORAGE']<0):
+            capacity_to_pgp_storage = cvx.Variable(1) # calculate pgp storage capacity
+            constraints += [
+                capacity_to_pgp_storage >= 0]
+        else:
+            capacity_to_pgp_storage = case_dic['CAPACITY_TO_PGP_STORAGE'] * numerics_demand_scaling
+            
+        if(case_dic['CAPACITY_FROM_PGP_STORAGE']<0):
+            capacity_from_pgp_storage = cvx.Variable(1) # calculate pgp storage capacity
+            constraints += [
+                capacity_from_pgp_storage >= 0]
+        else:
+            capacity_from_pgp_storage = case_dic['CAPACITY_FROM_PGP_STORAGE'] * numerics_demand_scaling
+            
         dispatch_to_pgp_storage = cvx.Variable(num_time_periods)
         dispatch_from_pgp_storage = cvx.Variable(num_time_periods)  # this is dispatch FROM storage
         energy_pgp_storage = cvx.Variable(num_time_periods) # amount of energy currently stored in tank
         constraints += [
-                capacity_pgp_storage >= 0,  # energy
-                capacity_to_pgp_storage >= 0,  # power in
-                capacity_from_pgp_storage >= 0,  # power out
                 dispatch_to_pgp_storage >= 0, 
                 dispatch_to_pgp_storage <= capacity_to_pgp_storage,
                 dispatch_from_pgp_storage >= 0, # dispatch_to_storage is negative value
@@ -366,7 +411,7 @@ def core_model (global_dic, case_dic):
     #print (constraints)
     #print (fcn2min)
     #print (system_components)
-    
+    #print (obj)
     # Form and Solve the Problem
     prob = cvx.Problem(obj, constraints)
 #    prob.solve(solver = 'GUROBI')
@@ -387,9 +432,9 @@ def core_model (global_dic, case_dic):
         
         end_time = time.time()  # timer ends
   
-    except cvx.error.SolverError as e:
+    except cvx.error.SolverError as err:
 
-        print('Solver error encounterd!', e)
+        print('Solver error encounterd!', err)
         
         result = {
             'SYSTEM_COST': -1,
@@ -444,21 +489,30 @@ def core_model (global_dic, case_dic):
         
         
         if 'NATGAS' in system_components:
-            result['CAPACITY_NATGAS'] = np.asscalar(capacity_natgas.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_NATGAS'] < 0:
+                result['CAPACITY_NATGAS'] = np.asscalar(capacity_natgas.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_NATGAS'] = case_dic['CAPACITY_NATGAS']
             result['DISPATCH_NATGAS'] = np.array(dispatch_natgas.value).flatten()/numerics_demand_scaling
         else:
             result['CAPACITY_NATGAS'] = capacity_natgas/numerics_demand_scaling
             result['DISPATCH_NATGAS'] = dispatch_natgas/numerics_demand_scaling
     
         if 'NATGAS_CCS' in system_components:
-            result['CAPACITY_NATGAS_CCS'] = np.asscalar(capacity_natgas_ccs.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_NATGAS_CCS'] < 0:
+                result['CAPACITY_NATGAS_CCS'] = np.asscalar(capacity_natgas_ccs.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_NATGAS_CCS'] = case_dic['CAPACITY_NATGAS_CCS']
             result['DISPATCH_NATGAS_CCS'] = np.array(dispatch_natgas_ccs.value).flatten()/numerics_demand_scaling
         else:
             result['CAPACITY_NATGAS_CCS'] = capacity_natgas_ccs/numerics_demand_scaling
             result['DISPATCH_NATGAS_CCS'] = dispatch_natgas_ccs/numerics_demand_scaling
     
         if 'SOLAR' in system_components:
-            result['CAPACITY_SOLAR'] = np.asscalar(capacity_solar.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_SOLAR'] < 0:
+                result['CAPACITY_SOLAR'] = np.asscalar(capacity_solar.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_SOLAR'] = case_dic['CAPACITY_SOLAR']
             result['DISPATCH_SOLAR'] = np.array(dispatch_solar.value).flatten()/numerics_demand_scaling
             result['CURTAILMENT_SOLAR'] = result['CAPACITY_SOLAR'] * solar_series - result['DISPATCH_SOLAR']
         else:
@@ -467,7 +521,10 @@ def core_model (global_dic, case_dic):
             result['CURTAILMENT_SOLAR'] = (capacity_solar-dispatch_solar)/numerics_demand_scaling 
     
         if 'WIND' in system_components:
-            result['CAPACITY_WIND'] = np.asscalar(capacity_wind.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_WIND'] < 0:
+                result['CAPACITY_WIND'] = np.asscalar(capacity_wind.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_WIND'] = case_dic['CAPACITY_WIND']
             result['DISPATCH_WIND'] = np.array(dispatch_wind.value).flatten()/numerics_demand_scaling
             result['CURTAILMENT_WIND'] = result['CAPACITY_WIND'] * wind_series - result['DISPATCH_WIND']
         else:
@@ -476,7 +533,10 @@ def core_model (global_dic, case_dic):
             result['CURTAILMENT_WIND'] = (capacity_wind-dispatch_wind)/numerics_demand_scaling
     
         if 'NUCLEAR' in system_components:
-            result['CAPACITY_NUCLEAR'] = np.asscalar(capacity_nuclear.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_NUCLEAR'] < 0:
+                result['CAPACITY_NUCLEAR'] = np.asscalar(capacity_nuclear.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_NUCLEAR'] = case_dic['CAPACITY_NUCLEAR']
             result['DISPATCH_NUCLEAR'] = np.array(dispatch_nuclear.value).flatten()/numerics_demand_scaling
             result['CURTAILMENT_NUCLEAR'] = result['CAPACITY_NUCLEAR'] * np.ones(num_time_periods) - result['DISPATCH_NUCLEAR']
         else:
@@ -485,7 +545,10 @@ def core_model (global_dic, case_dic):
             result['CURTAILMENT_NUCLEAR'] = (capacity_nuclear-dispatch_nuclear)/numerics_demand_scaling  
           
         if 'STORAGE' in system_components:
-            result['CAPACITY_STORAGE'] = np.asscalar(capacity_storage.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_STORAGE'] < 0:
+                result['CAPACITY_STORAGE'] = np.asscalar(capacity_storage.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_STORAGE'] = case_dic['CAPACITY_STORAGE']
             result['DISPATCH_TO_STORAGE'] = np.array(dispatch_to_storage.value).flatten()/numerics_demand_scaling
             result['DISPATCH_FROM_STORAGE'] = np.array(dispatch_from_storage.value).flatten()/numerics_demand_scaling
             result['ENERGY_STORAGE'] = np.array(energy_storage.value).flatten()/numerics_demand_scaling
@@ -496,9 +559,18 @@ def core_model (global_dic, case_dic):
             result['ENERGY_STORAGE'] = energy_storage/numerics_demand_scaling
             
         if 'PGP_STORAGE' in system_components:
-            result['CAPACITY_PGP_STORAGE'] = np.asscalar(capacity_pgp_storage.value)/numerics_demand_scaling
-            result['CAPACITY_TO_PGP_STORAGE'] = np.asscalar(capacity_to_pgp_storage.value)/numerics_demand_scaling
-            result['CAPACITY_FROM_PGP_STORAGE'] = np.asscalar(capacity_from_pgp_storage.value)/numerics_demand_scaling
+            if case_dic['CAPACITY_PGP_STORAGE'] < 0:
+                result['CAPACITY_PGP_STORAGE'] = np.asscalar(capacity_pgp_storage.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_PGP_STORAGE'] = case_dic['CAPACITY_PGP_STORAGE']
+            if case_dic['CAPACITY_TO_PGP_STORAGE'] < 0:
+                result['CAPACITY_TO_PGP_STORAGE'] = np.asscalar(capacity_to_pgp_storage.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_TO_PGP_STORAGE'] = case_dic['CAPACITY_TO_PGP_STORAGE']
+            if case_dic['CAPACITY_FROM_PGP_STORAGE'] < 0:
+                result['CAPACITY_FROM_PGP_STORAGE'] = np.asscalar(capacity_from_pgp_storage.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_FROM_PGP_STORAGE'] = case_dic['CAPACITY_FROM_PGP_STORAGE']
             result['DISPATCH_TO_PGP_STORAGE'] = np.array(dispatch_to_pgp_storage.value).flatten()/numerics_demand_scaling
             result['DISPATCH_FROM_PGP_STORAGE'] = np.array(dispatch_from_pgp_storage.value).flatten()/numerics_demand_scaling
             result['ENERGY_PGP_STORAGE'] = np.array(energy_pgp_storage.value).flatten()/numerics_demand_scaling

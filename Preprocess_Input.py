@@ -175,7 +175,10 @@ def preprocess_input(case_input_path_filename):
             'FIXED_COST_PGP_STORAGE',
             'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
             'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
-            'PGP_STORAGE_CHARGING_EFFICIENCY','PGP_STORAGE_DECAY_RATE']
+            'PGP_STORAGE_CHARGING_EFFICIENCY','PGP_STORAGE_DECAY_RATE',
+            'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
+            'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE',
+            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE']
             ))
     
     keywords_real_notscaled = list(map(str.upper,
@@ -185,7 +188,10 @@ def preprocess_input(case_input_path_filename):
             'START_DAY','START_HOUR','START_MONTH',
             'START_YEAR',
             'PGP_STORAGE_CHARGING_EFFICIENCY','PGP_STORAGE_DECAY_RATE',
-            'STORAGE_CHARGING_EFFICIENCY','STORAGE_DECAY_RATE']
+            'STORAGE_CHARGING_EFFICIENCY','STORAGE_DECAY_RATE',
+            'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
+            'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE',
+            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE']
             ))
     
     #Capacity cost -- Cost per hour of capacity that must be incurred whether or 
@@ -246,6 +252,20 @@ def preprocess_input(case_input_path_filename):
     # default global values to help with numerical issues
     all_cases_dic['NUMERICS_COST_SCALING'] = 1e+12 # multiplies all costs by a factor and then divides at end
     all_cases_dic['NUMERICS_DEMAND_SCALING'] = 1e+12 # multiplies demand by a factor and then divides all costs and capacities at end
+    
+    #                'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
+    #            'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE,
+    #            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE']
+    
+    all_cases_dic['CAPACITY_NATGAS'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_NATGAS_CCS'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_SOLAR'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_WIND'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_NUCLEAR'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_STORAGE'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_TO_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_FROM_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
 
     for list_item in all_cases_data:
         test_key = str.upper(list_item[0])
@@ -379,8 +399,8 @@ def preprocess_input(case_input_path_filename):
     
     list_of_component_lists = []
     for case_index in range(num_cases):
-        if verbose:
-            print ( 'Preprocess_Input.py:Components for ',case_list_dic['CASE_NAME'][case_index])
+        #if verbose:
+        #    print ( 'Preprocess_Input.py:Components for ',case_list_dic['CASE_NAME'][case_index])
         component_list = []
         if 'FIXED_COST_NUCLEAR' in have_keys:
             if case_list_dic['FIXED_COST_NUCLEAR'][case_index] >= 0 and case_list_dic['VAR_COST_NUCLEAR'][case_index] >= 0 :
@@ -420,7 +440,7 @@ def preprocess_input(case_input_path_filename):
     
 # update fixed and variable costs to reflect carbon prices
     for case_index in range(num_cases):
-        if case_list_dic['CO2_PRICE'][case_index] != 0.0:
+        if case_list_dic['CO2_PRICE'][case_index] > 0.0:  #  Note, negative CO2_PRICE is not allowed. Indicates no CO2 price.
             
             system_components = case_list_dic['SYSTEM_COMPONENTS'][case_index]
             

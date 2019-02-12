@@ -46,7 +46,10 @@ output_folder = global_dic['OUTPUT_PATH'] + '/' + global_dic['GLOBAL_NAME']
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
     
-copy2(case_input_path_filename, output_folder)
+try:
+    copy2(case_input_path_filename, output_folder)
+except:
+    print ('case input file not copied. Perhaps it is open and cannot be overwritten.')
 
 # -----------------------------------------------------------------------------
 
