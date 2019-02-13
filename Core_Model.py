@@ -67,7 +67,7 @@ def core_model_loop (global_dic, case_dic_list):
                                    
             if verbose:
                 today = datetime.datetime.now()
-                print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
+                print ('solved  ',case_dic_list[case_index]['CASE_NAME'])
             
             # put raw results in file for later analysis
             if 'STORAGE' in case_dic_list[case_index]['SYSTEM_COMPONENTS']:
