@@ -179,6 +179,7 @@ def save_basic_results( global_dic, case_dic_list ):
         
     scalar_names = [
             'case name',
+            'CO2 price ($/kgCO2)',
             'fixed cost natgas ($/kW/h)',
             'fixed cost natgas ccs ($/kW/h)',
             'fixed cost solar ($/kW/h)',
@@ -245,6 +246,7 @@ def save_basic_results( global_dic, case_dic_list ):
         
         scalar_table.append(
             [       case_dic['CASE_NAME'],
+                    case_dic['CO2_PRICE'],
              
                     # assumptions
                     
