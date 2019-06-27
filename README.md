@@ -1,5 +1,5 @@
-# SEM-1.1
-Python 3.6 version of SEM-1. This is a Simple Energy Model that optimizes electricity (or electricity
+# SEM-1.2
+Python 3.7 and cvxpy 1.x version of SEM-1. This is a Simple Energy Model that optimizes electricity (or electricity
 and fuels) without considering any spatial variation, policy, capacity markets, etc.
 
 <br>
@@ -48,20 +48,20 @@ Copy that text and paste in in an Anaconda window. (You might start these Anacon
 	       > cd  /c/gurobi801/win64
 	       > python setup.py install
 
-8. Install cvxpy, version 0.4.11. For python3, cvxpy must be installed with pip. They recommend making a special virtual environment to allow different versions of things to run on the same machine, but I just installed into my general space.  Open up an Anaconda window (I did it as Administrator) and type
+8. Install cvxpy. For python3, cvxpy must be installed with pip. They recommend making a special virtual environment to allow different versions of things to run on the same machine, but I just installed into my general space.  Open up an Anaconda window (I did it as Administrator) and type
 
-		> pip install cvxpy==0.4.11 
+		> pip install cvxpy 
 
 If this install fails on installing the ecos package, try the following line in an Anaconda window:
 
-                > conda install ecos
-		> pip install cvxpy==0.4.11
+        > conda install ecos
+		> pip install cvxpy
 
 <b>Additional notes on installing cvxpy</b> (Mengyao)
 
 If you get error messages for not having (or having the correct versions of) ecos, scs, or cvxcanon, try the following command (<a href="https://anaconda.org/sebp/cvxpy">Anaconda Cloud</a>): 
 
-                > conda install -c sebp cvxpy==0.4.11
+                > conda install -c sebp cvxpy
 
 This command should automatically download / install the right packages needed for cvxpy ("-c CHANNEL" specifies additional channels to search for packages; sebp is a contributer on Anaconda Cloud).
 
@@ -69,7 +69,7 @@ Check the installation with
 
 		> nosetests cvxpy 
 
-9. Download and run python3 version of the Simple Energy Model -- SEM-1.1: https://github.com/ClabEnergyProject/SEM-1.1
+9. Download and run python3 version of the Simple Energy Model -- SEM-1.2: https://github.com/ClabEnergyProject/SEM-1.2
 -- Open case_input.xlsx in excel. Make the cases you want (by altering base case or ratios to base case), and then save sheet as case_input.csv.
 -- Open Spyder and then within Spyder navigate to the folder that was cloned from github and open and run Simple_Energy_Model.py
 
@@ -99,13 +99,13 @@ The following is installation instructions for MacOS 10.13 machines.
 	
 	> conda install gurobi
 
-8. Install cvxpy, version 0.4.11. For python3, cvxpy must be installed with pip. Open up an Anaconda window (I did it as Administrator) and type  
+8. Install cvxpy. For python3, cvxpy must be installed with pip. Open up an Anaconda window (I did it as Administrator) and type  
 
-	> pip install cvxpy==0.4.11 
+	> pip install cvxpy 
 
 9. If you get error messages for not having (or having the correct versions of) ecos, scs, or cvxcanon, try the following command (Anaconda Cloud):
 
-	> conda install -c sebp cvxpy==0.4.11
+	> conda install -c sebp cvxpy
 
 This command should automatically download / install the right packages needed for cvxpy ("-c CHANNEL" specifies additional channels to search for packages; sebp is a contributer on Anaconda Cloud).
 
@@ -115,4 +115,4 @@ This command should automatically download / install the right packages needed f
 
 If you did not remove old Gurobi license and installed a new one, you might see error in this step. You need to delete the old Gurobi licencse and install the new one for your current Gurobi version
 
-11. Download and run python3 version of the Simple Energy Model -- SEM-1.1: https://github.com/ClabEnergyProject/SEM-1.1 -- Open case_input.xlsx in excel. Make the cases you want (by altering base case or ratios to base case), and then save sheet as case_input.csv. -- Open Spyder and then within Spyder navigate to the folder that was cloned from github and open and run Simple_Energy_Model.py
+11. Download and run python3 version of the Simple Energy Model -- SEM-1.2: https://github.com/ClabEnergyProject/SEM-1.2 -- Open case_input.xlsx in excel. Make the cases you want (by altering base case or ratios to base case), and then save sheet as case_input.csv. -- Open Spyder and then within Spyder navigate to the folder that was cloned from github and open and run Simple_Energy_Model.py
