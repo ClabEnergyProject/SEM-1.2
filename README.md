@@ -50,7 +50,7 @@ Copy that text and paste in in an Anaconda window. (You might start these Anacon
 	       
 (Note: the above line must call python and not python3, at least on Ken Caldeira's system.)
 
-If this install fails on installingm try the following line in an Anaconda window:
+If this install fails on installing, try the following line in an Anaconda window:
 
 		> conda config --add channels http://conda.anaconda.org/gurobi
 		> conda install gurobi
