@@ -311,7 +311,7 @@ def cost_and_storage_lifo_stack_analysis( global_dic, case_dic, result ):
         tmp = tmp + DISPATCH_TO_STORAGE[idx] - DISPATCH_FROM_STORAGE[idx]
               
         if DISPATCH_TO_STORAGE[idx] > 0:  # push on stack (with time moved up 1 cycle)
-            lifo_stack.append([idx-num_time_periods,DISPATCH_TO_STORAGE[idx]*STORAGE_CHARGING_EFFICIENCY ])
+            lifo_stack.append([idx-num_time_periods,DISPATCH_TO_STORAGE[idx]*CHARGING_EFFICIENCY_STORAGE ])
         if DISPATCH_FROM_STORAGE[idx] > 0:
             dispatch_remaining = DISPATCH_FROM_STORAGE[idx]
             while dispatch_remaining > 0:
@@ -335,12 +335,12 @@ def cost_and_storage_lifo_stack_analysis( global_dic, case_dic, result ):
     
     # energy storage at time t is the amount of energy in storage in the beginning of the time step.
     #   constraints += [
-    #        energy_storage[(i+1) % num_time_periods] == energy_storage[i] + storage_charging_efficiency * dispatch_to_storage[i] - dispatch_from_storage[i] - energy_storage[i]*storage_decay_rate
+    #        energy_storage[(i+1) % num_time_periods] == energy_storage[i] + charging_efficiency_storage * dispatch_to_storage[i] - dispatch_from_storage[i] - energy_storage[i]*decay_rate_storage
     #        ]
     #
     #   constraints += [
     #        energy_pgp_storage[(i+1) % num_time_periods] == energy_pgp_storage[i] 
-    #        + pgp_storage_charging_efficiency * dispatch_to_pgp_storage[i] 
+    #        + charging_efficiency_pgp_storage * dispatch_to_pgp_storage[i] 
     #        - dispatch_from_pgp_storage[i] 
     #        ]
 
@@ -361,7 +361,7 @@ def cost_and_storage_lifo_stack_analysis( global_dic, case_dic, result ):
         mean_res = 0
         max_res = 0
         if DISPATCH_TO_STORAGE[time_idx] > 0:  # push on stack
-            lifo_stack.append([time_idx,DISPATCH_TO_STORAGE[time_idx % num_time_periods]*STORAGE_CHARGING_EFFICIENCY ])
+            lifo_stack.append([time_idx,DISPATCH_TO_STORAGE[time_idx % num_time_periods]*CHARGING_EFFICIENCY_STORAGE ])
         if DISPATCH_FROM_STORAGE[time_idx] > 0:
             dispatch_remaining = DISPATCH_FROM_STORAGE[time_idx % num_time_periods]
             accum_time = 0

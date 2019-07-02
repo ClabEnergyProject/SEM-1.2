@@ -138,7 +138,7 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
 
     header_list += ['energy storage (kWh)']
     series_list.append( result_dic['ENERGY_STORAGE'].flatten() )
-  
+    
     header_list += ['dispatch to pgp storage (kW)']
     series_list.append( result_dic['DISPATCH_TO_PGP_STORAGE'].flatten() )
     
@@ -147,6 +147,15 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
 
     header_list += ['energy pgp storage (kWh)']
     series_list.append( result_dic['ENERGY_PGP_STORAGE'].flatten() )
+    
+    header_list += ['dispatch to csp storage (kW)']
+    series_list.append( result_dic['DISPATCH_TO_CSP_STORAGE'].flatten() )  # THere is no FROM in dispatch results
+    
+    header_list += ['dispatch from csp storage (kW)']
+    series_list.append( result_dic['DISPATCH_FROM_CSP_STORAGE'].flatten() )  # THere is no FROM in dispatch results
+
+    header_list += ['energy csp storage (kWh)']
+    series_list.append( result_dic['ENERGY_CSP_STORAGE'].flatten() )
     
     header_list += ['dispatch unmet demand (kW)']
     series_list.append( result_dic['DISPATCH_UNMET_DEMAND'].flatten() )
@@ -187,6 +196,8 @@ def save_basic_results( global_dic, case_dic_list ):
             'fixed cost nuclear ($/kW/h)',
             'fixed cost storage (($/h)/kWh)',
             'fixed cost pgp storage (($/h)/kWh)',
+            'fixed cost csp (($/h)/kWh)',
+            'fixed cost csp storage (($/h)/kWh)',
             
             'var cost natgas ($/kWh)',
             'var cost natgas ccs ($/kWh)',
@@ -197,17 +208,25 @@ def save_basic_results( global_dic, case_dic_list ):
             'var cost storage ($/kWh)',
             'var cost to pgp storage ($/kWh)',
             'var cost pgp storage ($/kWh)',
+            'var cost csp  ($/kWh)',
+            'var cost csp storage ($/kWh)',
+            
             'var cost unmet demand ($/kWh)',
             
             'storage charging efficiency',
             'storage charging time (h)',
             'storage decay rate (1/h)',
+            
             'pgp storage charging efficiency',
             'pgp storage decay rate (1/h)',
+            
+            'csp storage charging efficiency',
+            'csp storage decay rate (1/h)',
             
             'mean demand (kW)',
             'capacity factor solar series (-)',
             'capacity factor wind series (-)',
+            'capacity factor csp series (-)',
             
             'capacity natgas (kW)',
             'capacity natgas ccs (kW)',
@@ -218,6 +237,10 @@ def save_basic_results( global_dic, case_dic_list ):
             'capacity pgp storage (kWh)',
             'capacity to pgp storage (kW)',
             'capacity from pgp storage (kW)',
+            
+            'capacity csp (kW)',
+            'capacity csp storage (kWh)',
+            
             'system cost ($/kW/h)', # assuming demand normalized to 1 kW
             'problem status',
             
@@ -229,14 +252,21 @@ def save_basic_results( global_dic, case_dic_list ):
             'dispatch to storage (kW)',
             'dispatch from storage (kW)',
             'energy storage (kWh)',
+            
             'dispatch to pgp storage (kW)',
             'dispatch pgp storage (kW)',
             'energy pgp storage (kWh)',
+            
+            'dispatch to csp storage (kW)',
+            'dispatch from csp storage (kW)',
+            'energy csp storage (kWh)',
+            
             'dispatch unmet demand (kW)',
             
             'curtailment solar (kW)',
             'curtailment wind (kW)',
-            'curtailment nuclear (kW)'
+            'curtailment nuclear (kW)',
+            'curtailment csp (kW)'
             ]
 
     scalar_table = []
@@ -257,6 +287,9 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['FIXED_COST_NUCLEAR'],
                     case_dic['FIXED_COST_STORAGE'],
                     case_dic['FIXED_COST_PGP_STORAGE'],
+
+                    case_dic['FIXED_COST_CSP'],
+                    case_dic['FIXED_COST_CSP_STORAGE'],
                     
                     case_dic['VAR_COST_NATGAS'],
                     case_dic['VAR_COST_NATGAS_CCS'],
@@ -267,18 +300,27 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['VAR_COST_FROM_STORAGE'],
                     case_dic['VAR_COST_TO_PGP_STORAGE'],
                     case_dic['VAR_COST_FROM_PGP_STORAGE'],
+                    
+                    case_dic['VAR_COST_CSP'],  # power cost
+                    case_dic['VAR_COST_CSP_STORAGE'],  # energy cost
+                   
+                    
                     case_dic['VAR_COST_UNMET_DEMAND'],
                     
-                    case_dic['STORAGE_CHARGING_EFFICIENCY'],
-                    case_dic['STORAGE_CHARGING_TIME'],
-                    case_dic['STORAGE_DECAY_RATE'],
-                    case_dic['PGP_STORAGE_CHARGING_EFFICIENCY'],
-                    case_dic['PGP_STORAGE_DECAY_RATE'],
+                    case_dic['CHARGING_EFFICIENCY_STORAGE'],
+                    case_dic['CHARGING_TIME_STORAGE'],
+                    case_dic['DECAY_RATE_STORAGE'],
+                    case_dic['CHARGING_EFFICIENCY_PGP_STORAGE'],
+                    case_dic['DECAY_RATE_PGP_STORAGE'],
+
+                    case_dic['CHARGING_EFFICIENCY_CSP_STORAGE'],
+                    case_dic['DECAY_RATE_CSP_STORAGE'],
                     
                     # mean of time series assumptions
                     np.average(case_dic['DEMAND_SERIES']),
                     np.average(case_dic['SOLAR_SERIES']),
                     np.average(case_dic['WIND_SERIES']),
+                    np.average(case_dic['CSP_SERIES']),
                                     
                     # scalar results
                     
@@ -291,6 +333,10 @@ def save_basic_results( global_dic, case_dic_list ):
                     result_dic['CAPACITY_PGP_STORAGE'],
                     result_dic['CAPACITY_TO_PGP_STORAGE'],
                     result_dic['CAPACITY_FROM_PGP_STORAGE'],
+                    
+                    result_dic['CAPACITY_CSP'],
+                    result_dic['CAPACITY_CSP_STORAGE'],
+                    
                     result_dic['SYSTEM_COST'],
                     result_dic['PROBLEM_STATUS'],
                     
@@ -307,11 +353,17 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(result_dic['DISPATCH_TO_PGP_STORAGE']),
                     np.average(result_dic['DISPATCH_FROM_PGP_STORAGE']),
                     np.average(result_dic['ENERGY_PGP_STORAGE']),
+                    
+                    np.average(result_dic['DISPATCH_TO_CSP_STORAGE']),
+                    np.average(result_dic['DISPATCH_FROM_CSP_STORAGE']),
+                    np.average(result_dic['ENERGY_CSP_STORAGE']),
+                    
                     np.average(result_dic['DISPATCH_UNMET_DEMAND']),
                     
                     np.average(result_dic['CURTAILMENT_SOLAR']),
                     np.average(result_dic['CURTAILMENT_WIND']),
-                    np.average(result_dic['CURTAILMENT_NUCLEAR'])
+                    np.average(result_dic['CURTAILMENT_NUCLEAR']),
+                    np.average(result_dic['CURTAILMENT_CSP'])
                     
                     
              ]
