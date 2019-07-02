@@ -50,13 +50,18 @@ Copy that text and paste in in an Anaconda window. (You might start these Anacon
 	       
 (Note: the above line must call python and not python3, at least on Ken Caldeira's system.)
 
+If this install fails on installingm try the following line in an Anaconda window:
+
+		> conda config --add channels http://conda.anaconda.org/gurobi
+		> conda install gurobi
+
 8. Install cvxpy. For python3, cvxpy must be installed with pip. They recommend making a special virtual environment to allow different versions of things to run on the same machine, but I just installed into my general space.  Open up an Anaconda window (I did it as Administrator) and type
 
 		> pip install cvxpy 
 
 If this install fails on installing the ecos package, try the following line in an Anaconda window:
 
-        > conda install ecos
+	        > conda install ecos
 		> pip install cvxpy
 
 <b>Additional notes on installing cvxpy</b> (Mengyao)
@@ -97,8 +102,7 @@ The following is installation instructions for MacOS 10.13 machines.
 
 7. Set up python link to Gurobi. Open up the Anaconda3 terminal window as Administrator from the start menu. And then type: 
 
-	> conda config --add channels http://conda.anaconda.org/gurobi
-	
+	> conda config --add channels http://conda.anaconda.org/gurobi	
 	> conda install gurobi
 
 8. Install cvxpy. For python3, cvxpy must be installed with pip. Open up an Anaconda window (I did it as Administrator) and type  
