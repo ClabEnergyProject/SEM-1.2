@@ -152,7 +152,7 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     series_list.append( result_dic['DISPATCH_TO_CSP_STORAGE'].flatten() )  # THere is no FROM in dispatch results
     
     header_list += ['dispatch from csp storage (kW)']
-    series_list.append( result_dic['DISPATCH_FROM_CSP_STORAGE'].flatten() )  # THere is no FROM in dispatch results
+    series_list.append( result_dic['DISPATCH_FROM_CSP'].flatten() )  # THere is no FROM in dispatch results
 
     header_list += ['energy csp storage (kWh)']
     series_list.append( result_dic['ENERGY_CSP_STORAGE'].flatten() )
@@ -355,7 +355,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(result_dic['ENERGY_PGP_STORAGE']),
                     
                     np.average(result_dic['DISPATCH_TO_CSP_STORAGE']),
-                    np.average(result_dic['DISPATCH_FROM_CSP_STORAGE']),
+                    np.average(result_dic['DISPATCH_FROM_CSP']),
                     np.average(result_dic['ENERGY_CSP_STORAGE']),
                     
                     np.average(result_dic['DISPATCH_UNMET_DEMAND']),

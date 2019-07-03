@@ -392,7 +392,7 @@ def core_model (global_dic, case_dic):
 # For CSP, the dispatch components are:
 #     1. CSP generator to grid (dispatch_csp)
 #     2. CSP generator to storage (when dispatch demand met) (dispatch_csp_to_storage)
-#     3. Storage to dispatch (when no/low generation) (dispatch_from_csp_storage)
+#     3. Storage to dispatch (when no/low generation) (DISPATCH_FROM_CSP)
 
     if 'CSP' in system_components:
         if(case_dic['CAPACITY_CSP']<0):
@@ -410,14 +410,14 @@ def core_model (global_dic, case_dic):
             capacity_csp_storage = case_dic['CAPACITY_CSP_STORAGE'] * numerics_demand_scaling
         
         dispatch_to_csp_storage = cvx.Variable(num_time_periods)
-        dispatch_from_csp_storage = cvx.Variable(num_time_periods)
+        dispatch_from_csp = cvx.Variable(num_time_periods)
         energy_csp_storage = cvx.Variable(num_time_periods) # amount of energy currently stored in CSP storage
         constraints += [
                 dispatch_to_csp_storage >= 0, 
                 dispatch_to_csp_storage <= capacity_csp * csp_series,  ######### might need to be changed to direct solar radiation??
 
-                dispatch_from_csp_storage >= 0,
-                dispatch_from_csp_storage <= energy_csp_storage * (1 - decay_rate_csp_storage) + \
+                dispatch_from_csp >= 0,
+                dispatch_from_csp <= energy_csp_storage * (1 - decay_rate_csp_storage) + \
                      charging_efficiency_storage * dispatch_to_csp_storage, 
                      # you can't dispatch more from storage in a time step than is
                      # in storage plus what you are adding now
@@ -428,7 +428,7 @@ def core_model (global_dic, case_dic):
         
         fcn2min += capacity_csp * fixed_cost_csp + \
             capacity_csp_storage * fixed_cost_csp_storage +  \
-            cvx.sum(dispatch_from_csp_storage * var_cost_csp)/num_time_periods + \
+            cvx.sum(dispatch_from_csp * var_cost_csp)/num_time_periods + \
             cvx.sum(energy_csp_storage * var_cost_csp_storage)/num_time_periods
 
         for i in range(num_time_periods):
@@ -437,7 +437,7 @@ def core_model (global_dic, case_dic):
                     energy_csp_storage[(i+1) % num_time_periods] == 
                         energy_csp_storage[i]  \
                         + charging_efficiency_csp_storage * dispatch_to_csp_storage[i]  \
-                        - dispatch_from_csp_storage[i] \
+                        - dispatch_from_csp[i] \
                         - energy_csp_storage[i]*decay_rate_csp_storage
                     ]
     else:
@@ -445,7 +445,7 @@ def core_model (global_dic, case_dic):
         capacity_csp_storage = 0
         dispatch_csp = np.zeros(num_time_periods)
         dispatch_to_csp_storage = np.zeros(num_time_periods)
-        dispatch_from_csp_storage = np.zeros(num_time_periods)
+        dispatch_from_csp = np.zeros(num_time_periods)
         energy_csp_storage = np.zeros(num_time_periods)
         
 #%%------------------ unmet demand ------------------------------------------
@@ -468,7 +468,7 @@ def core_model (global_dic, case_dic):
             + dispatch_nuclear
             + dispatch_from_storage
             + dispatch_from_pgp_storage
-            + dispatch_from_csp_storage
+            + dispatch_from_csp
             + dispatch_unmet_demand
             == demand_series + dispatch_to_storage + dispatch_to_pgp_storage
             ]
@@ -544,7 +544,7 @@ def core_model (global_dic, case_dic):
         result['DISPATCH_CSP'] = -1 * np.ones(demand_series.size) 
         result['CURTAILMENT_CSP'] = -1 * np.ones(demand_series.size) 
         result['DISPATCH_TO_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
-        result['DISPATCH_FROM_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_FROM_CSP'] = -1 * np.ones(demand_series.size)
         result['ENERGY_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_UNMET_DEMAND'] = -1 * np.ones(demand_series.size)
 
@@ -672,7 +672,7 @@ def core_model (global_dic, case_dic):
             else:
                 result['CAPACITY_CSP_STORAGE'] = case_dic['CAPACITY_CSP_STORAGE']
             result['DISPATCH_TO_CSP_STORAGE'] = np.array(dispatch_to_csp_storage.value).flatten()/numerics_demand_scaling
-            result['DISPATCH_FROM_CSP_STORAGE'] = np.array(dispatch_from_csp_storage.value).flatten()/numerics_demand_scaling
+            result['DISPATCH_FROM_CSP'] = np.array(dispatch_from_csp.value).flatten()/numerics_demand_scaling
             result['ENERGY_CSP_STORAGE'] = np.array(energy_csp_storage.value).flatten()/numerics_demand_scaling
             result['CURTAILMENT_CSP'] = result['CAPACITY_CSP'] * csp_series - result['DISPATCH_TO_CSP_STORAGE']
         else:
@@ -680,7 +680,7 @@ def core_model (global_dic, case_dic):
             result['CURTAILMENT_CSP'] = (capacity_csp-dispatch_csp)/numerics_demand_scaling 
             result['CAPACITY_CSP_STORAGE'] = capacity_csp_storage/numerics_demand_scaling
             result['DISPATCH_TO_CSP_STORAGE'] = dispatch_to_csp_storage/numerics_demand_scaling
-            result['DISPATCH_FROM_CSP_STORAGE'] = dispatch_from_csp_storage/numerics_demand_scaling
+            result['DISPATCH_FROM_CSP'] = dispatch_from_csp/numerics_demand_scaling
             result['ENERGY_CSP_STORAGE'] = energy_csp_storage/numerics_demand_scaling
 
         if 'UNMET_DEMAND' in system_components:

@@ -121,6 +121,7 @@ def quick_look(global_dic, case_dic_list):
     color_PGP_STORAGE =  'pink'
     color_CURTAILMENT =  'lightgray'
     color_UNMET_DEMAND =  'gray' # not explicitly referenced but referenced through eval()
+    color_CSP = 'yellow'
     
     num_cases = len (case_dic_list) # number of cases
     # 'SYSTEM_COMPONENTS' -- LIST OF COMPONENTS, CHOICES ARE: 'WIND','SOLAR', 'NATGAS','NATGAS_CCS','NUCLEAR','STORAGE', 'PGP_STORAGE', 'UNMET'    
@@ -155,7 +156,7 @@ def quick_look(global_dic, case_dic_list):
 
         for component in system_components:
             addfrom = ''
-            if component == 'STORAGE' or component == 'PGP_STORAGE': 
+            if component == 'STORAGE' or component == 'PGP_STORAGE' or component == 'CSP': 
                 addfrom = 'FROM_'
             results_matrix_dispatch.append(result_dic['DISPATCH_' + addfrom + component ])
             legend_list_dispatch.append( 'DISPATCH_' + addfrom + component +' kW' )
