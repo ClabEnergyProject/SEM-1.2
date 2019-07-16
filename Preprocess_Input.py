@@ -32,6 +32,8 @@ Each dictionary in <case_dic_list> OPTIONALLY contains:
             'VAR_COST_NATGAS','VAR_COST_NATGAS_CCS','VAR_COST_SOLAR','DECAY_RATE_STORAGE',
             'VAR_COST_WIND','VAR_COST_NUCLEAR','VAR_COST_UNMET_DEMAND',
             'CHARGING_TIME_STORAGE',
+            'FIXED_COST_WIND2','VAR_COST_WIND2',
+            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2',
             'FIXED_COST_PGP_STORAGE',
             'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
             'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
@@ -157,6 +159,7 @@ def preprocess_input(case_input_path_filename):
 
     keywords_str = list(map(str.upper,
             ['DATA_PATH','DEMAND_FILE',
+             'SOLAR2_CAPACITY_FILE','WIND2_CAPACITY_FILE',
              'SOLAR_CAPACITY_FILE','WIND_CAPACITY_FILE','CSP_CAPACITY_FILE','OUTPUT_PATH',
              'CASE_NAME','GLOBAL_NAME']
             ))
@@ -174,6 +177,8 @@ def preprocess_input(case_input_path_filename):
             'VAR_COST_NATGAS','VAR_COST_NATGAS_CCS','VAR_COST_SOLAR','DECAY_RATE_STORAGE',
             'VAR_COST_WIND','VAR_COST_NUCLEAR','VAR_COST_UNMET_DEMAND',
             'VAR_COST_CSP','VAR_COST_CSP_STORAGE',
+            'FIXED_COST_WIND2','VAR_COST_WIND2','VAR_CO2_WIND2',
+            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2','VAR_CO2_SOLAR2',            
             'CHARGING_TIME_STORAGE',
             'FIXED_COST_PGP_STORAGE',
             'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
@@ -197,6 +202,7 @@ def preprocess_input(case_input_path_filename):
             'CHARGING_EFFICIENCY_STORAGE','DECAY_RATE_STORAGE',
             'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
             'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE',
+            'CAPACITY_WIND2','CAPACITY_SOLAR2',
             'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE',
             'CAPACITY_CSP','CAPACITY_CSP_STORAGE','DECAY_RATE_CSP_STORAGE',
             'CHARGING_EFFICIENCY_CSP_STORAGE']
@@ -269,6 +275,8 @@ def preprocess_input(case_input_path_filename):
     all_cases_dic['CAPACITY_NATGAS_CCS'] = -1. # if < 0, then calculated in optimization
     all_cases_dic['CAPACITY_SOLAR'] = -1. # if < 0, then calculated in optimization
     all_cases_dic['CAPACITY_WIND'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_SOLAR2'] = -1. # if < 0, then calculated in optimization
+    all_cases_dic['CAPACITY_WIND2'] = -1. # if < 0, then calculated in optimization
     all_cases_dic['CAPACITY_NUCLEAR'] = -1. # if < 0, then calculated in optimization
     all_cases_dic['CAPACITY_STORAGE'] = -1. # if < 0, then calculated in optimization
     all_cases_dic['CAPACITY_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
@@ -424,6 +432,8 @@ def preprocess_input(case_input_path_filename):
     case_list_dic['DEMAND_SERIES'] = demand_series_list
     case_list_dic['WIND_SERIES'] = wind_series_list
     case_list_dic['SOLAR_SERIES'] = solar_series_list
+    case_list_dic['WIND2_SERIES'] = wind_series_list
+    case_list_dic['SOLAR2_SERIES'] = solar_series_list
     case_list_dic['CSP_SERIES'] = csp_series_list
                                                 
     # Now develop list of component lists
@@ -454,6 +464,14 @@ def preprocess_input(case_input_path_filename):
         if 'FIXED_COST_SOLAR' in have_keys:
             if case_list_dic['FIXED_COST_SOLAR'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR'][case_index] >= 0 :
                 component_list.append('SOLAR')
+                                                
+        if 'FIXED_COST_WIND2' in have_keys:
+            if case_list_dic['FIXED_COST_WIND2'][case_index] >= 0 and case_list_dic['VAR_COST_WIND2'][case_index] >= 0 :
+                component_list.append('WIND2')
+                                                
+        if 'FIXED_COST_SOLAR2' in have_keys:
+            if case_list_dic['FIXED_COST_SOLAR2'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR2'][case_index] >= 0 :
+                component_list.append('SOLAR2')
                                                 
         if 'FIXED_COST_STORAGE' in have_keys:
             if case_list_dic['FIXED_COST_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE'][case_index] >= 0 :
@@ -512,6 +530,18 @@ def preprocess_input(case_input_path_filename):
                         + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_SOLAR'][case_index])
                 case_list_dic['VAR_COST_SOLAR'][case_index] = (case_list_dic['VAR_COST_SOLAR'][case_index] 
                         + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_SOLAR'][case_index])  
+                                                    
+            if 'WIND2' in system_components:
+                case_list_dic['FIXED_COST_WIND2'][case_index] = (case_list_dic['FIXED_COST_WIND2'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_WIND2'][case_index])
+                case_list_dic['VAR_COST_WIND2'][case_index] = (case_list_dic['VAR_COST_WIND2'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_WIND2'][case_index])
+                                                    
+            if 'SOLAR2' in system_components:
+                case_list_dic['FIXED_COST_SOLAR2'][case_index] = (case_list_dic['FIXED_COST_SOLAR2'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['FIXED_CO2_SOLAR2'][case_index])
+                case_list_dic['VAR_COST_SOLAR2'][case_index] = (case_list_dic['VAR_COST_SOLAR2'][case_index] 
+                        + case_list_dic['CO2_PRICE'][case_index]*case_list_dic['VAR_CO2_SOLAR2'][case_index])  
                                                   
             #  NOTE:  Carbon embodied in STORAGE, PGP_STORAGE or CSP is not considered here !!!
             

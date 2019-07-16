@@ -99,6 +99,11 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
         case_dic['WIND_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
     if len(case_dic['SOLAR_SERIES']) == 0:
         case_dic['SOLAR_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
+             
+    if len(case_dic['WIND2_SERIES']) == 0:
+        case_dic['WIND2_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
+    if len(case_dic['SOLAR2_SERIES']) == 0:
+        case_dic['SOLAR2_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
     
     header_list = []
     series_list = []
@@ -115,6 +120,12 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['wind capacity factor (-)']
     series_list.append( np.array(case_dic['WIND_SERIES']))
 
+    header_list += ['solar2 capacity factor (-)']
+    series_list.append( np.array(case_dic['SOLAR2_SERIES']))    
+    
+    header_list += ['wind2 capacity factor (-)']
+    series_list.append( np.array(case_dic['WIND2_SERIES']))
+
     header_list += ['dispatch natgas (kW)']
     series_list.append( result_dic['DISPATCH_NATGAS'].flatten() )
     
@@ -126,6 +137,12 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     
     header_list += ['dispatch wind (kW)']
     series_list.append( result_dic['DISPATCH_WIND'].flatten() )
+    
+    header_list += ['dispatch solar2 (kW)']
+    series_list.append( result_dic['DISPATCH_SOLAR2'].flatten() ) 
+    
+    header_list += ['dispatch wind2 (kW)']
+    series_list.append( result_dic['DISPATCH_WIND2'].flatten() )
     
     header_list += ['dispatch nuclear (kW)']
     series_list.append( result_dic['DISPATCH_NUCLEAR'].flatten() )
@@ -166,6 +183,12 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['cutailment wind (kW)']
     series_list.append( result_dic['CURTAILMENT_WIND'].flatten() )
     
+    header_list += ['cutailment solar2 (kW)']
+    series_list.append( result_dic['CURTAILMENT_SOLAR2'].flatten() )
+    
+    header_list += ['cutailment wind2 (kW)']
+    series_list.append( result_dic['CURTAILMENT_WIND2'].flatten() )
+    
     header_list += ['cutailment nuclear (kW)']
     series_list.append( result_dic['CURTAILMENT_NUCLEAR'].flatten() )
     
@@ -193,6 +216,8 @@ def save_basic_results( global_dic, case_dic_list ):
             'fixed cost natgas ccs ($/kW/h)',
             'fixed cost solar ($/kW/h)',
             'fixed cost wind ($/kW/h)',
+            'fixed cost solar2 ($/kW/h)',
+            'fixed cost wind2 ($/kW/h)',
             'fixed cost nuclear ($/kW/h)',
             'fixed cost storage (($/h)/kWh)',
             'fixed cost pgp storage (($/h)/kWh)',
@@ -203,6 +228,8 @@ def save_basic_results( global_dic, case_dic_list ):
             'var cost natgas ccs ($/kWh)',
             'var cost solar ($/kWh)',
             'var cost wind ($/kWh)',
+            'var cost solar2 ($/kWh)',
+            'var cost wind2 ($/kWh)',
             'var cost nuclear ($/kWh)',
             'var cost to storage ($/kWh)',
             'var cost storage ($/kWh)',
@@ -226,12 +253,16 @@ def save_basic_results( global_dic, case_dic_list ):
             'mean demand (kW)',
             'capacity factor solar series (-)',
             'capacity factor wind series (-)',
+            'capacity factor solar2 series (-)',
+            'capacity factor wind2 series (-)',
             'capacity factor csp series (-)',
             
             'capacity natgas (kW)',
             'capacity natgas ccs (kW)',
             'capacity solar (kW)',
             'capacity wind (kW)',
+            'capacity solar2 (kW)',
+            'capacity wind2 (kW)',
             'capacity nuclear (kW)',
             'capacity storage (kWh)',
             'capacity pgp storage (kWh)',
@@ -248,6 +279,8 @@ def save_basic_results( global_dic, case_dic_list ):
             'dispatch natgas ccs (kW)',
             'dispatch solar (kW)',
             'dispatch wind (kW)',
+            'dispatch solar2 (kW)',
+            'dispatch wind2 (kW)',
             'dispatch nuclear (kW)',
             'dispatch to storage (kW)',
             'dispatch from storage (kW)',
@@ -265,6 +298,8 @@ def save_basic_results( global_dic, case_dic_list ):
             
             'curtailment solar (kW)',
             'curtailment wind (kW)',
+            'curtailment solar2 (kW)',
+            'curtailment wind2 (kW)',
             'curtailment nuclear (kW)',
             'curtailment csp (kW)'
             ]
@@ -284,6 +319,8 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['FIXED_COST_NATGAS_CCS'],
                     case_dic['FIXED_COST_SOLAR'],
                     case_dic['FIXED_COST_WIND'],
+                    case_dic['FIXED_COST_SOLAR2'],
+                    case_dic['FIXED_COST_WIND2'],
                     case_dic['FIXED_COST_NUCLEAR'],
                     case_dic['FIXED_COST_STORAGE'],
                     case_dic['FIXED_COST_PGP_STORAGE'],
@@ -295,6 +332,8 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['VAR_COST_NATGAS_CCS'],
                     case_dic['VAR_COST_SOLAR'],
                     case_dic['VAR_COST_WIND'],
+                    case_dic['VAR_COST_SOLAR2'],
+                    case_dic['VAR_COST_WIND2'],
                     case_dic['VAR_COST_NUCLEAR'],
                     case_dic['VAR_COST_TO_STORAGE'],
                     case_dic['VAR_COST_FROM_STORAGE'],
@@ -320,6 +359,8 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(case_dic['DEMAND_SERIES']),
                     np.average(case_dic['SOLAR_SERIES']),
                     np.average(case_dic['WIND_SERIES']),
+                    np.average(case_dic['SOLAR2_SERIES']),
+                    np.average(case_dic['WIND2_SERIES']),
                     np.average(case_dic['CSP_SERIES']),
                                     
                     # scalar results
@@ -328,6 +369,8 @@ def save_basic_results( global_dic, case_dic_list ):
                     result_dic['CAPACITY_NATGAS_CCS'],
                     result_dic['CAPACITY_SOLAR'],
                     result_dic['CAPACITY_WIND'],
+                    result_dic['CAPACITY_SOLAR2'],
+                    result_dic['CAPACITY_WIND2'],
                     result_dic['CAPACITY_NUCLEAR'],
                     result_dic['CAPACITY_STORAGE'],
                     result_dic['CAPACITY_PGP_STORAGE'],
@@ -346,6 +389,8 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(result_dic['DISPATCH_NATGAS_CCS']),
                     np.average(result_dic['DISPATCH_SOLAR']),
                     np.average(result_dic['DISPATCH_WIND']),
+                    np.average(result_dic['DISPATCH_SOLAR2']),
+                    np.average(result_dic['DISPATCH_WIND2']),
                     np.average(result_dic['DISPATCH_NUCLEAR']),
                     np.average(result_dic['DISPATCH_TO_STORAGE']),
                     np.average(result_dic['DISPATCH_FROM_STORAGE']),
@@ -362,6 +407,8 @@ def save_basic_results( global_dic, case_dic_list ):
                     
                     np.average(result_dic['CURTAILMENT_SOLAR']),
                     np.average(result_dic['CURTAILMENT_WIND']),
+                    np.average(result_dic['CURTAILMENT_SOLAR2']),
+                    np.average(result_dic['CURTAILMENT_WIND2']),
                     np.average(result_dic['CURTAILMENT_NUCLEAR']),
                     np.average(result_dic['CURTAILMENT_CSP'])
                     

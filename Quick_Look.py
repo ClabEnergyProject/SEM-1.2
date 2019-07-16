@@ -116,6 +116,8 @@ def quick_look(global_dic, case_dic_list):
     color_NATGAS_CCS  = 'brown' # not explicitly referenced but referenced through eval()
     color_SOLAR   = 'orange' # not explicitly referenced but referenced through eval()
     color_WIND    = 'blue' # not explicitly referenced but referenced through eval()
+    color_SOLAR2   = 'orangered' # not explicitly referenced but referenced through eval()
+    color_WIND2    = 'darkblue' # not explicitly referenced but referenced through eval()
     color_NUCLEAR = 'green' # not explicitly referenced but referenced through eval()
     color_STORAGE = 'purple'
     color_PGP_STORAGE =  'pink'
