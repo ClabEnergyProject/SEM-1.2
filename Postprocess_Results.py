@@ -48,9 +48,9 @@ def get_dimension_info(case_dic_list):
     VAR_COST_SOLAR = []
     VAR_COST_WIND = []
     VAR_COST_NUCLEAR = []
-    STORAGE_DECAY_RATE = []
+    DECAY_RATE_STORAGE = []
     
-    STORAGE_CHARGING_TIME = []
+    CHARGING_TIME_STORAGE = []
     
     num_scenarios = len(case_dic_list)
     for idx in range(num_scenarios):
@@ -64,9 +64,9 @@ def get_dimension_info(case_dic_list):
         VAR_COST_SOLAR   = np.r_[VAR_COST_SOLAR,   case_dic_list[idx]['VAR_COST_SOLAR']]
         VAR_COST_WIND    = np.r_[VAR_COST_WIND,    case_dic_list[idx]['VAR_COST_WIND']]
         VAR_COST_NUCLEAR = np.r_[VAR_COST_NUCLEAR, case_dic_list[idx]['VAR_COST_NUCLEAR']]
-        STORAGE_DECAY_RATE = np.r_[STORAGE_DECAY_RATE, case_dic_list[idx]['STORAGE_DECAY_RATE']]
+        DECAY_RATE_STORAGE = np.r_[DECAY_RATE_STORAGE, case_dic_list[idx]['DECAY_RATE_STORAGE']]
         
-        STORAGE_CHARGING_TIME = np.r_[STORAGE_CHARGING_TIME, case_dic_list[idx]['STORAGE_CHARGING_TIME']]
+        CHARGING_TIME_STORAGE = np.r_[CHARGING_TIME_STORAGE, case_dic_list[idx]['CHARGING_TIME_STORAGE']]
         
     FIXED_COST_NATGAS_list  = np.unique(FIXED_COST_NATGAS)
     FIXED_COST_SOLAR_list   = np.unique(FIXED_COST_SOLAR)
@@ -78,9 +78,9 @@ def get_dimension_info(case_dic_list):
     VAR_COST_SOLAR_list   = np.unique(VAR_COST_SOLAR)
     VAR_COST_WIND_list    = np.unique(VAR_COST_WIND)
     VAR_COST_NUCLEAR_list = np.unique(VAR_COST_NUCLEAR)
-    STORAGE_DECAY_RATE_list = np.unique(STORAGE_DECAY_RATE)
+    DECAY_RATE_STORAGE_list = np.unique(DECAY_RATE_STORAGE)
     
-    STORAGE_CHARGING_TIME_list = np.unique(STORAGE_CHARGING_TIME)
+    CHARGING_TIME_STORAGE_list = np.unique(CHARGING_TIME_STORAGE)
     
     cost_list = {'FIXED_COST_NATGAS':FIXED_COST_NATGAS_list,
                  'FIXED_COST_SOLAR':FIXED_COST_SOLAR_list,
@@ -91,8 +91,8 @@ def get_dimension_info(case_dic_list):
                  'VAR_COST_SOLAR':VAR_COST_SOLAR_list,
                  'VAR_COST_WIND':VAR_COST_WIND_list,
                  'VAR_COST_NUCLEAR':VAR_COST_NUCLEAR_list,
-                 'STORAGE_DECAY_RATE':STORAGE_DECAY_RATE_list,
-                 'STORAGE_CHARGING_TIME':STORAGE_CHARGING_TIME_list}
+                 'DECAY_RATE_STORAGE':DECAY_RATE_STORAGE_list,
+                 'CHARGING_TIME_STORAGE':CHARGING_TIME_STORAGE_list}
     var_list = ['FIXED_COST_NATGAS',
                 'FIXED_COST_SOLAR',
                 'FIXED_COST_WIND',
@@ -102,8 +102,8 @@ def get_dimension_info(case_dic_list):
                 'VAR_COST_SOLAR',
                 'VAR_COST_WIND',
                 'VAR_COST_NUCLEAR',
-                'STORAGE_DECAY_RATE',
-                'STORAGE_CHARGING_TIME']
+                'DECAY_RATE_STORAGE',
+                'CHARGING_TIME_STORAGE']
     
     return cost_list, var_list
 
@@ -130,7 +130,7 @@ def prepare_scalar_variables (global_dic, case_dic_list, result_list ):
         tmp['VAR_COST_SOLAR']         = np.array(np.squeeze(case_dic_list[idx]['VAR_COST_SOLAR']))
         tmp['VAR_COST_WIND']          = np.array(np.squeeze(case_dic_list[idx]['VAR_COST_WIND']))
         tmp['VAR_COST_NUCLEAR']       = np.array(np.squeeze(case_dic_list[idx]['VAR_COST_NUCLEAR']))
-        tmp['STORAGE_DECAY_RATE']       = np.array(np.squeeze(case_dic_list[idx]['STORAGE_DECAY_RATE']))
+        tmp['DECAY_RATE_STORAGE']       = np.array(np.squeeze(case_dic_list[idx]['DECAY_RATE_STORAGE']))
         tmp['VAR_COST_TO_STORAGE']    = np.array(np.squeeze(case_dic_list[idx]['VAR_COST_TO_STORAGE']))
         tmp['VAR_COST_FROM_STORAGE']  = np.array(np.squeeze(case_dic_list[idx]['VAR_COST_FROM_STORAGE']))
         tmp['VAR_COST_UNMET_DEMAND']  = np.array(np.squeeze(case_dic_list[idx]['VAR_COST_UNMET_DEMAND']))
@@ -149,8 +149,8 @@ def prepare_scalar_variables (global_dic, case_dic_list, result_list ):
         tmp['DISPATCH_CURTAILMENT']   = np.array(np.squeeze(result_list[idx]['DISPATCH_CURTAILMENT']))  #/ num_time_periods
         tmp['ENERGY_STORAGE']         = np.array(np.squeeze(result_list[idx]['ENERGY_STORAGE']))        #/ num_time_periods
         tmp['SYSTEM_COST']    = np.array(np.squeeze(result_list[idx]['SYSTEM_COST']))  
-        tmp['STORAGE_CHARGING_EFFICIENCY']    = np.array(np.squeeze(case_dic_list[idx]['STORAGE_CHARGING_EFFICIENCY']))
-        tmp['STORAGE_CHARGING_TIME']    = np.array(np.squeeze(case_dic_list[idx]['STORAGE_CHARGING_TIME']))
+        tmp['CHARGING_EFFICIENCY_STORAGE']    = np.array(np.squeeze(case_dic_list[idx]['CHARGING_EFFICIENCY_STORAGE']))
+        tmp['CHARGING_TIME_STORAGE']    = np.array(np.squeeze(case_dic_list[idx]['CHARGING_TIME_STORAGE']))
         tmp['CASE_NAME'] = np.array(np.squeeze(case_dic_list[idx]['CASE_NAME']))
 
         res[idx] = tmp
@@ -297,7 +297,7 @@ def stack_plot1(
     VAR_COST_SOLAR   = get_multicases_results(res, num_case, 'VAR_COST_SOLAR')
     VAR_COST_WIND    = get_multicases_results(res, num_case, 'VAR_COST_WIND')
     VAR_COST_NUCLEAR = get_multicases_results(res, num_case, 'VAR_COST_NUCLEAR')
-    STORAGE_DECAY_RATE    = get_multicases_results(res, num_case, 'STORAGE_DECAY_RATE') 
+    DECAY_RATE_STORAGE    = get_multicases_results(res, num_case, 'DECAY_RATE_STORAGE') 
     VAR_COST_TO_STORAGE   = get_multicases_results(res, num_case, 'VAR_COST_TO_STORAGE') 
     VAR_COST_FROM_STORAGE = get_multicases_results(res, num_case, 'VAR_COST_FROM_STORAGE')     
     DISPATCH_NATGAS       = get_multicases_results(res, num_case, 'DISPATCH_NATGAS')        / num_time_periods
@@ -364,7 +364,7 @@ def stack_plot1(
     cost_solar   = cal_cost(FIXED_COST_SOLAR,   CAPACITY_SOLAR,   VAR_COST_SOLAR,   DISPATCH_SOLAR,   num_case, num_time_periods)
     cost_wind    = cal_cost(FIXED_COST_WIND,    CAPACITY_WIND,    VAR_COST_WIND,    DISPATCH_WIND,    num_case, num_time_periods)
     cost_nuclear = cal_cost(FIXED_COST_NUCLEAR, CAPACITY_NUCLEAR, VAR_COST_NUCLEAR, DISPATCH_NUCLEAR, num_case, num_time_periods)
-    cost_storage = cal_cost(FIXED_COST_STORAGE, CAPACITY_STORAGE, STORAGE_DECAY_RATE,    ENERGY_STORAGE   ,num_case, num_time_periods, 
+    cost_storage = cal_cost(FIXED_COST_STORAGE, CAPACITY_STORAGE, DECAY_RATE_STORAGE,    ENERGY_STORAGE   ,num_case, num_time_periods, 
                             VAR_COST_TO_STORAGE,  DISPATCH_TO_STORAGE,
                             VAR_COST_FROM_STORAGE,DISPATCH_FROM_STORAGE)  # now dispatch_to/from is free    
     
@@ -820,17 +820,17 @@ def battery_plot(res,
     DISPATCH_TO_STORAGE         = get_multicases_results(res, num_case, 'DISPATCH_TO_STORAGE')[case_idx]
     DISPATCH_FROM_STORAGE       = get_multicases_results(res, num_case, 'DISPATCH_FROM_STORAGE')[case_idx]
     ENERGY_STORAGE              = get_multicases_results(res, num_case, 'ENERGY_STORAGE')[case_idx]
-    STORAGE_CHARGING_EFFICIENCY = get_multicases_results(res, num_case, 'STORAGE_CHARGING_EFFICIENCY')[case_idx]
+    CHARGING_EFFICIENCY_STORAGE = get_multicases_results(res, num_case, 'CHARGING_EFFICIENCY_STORAGE')[case_idx]
     max_headroom, mean_residence_time, max_residence_time = battery_calculation(num_time_periods,
                                                                                 DISPATCH_TO_STORAGE,
                                                                                 DISPATCH_FROM_STORAGE,
                                                                                 ENERGY_STORAGE,
-                                                                                STORAGE_CHARGING_EFFICIENCY)
+                                                                                CHARGING_EFFICIENCY_STORAGE)
     aa = DISPATCH_FROM_STORAGE
     bb = DISPATCH_TO_STORAGE
     aaa = np.squeeze(avg_series(aa, 1, 1,num_time_periods,24,1))
     bbb = np.squeeze(avg_series(bb, 1, 1,num_time_periods,24,1))
-    ccc = STORAGE_CHARGING_EFFICIENCY
+    ccc = CHARGING_EFFICIENCY_STORAGE
     battery_output = [aaa, bbb, ccc]
     
     xaxis = np.arange(num_time_periods/24)+1

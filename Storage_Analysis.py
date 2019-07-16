@@ -26,8 +26,8 @@ def storage_analysis(global_dic,case_dic,result_dic):
 
     var_cost_to_storage = case_dic['VAR_COST_TO_STORAGE']
     var_cost_from_storage = case_dic['VAR_COST_FROM_STORAGE']
-    storage_charging_efficiency = case_dic['STORAGE_CHARGING_EFFICIENCY']
-    storage_decay_rate = case_dic['STORAGE_DECAY_RATE']
+    charging_efficiency_storage = case_dic['CHARGING_EFFICIENCY_STORAGE']
+    decay_rate_storage = case_dic['DECAY_RATE_STORAGE']
     
     dispatch_to_storage = result_dic['DISPATCH_TO_STORAGE']
     dispatch_from_storage = result_dic['DISPATCH_FROM_STORAGE']
@@ -53,8 +53,8 @@ def storage_analysis(global_dic,case_dic,result_dic):
     
     #            constraints += [
     #                energy_storage[(i+1) % num_time_periods] == 
-    #                    energy_storage[i] + storage_charging_efficiency * dispatch_to_storage[i] 
-    #                    - dispatch_from_storage[i] - energy_storage[i]*storage_decay_rate
+    #                    energy_storage[i] + charging_efficiency_storage * dispatch_to_storage[i] 
+    #                    - dispatch_from_storage[i] - energy_storage[i]*decay_rate_storage
     
     # and
     
@@ -83,7 +83,7 @@ def storage_analysis(global_dic,case_dic,result_dic):
         
         # all of the electricity decays between time steps
         lifo_stack = [[item[0],                             #idx
-                       item[1]*(1.-storage_decay_rate),     #energy
+                       item[1]*(1.-decay_rate_storage),     #energy
                        item[2],                             #electricity cost
                        item[3]                              #variable cost to storage
                        ] for item in lifo_stack]
@@ -91,7 +91,7 @@ def storage_analysis(global_dic,case_dic,result_dic):
         if dispatch_to_storage[idx] > 0:  # push on stack
             lifo_stack.append([
                     idx0,
-                    dispatch_to_storage[idx]*storage_charging_efficiency,
+                    dispatch_to_storage[idx]*charging_efficiency_storage,
                     price[idx]*dispatch_to_storage[idx],
                     var_cost_to_storage*dispatch_to_storage[idx]
                     ] )
