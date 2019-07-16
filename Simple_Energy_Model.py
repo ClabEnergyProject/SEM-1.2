@@ -8,6 +8,10 @@
   
   The format of this file is documented in the file called <case_input.csv>.
   
+  If you are in Spyder, under the Run menu you can select 'configuration per File' Fn+Ctrl+F6
+  and enter the file name of your input .csv file, e.g., Check 'command line options'
+  and enter ./case_input_base_190716.csv
+  
 '''
 
 from Core_Model import core_model_loop
