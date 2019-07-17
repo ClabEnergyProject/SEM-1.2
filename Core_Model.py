@@ -102,8 +102,8 @@ def core_model (global_dic, case_dic):
     demand_series = np.array(case_dic['DEMAND_SERIES'])*numerics_demand_scaling
     solar_series = case_dic['SOLAR_SERIES'] # Assumed to be normalized per kW capacity
     wind_series = case_dic['WIND_SERIES'] # Assumed to be normalized per kW capacity
-    solar_series = case_dic['SOLAR2_SERIES'] # Assumed to be normalized per kW capacity
-    wind_series = case_dic['WIND2_SERIES'] # Assumed to be normalized per kW capacity
+    solar2_series = case_dic['SOLAR2_SERIES'] # Assumed to be normalized per kW capacity
+    wind2_series = case_dic['WIND2_SERIES'] # Assumed to be normalized per kW capacity
     csp_series = case_dic['CSP_SERIES'] # Assumed to be normalized per kW capacity
 
 
@@ -269,7 +269,7 @@ def core_model (global_dic, case_dic):
         if(case_dic['CAPACITY_SOLAR2']<0):
             capacity_solar2 = cvx.Variable(1) # calculate SOLAR2 capacity
             constraints += [
-                capacity_solar >= 0]
+                capacity_solar2 >= 0]
         else:
             capacity_solar2 = case_dic['CAPACITY_SOLAR2'] * numerics_demand_scaling
 
@@ -511,6 +511,8 @@ def core_model (global_dic, case_dic):
             + dispatch_natgas_ccs
             + dispatch_solar
             + dispatch_wind
+            + dispatch_solar2
+            + dispatch_wind2
             + dispatch_nuclear
             + dispatch_from_storage
             + dispatch_from_pgp_storage

@@ -327,7 +327,10 @@ def preprocess_input(case_input_path_filename):
     dummy = [-1 for i in range(num_cases)]
     for keyword in list(set(keywords_real).difference(case_list_dic.keys())):
         case_list_dic[keyword] = dummy
-    
+
+                                                
+#%% 
+
     # ok, now we have everything from the case_input file in case_list_dic.
     # Let's add the other things we need. First, we will see what system components
     # are used in each case.
@@ -338,8 +341,70 @@ def preprocess_input(case_input_path_filename):
     
     have_keys = case_list_dic.keys()
 
+    # Now develop list of component lists
+    # If any of the cost variables for a technology is negative, that technology is assumed 
+    # not to be in the mix.
+    
+    list_of_component_lists = []
+    for case_index in range(num_cases):
+        #if verbose:
+        #    print ( 'Preprocess_Input.py:Components for ',case_list_dic['CASE_NAME'][case_index])
+        component_list = []
+        if 'FIXED_COST_NUCLEAR' in have_keys:
+            if case_list_dic['FIXED_COST_NUCLEAR'][case_index] >= 0 and case_list_dic['VAR_COST_NUCLEAR'][case_index] >= 0 :
+                component_list.append('NUCLEAR')
+                                                
+        if 'FIXED_COST_NATGAS' in have_keys:
+            if case_list_dic['FIXED_COST_NATGAS'][case_index] >= 0 and case_list_dic['VAR_COST_NATGAS'][case_index] >= 0 :
+                component_list.append('NATGAS')
+                                                
+        if 'FIXED_COST_NATGAS_CCS' in have_keys:
+            if case_list_dic['FIXED_COST_NATGAS_CCS'][case_index] >= 0 and case_list_dic['VAR_COST_NATGAS_CCS'][case_index] >= 0 :
+                component_list.append('NATGAS_CCS')
+                                                
+        if 'FIXED_COST_WIND' in have_keys:
+            if case_list_dic['FIXED_COST_WIND'][case_index] >= 0 and case_list_dic['VAR_COST_WIND'][case_index] >= 0 :
+                component_list.append('WIND')
+                                                
+        if 'FIXED_COST_SOLAR' in have_keys:
+            if case_list_dic['FIXED_COST_SOLAR'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR'][case_index] >= 0 :
+                component_list.append('SOLAR')
+                                                
+        if 'FIXED_COST_WIND2' in have_keys:
+            if case_list_dic['FIXED_COST_WIND2'][case_index] >= 0 and case_list_dic['VAR_COST_WIND2'][case_index] >= 0 :
+                component_list.append('WIND2')
+                                                
+        if 'FIXED_COST_SOLAR2' in have_keys:
+            if case_list_dic['FIXED_COST_SOLAR2'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR2'][case_index] >= 0 :
+                component_list.append('SOLAR2')
+                                                
+        if 'FIXED_COST_STORAGE' in have_keys:
+            if case_list_dic['FIXED_COST_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE'][case_index] >= 0 :
+                component_list.append('STORAGE')
+                
+        if 'FIXED_COST_PGP_STORAGE' in have_keys:
+            if (case_list_dic['FIXED_COST_PGP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_FROM_PGP_STORAGE'][case_index] >= 0  and 
+                case_list_dic['VAR_COST_TO_PGP_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_PGP_STORAGE'][case_index] >= 0):
+                component_list.append('PGP_STORAGE')
+                
+        if 'FIXED_COST_CSP' in have_keys:
+            if (case_list_dic['FIXED_COST_CSP'][case_index] >= 0 and case_list_dic['VAR_COST_CSP'][case_index] >= 0  and 
+                case_list_dic['FIXED_COST_CSP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_CSP_STORAGE'][case_index] >= 0 and 
+                case_list_dic['CHARGING_EFFICIENCY_CSP_STORAGE'][case_index] >= 0):
+                component_list.append('CSP')
+                
+        if 'VAR_COST_UNMET_DEMAND' in have_keys:
+            if case_list_dic['VAR_COST_UNMET_DEMAND'][case_index] >= 0:
+                component_list.append('UNMET_DEMAND')
+                                
+        list_of_component_lists.append(component_list)
+    case_list_dic['SYSTEM_COMPONENTS'] = list_of_component_lists
+
+#%%    
     solar_series_list = []
     wind_series_list = []
+    solar2_series_list = []
+    wind2_series_list = []
     demand_series_list = []
     csp_series_list = []
 
@@ -407,6 +472,48 @@ def preprocess_input(case_input_path_filename):
                 wind_series_list.append([])
         else:
             wind_series_list.append([])
+
+        if 'FIXED_COST_SOLAR2' in have_keys:
+            if case_list_dic['FIXED_COST_SOLAR2'][case_index] >= 0:
+                solar2_series_list.append(
+                        read_csv_dated_data_file(
+                                case_list_dic['START_YEAR'][case_index],
+                                case_list_dic['START_MONTH'][case_index],
+                                case_list_dic['START_DAY'][case_index],
+                                case_list_dic['START_HOUR'][case_index],
+                                case_list_dic['END_YEAR'][case_index],
+                                case_list_dic['END_MONTH'][case_index],
+                                case_list_dic['END_DAY'][case_index],
+                                case_list_dic['END_HOUR'][case_index],
+                                global_dic['DATA_PATH'],
+                                case_list_dic['SOLAR2_CAPACITY_FILE'][case_index]
+                                )
+                        )
+            else:
+                solar2_series_list.append([])
+        else:
+            solar2_series_list.append([])
+                        
+        if 'FIXED_COST_WIND2' in have_keys:
+            if case_list_dic['FIXED_COST_WIND2'][case_index] >= 0:
+                wind2_series_list.append(
+                        read_csv_dated_data_file(
+                                case_list_dic['START_YEAR'][case_index],
+                                case_list_dic['START_MONTH'][case_index],
+                                case_list_dic['START_DAY'][case_index],
+                                case_list_dic['START_HOUR'][case_index],
+                                case_list_dic['END_YEAR'][case_index],
+                                case_list_dic['END_MONTH'][case_index],
+                                case_list_dic['END_DAY'][case_index],
+                                case_list_dic['END_HOUR'][case_index],
+                                global_dic['DATA_PATH'],
+                                case_list_dic['WIND2_CAPACITY_FILE'][case_index]
+                                )
+                        )
+            else:
+                wind2_series_list.append([])
+        else:
+            wind2_series_list.append([])
                         
         if 'FIXED_COST_CSP' in have_keys:
             if case_list_dic['FIXED_COST_CSP'][case_index] >= 0:
@@ -432,69 +539,11 @@ def preprocess_input(case_input_path_filename):
     case_list_dic['DEMAND_SERIES'] = demand_series_list
     case_list_dic['WIND_SERIES'] = wind_series_list
     case_list_dic['SOLAR_SERIES'] = solar_series_list
-    case_list_dic['WIND2_SERIES'] = wind_series_list
-    case_list_dic['SOLAR2_SERIES'] = solar_series_list
+    case_list_dic['WIND2_SERIES'] = wind2_series_list
+    case_list_dic['SOLAR2_SERIES'] = solar2_series_list
     case_list_dic['CSP_SERIES'] = csp_series_list
-                                                
-    # Now develop list of component lists
-    # If any of the cost variables for a technology is negative, that technology is assumed 
-    # not to be in the mix.
     
-    list_of_component_lists = []
-    for case_index in range(num_cases):
-        #if verbose:
-        #    print ( 'Preprocess_Input.py:Components for ',case_list_dic['CASE_NAME'][case_index])
-        component_list = []
-        if 'FIXED_COST_NUCLEAR' in have_keys:
-            if case_list_dic['FIXED_COST_NUCLEAR'][case_index] >= 0 and case_list_dic['VAR_COST_NUCLEAR'][case_index] >= 0 :
-                component_list.append('NUCLEAR')
-                                                
-        if 'FIXED_COST_NATGAS' in have_keys:
-            if case_list_dic['FIXED_COST_NATGAS'][case_index] >= 0 and case_list_dic['VAR_COST_NATGAS'][case_index] >= 0 :
-                component_list.append('NATGAS')
-                                                
-        if 'FIXED_COST_NATGAS_CCS' in have_keys:
-            if case_list_dic['FIXED_COST_NATGAS_CCS'][case_index] >= 0 and case_list_dic['VAR_COST_NATGAS_CCS'][case_index] >= 0 :
-                component_list.append('NATGAS_CCS')
-                                                
-        if 'FIXED_COST_WIND' in have_keys:
-            if case_list_dic['FIXED_COST_WIND'][case_index] >= 0 and case_list_dic['VAR_COST_WIND'][case_index] >= 0 :
-                component_list.append('WIND')
-                                                
-        if 'FIXED_COST_SOLAR' in have_keys:
-            if case_list_dic['FIXED_COST_SOLAR'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR'][case_index] >= 0 :
-                component_list.append('SOLAR')
-                                                
-        if 'FIXED_COST_WIND2' in have_keys:
-            if case_list_dic['FIXED_COST_WIND2'][case_index] >= 0 and case_list_dic['VAR_COST_WIND2'][case_index] >= 0 :
-                component_list.append('WIND2')
-                                                
-        if 'FIXED_COST_SOLAR2' in have_keys:
-            if case_list_dic['FIXED_COST_SOLAR2'][case_index] >= 0 and case_list_dic['VAR_COST_SOLAR2'][case_index] >= 0 :
-                component_list.append('SOLAR2')
-                                                
-        if 'FIXED_COST_STORAGE' in have_keys:
-            if case_list_dic['FIXED_COST_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE'][case_index] >= 0 :
-                component_list.append('STORAGE')
-                
-        if 'FIXED_COST_PGP_STORAGE' in have_keys:
-            if (case_list_dic['FIXED_COST_PGP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_FROM_PGP_STORAGE'][case_index] >= 0  and 
-                case_list_dic['VAR_COST_TO_PGP_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_PGP_STORAGE'][case_index] >= 0):
-                component_list.append('PGP_STORAGE')
-                
-        if 'FIXED_COST_CSP' in have_keys:
-            if (case_list_dic['FIXED_COST_CSP'][case_index] >= 0 and case_list_dic['VAR_COST_CSP'][case_index] >= 0  and 
-                case_list_dic['FIXED_COST_CSP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_CSP_STORAGE'][case_index] >= 0 and 
-                case_list_dic['CHARGING_EFFICIENCY_CSP_STORAGE'][case_index] >= 0):
-                component_list.append('CSP')
-                
-        if 'VAR_COST_UNMET_DEMAND' in have_keys:
-            if case_list_dic['VAR_COST_UNMET_DEMAND'][case_index] >= 0:
-                component_list.append('UNMET_DEMAND')
-                                
-        list_of_component_lists.append(component_list)
-    case_list_dic['SYSTEM_COMPONENTS'] = list_of_component_lists
-    
+#%%
 # update fixed and variable costs to reflect carbon prices
     for case_index in range(num_cases):
         if case_list_dic['CO2_PRICE'][case_index] > 0.0:  #  Note, negative CO2_PRICE is not allowed. Indicates no CO2 price.

@@ -105,6 +105,9 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     if len(case_dic['SOLAR2_SERIES']) == 0:
         case_dic['SOLAR2_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
     
+    if len(case_dic['CSP_SERIES']) == 0:
+        case_dic['CSP_SERIES'] = ( 0.*np.array(case_dic['DEMAND_SERIES'])).tolist()
+    
     header_list = []
     series_list = []
     
