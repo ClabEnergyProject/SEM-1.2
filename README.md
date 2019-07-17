@@ -22,6 +22,8 @@ F. Do a runtime analysis to speed up execution of Quick_Look.py
 
 G. Make version that can be spread across CEES-Mazama.
 
+H. Make some test cases and output files. (Ideally automate.)
+
 <br>
 <b>=====  WINDOWS 10 INSTALLATION INSTRUCTIONS  ===== </b>
 <br>
