@@ -13,8 +13,9 @@ This is the heart of the Simple Energy Model. It reads in the case dictionary
 that was created in Preprocess_Input.py, and then executes all of the cases.
 
 Technology:
-    Generation: natural gas, wind, solar, nuclear
+    Generation: natural gas, wind, solar, nuclear, wind2, solar2, solar_csp
     Energy storage: one generic (a pre-determined round-trip efficiency)
+                    plus PGP,
     Curtailment: Yes (free)
     Unmet demand: No
 
@@ -101,6 +102,8 @@ def core_model (global_dic, case_dic):
     demand_series = np.array(case_dic['DEMAND_SERIES'])*numerics_demand_scaling
     solar_series = case_dic['SOLAR_SERIES'] # Assumed to be normalized per kW capacity
     wind_series = case_dic['WIND_SERIES'] # Assumed to be normalized per kW capacity
+    solar2_series = case_dic['SOLAR2_SERIES'] # Assumed to be normalized per kW capacity
+    wind2_series = case_dic['WIND2_SERIES'] # Assumed to be normalized per kW capacity
     csp_series = case_dic['CSP_SERIES'] # Assumed to be normalized per kW capacity
 
 
@@ -109,6 +112,8 @@ def core_model (global_dic, case_dic):
     fixed_cost_natgas_ccs = case_dic['FIXED_COST_NATGAS_CCS']*numerics_cost_scaling
     fixed_cost_solar = case_dic['FIXED_COST_SOLAR']*numerics_cost_scaling
     fixed_cost_wind = case_dic['FIXED_COST_WIND']*numerics_cost_scaling
+    fixed_cost_solar2 = case_dic['FIXED_COST_SOLAR2']*numerics_cost_scaling
+    fixed_cost_wind2 = case_dic['FIXED_COST_WIND2']*numerics_cost_scaling
     fixed_cost_nuclear = case_dic['FIXED_COST_NUCLEAR']*numerics_cost_scaling
     fixed_cost_storage = case_dic['FIXED_COST_STORAGE']*numerics_cost_scaling
     fixed_cost_pgp_storage = case_dic['FIXED_COST_PGP_STORAGE']*numerics_cost_scaling
@@ -122,6 +127,8 @@ def core_model (global_dic, case_dic):
     var_cost_natgas_ccs = case_dic['VAR_COST_NATGAS_CCS']*numerics_cost_scaling
     var_cost_solar = case_dic['VAR_COST_SOLAR']*numerics_cost_scaling
     var_cost_wind = case_dic['VAR_COST_WIND']*numerics_cost_scaling
+    var_cost_solar2 = case_dic['VAR_COST_SOLAR2']*numerics_cost_scaling
+    var_cost_wind2 = case_dic['VAR_COST_WIND2']*numerics_cost_scaling
     var_cost_nuclear = case_dic['VAR_COST_NUCLEAR']*numerics_cost_scaling
     var_cost_unmet_demand = case_dic['VAR_COST_UNMET_DEMAND']*numerics_cost_scaling
     var_cost_to_storage = case_dic['VAR_COST_TO_STORAGE']*numerics_cost_scaling
@@ -240,7 +247,7 @@ def core_model (global_dic, case_dic):
 #%%-------------------- wind ------------------------------------------
     if 'WIND' in system_components:
         if(case_dic['CAPACITY_WIND']<0):
-            capacity_wind = cvx.Variable(1) # calculate SOLAR capacity
+            capacity_wind = cvx.Variable(1) # calculate wind capacity
             constraints += [
                 capacity_wind >= 0]
         else:
@@ -255,6 +262,45 @@ def core_model (global_dic, case_dic):
     else:
         capacity_wind = 0
         dispatch_wind = np.zeros(num_time_periods)
+
+
+#%%-------------------- solar2 ------------------------------------------
+    if 'SOLAR2' in system_components:
+        if(case_dic['CAPACITY_SOLAR2']<0):
+            capacity_solar2 = cvx.Variable(1) # calculate SOLAR2 capacity
+            constraints += [
+                capacity_solar2 >= 0]
+        else:
+            capacity_solar2 = case_dic['CAPACITY_SOLAR2'] * numerics_demand_scaling
+
+        dispatch_solar2 = cvx.Variable(num_time_periods)
+        constraints += [
+                dispatch_solar2 >= 0,
+                dispatch_solar2 <= capacity_solar2 * solar2_series
+                ]
+        fcn2min += capacity_solar2 * fixed_cost_solar2 + cvx.sum(dispatch_solar2 * var_cost_solar2)/num_time_periods
+    else:
+        capacity_solar2 = 0
+        dispatch_solar2 = np.zeros(num_time_periods)
+
+#%%-------------------- wind2 ------------------------------------------
+    if 'WIND2' in system_components:
+        if(case_dic['CAPACITY_WIND2']<0):
+            capacity_wind2 = cvx.Variable(1) # calculate SOLAR capacity
+            constraints += [
+                capacity_wind2 >= 0]
+        else:
+            capacity_wind2 = case_dic['CAPACITY_WIND2'] * numerics_demand_scaling
+
+        dispatch_wind2 = cvx.Variable(num_time_periods)
+        constraints += [
+                dispatch_wind2 >= 0,
+                dispatch_wind2 <= capacity_wind2 * wind2_series
+                ]
+        fcn2min += capacity_wind2 * fixed_cost_wind2 + cvx.sum(dispatch_wind2 * var_cost_wind2)/num_time_periods
+    else:
+        capacity_wind2 = 0
+        dispatch_wind2 = np.zeros(num_time_periods)
 
 #%%-------------------- nuclear ------------------------------------------
     if 'NUCLEAR' in system_components:
@@ -465,6 +511,8 @@ def core_model (global_dic, case_dic):
             + dispatch_natgas_ccs
             + dispatch_solar
             + dispatch_wind
+            + dispatch_solar2
+            + dispatch_wind2
             + dispatch_nuclear
             + dispatch_from_storage
             + dispatch_from_pgp_storage
@@ -518,6 +566,8 @@ def core_model (global_dic, case_dic):
         result['CAPACITY_NATGAS_CCS'] = -1
         result['CAPACITY_SOLAR'] = -1
         result['CAPACITY_WIND'] = -1
+        result['CAPACITY_SOLAR2'] = -1
+        result['CAPACITY_WIND2'] = -1
         result['CAPACITY_NUCLEAR'] = -1
         result['CAPACITY_STORAGE'] = -1
         result['CAPACITY_PGP_STORAGE'] = -1
@@ -527,25 +577,35 @@ def core_model (global_dic, case_dic):
         result['CAPACITY_CSP_STORAGE'] = -1
         
         result['PRICE'] = -1 * np.ones(demand_series.size)
+        
         result['DISPATCH_NATGAS'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_NATGAS_CCS'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_SOLAR'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_WIND'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_SOLAR2'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_WIND2'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_NUCLEAR'] = -1 * np.ones(demand_series.size)
+
         result['CURTAILMENT_SOLAR'] = -1 * np.ones(demand_series.size)
         result['CURTAILMENT_WIND'] = -1 * np.ones(demand_series.size)
+        result['CURTAILMENT_SOLAR2'] = -1 * np.ones(demand_series.size)
+        result['CURTAILMENT_WIND2'] = -1 * np.ones(demand_series.size)
         result['CURTAILMENT_NUCLEAR'] = -1 * np.ones(demand_series.size)
+ 
         result['DISPATCH_TO_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_FROM_STORAGE'] = -1 * np.ones(demand_series.size)
         result['ENERGY_STORAGE'] = -1 * np.ones(demand_series.size)
+        
         result['DISPATCH_TO_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_FROM_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
         result['ENERGY_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
+        
         result['DISPATCH_CSP'] = -1 * np.ones(demand_series.size) 
         result['CURTAILMENT_CSP'] = -1 * np.ones(demand_series.size) 
         result['DISPATCH_TO_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_FROM_CSP'] = -1 * np.ones(demand_series.size)
         result['ENERGY_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
+        
         result['DISPATCH_UNMET_DEMAND'] = -1 * np.ones(demand_series.size)
 
     else:
@@ -611,6 +671,30 @@ def core_model (global_dic, case_dic):
             result['CAPACITY_WIND'] = capacity_wind/numerics_demand_scaling
             result['DISPATCH_WIND'] = dispatch_wind/numerics_demand_scaling
             result['CURTAILMENT_WIND'] = (capacity_wind-dispatch_wind)/numerics_demand_scaling
+
+        if 'SOLAR2' in system_components:
+            if case_dic['CAPACITY_SOLAR2'] < 0:
+                result['CAPACITY_SOLAR2'] = np.asscalar(capacity_solar2.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_SOLAR2'] = case_dic['CAPACITY_SOLAR2']
+            result['DISPATCH_SOLAR2'] = np.array(dispatch_solar2.value).flatten()/numerics_demand_scaling
+            result['CURTAILMENT_SOLAR2'] = result['CAPACITY_SOLAR2'] * solar2_series - result['DISPATCH_SOLAR2']
+        else:
+            result['CAPACITY_SOLAR2'] = capacity_solar2/numerics_demand_scaling
+            result['DISPATCH_SOLAR2'] = dispatch_solar2/numerics_demand_scaling
+            result['CURTAILMENT_SOLAR2'] = (capacity_solar2-dispatch_solar2)/numerics_demand_scaling
+
+        if 'WIND2' in system_components:
+            if case_dic['CAPACITY_WIND2'] < 0:
+                result['CAPACITY_WIND2'] = np.asscalar(capacity_wind2.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_WIND2'] = case_dic['CAPACITY_WIND2']
+            result['DISPATCH_WIND2'] = np.array(dispatch_wind2.value).flatten()/numerics_demand_scaling
+            result['CURTAILMENT_WIND2'] = result['CAPACITY_WIND2'] * wind2_series - result['DISPATCH_WIND2']
+        else:
+            result['CAPACITY_WIND2'] = capacity_wind2/numerics_demand_scaling
+            result['DISPATCH_WIND2'] = dispatch_wind2/numerics_demand_scaling
+            result['CURTAILMENT_WIND2'] = (capacity_wind2-dispatch_wind2)/numerics_demand_scaling
 
         if 'NUCLEAR' in system_components:
             if case_dic['CAPACITY_NUCLEAR'] < 0:
