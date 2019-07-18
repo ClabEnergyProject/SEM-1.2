@@ -159,6 +159,15 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['energy storage (kWh)']
     series_list.append( result_dic['ENERGY_STORAGE'].flatten() )
     
+    header_list += ['dispatch to storage2 (kW)']
+    series_list.append( result_dic['DISPATCH_TO_STORAGE2'].flatten() )
+    
+    header_list += ['dispatch from storage2 (kW)']
+    series_list.append( result_dic['DISPATCH_FROM_STORAGE2'].flatten() )  # THere is no FROM in dispatch results
+
+    header_list += ['energy storage2 (kWh)']
+    series_list.append( result_dic['ENERGY_STORAGE2'].flatten() )
+    
     header_list += ['dispatch to pgp storage (kW)']
     series_list.append( result_dic['DISPATCH_TO_PGP_STORAGE'].flatten() )
     
@@ -223,6 +232,7 @@ def save_basic_results( global_dic, case_dic_list ):
             'fixed cost wind2 ($/kW/h)',
             'fixed cost nuclear ($/kW/h)',
             'fixed cost storage (($/h)/kWh)',
+            'fixed cost storage2 (($/h)/kWh)',
             'fixed cost pgp storage (($/h)/kWh)',
             'fixed cost csp (($/h)/kWh)',
             'fixed cost csp storage (($/h)/kWh)',
@@ -234,8 +244,12 @@ def save_basic_results( global_dic, case_dic_list ):
             'var cost solar2 ($/kWh)',
             'var cost wind2 ($/kWh)',
             'var cost nuclear ($/kWh)',
-            'var cost to storage ($/kWh)',
             'var cost storage ($/kWh)',
+            'var cost to storage ($/kWh)',
+            'var cost from storage ($/kWh)',
+            'var cost storage2 ($/kWh)',
+            'var cost to storage2 ($/kWh)',
+            'var cost from storage2 ($/kWh)',
             'var cost to pgp storage ($/kWh)',
             'var cost pgp storage ($/kWh)',
             'var cost csp  ($/kWh)',
@@ -246,6 +260,10 @@ def save_basic_results( global_dic, case_dic_list ):
             'storage charging efficiency',
             'storage charging time (h)',
             'storage decay rate (1/h)',
+            
+            'storage2 charging efficiency',
+            'storage2 charging time (h)',
+            'storage2 decay rate (1/h)',
             
             'pgp storage charging efficiency',
             'pgp storage decay rate (1/h)',
@@ -268,6 +286,7 @@ def save_basic_results( global_dic, case_dic_list ):
             'capacity wind2 (kW)',
             'capacity nuclear (kW)',
             'capacity storage (kWh)',
+            'capacity storage2 (kWh)',
             'capacity pgp storage (kWh)',
             'capacity to pgp storage (kW)',
             'capacity from pgp storage (kW)',
@@ -288,6 +307,10 @@ def save_basic_results( global_dic, case_dic_list ):
             'dispatch to storage (kW)',
             'dispatch from storage (kW)',
             'energy storage (kWh)',
+            
+            'dispatch to storage2 (kW)',
+            'dispatch from storage2 (kW)',
+            'energy storage2 (kWh)',
             
             'dispatch to pgp storage (kW)',
             'dispatch pgp storage (kW)',
@@ -326,6 +349,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['FIXED_COST_WIND2'],
                     case_dic['FIXED_COST_NUCLEAR'],
                     case_dic['FIXED_COST_STORAGE'],
+                    case_dic['FIXED_COST_STORAGE2'],
                     case_dic['FIXED_COST_PGP_STORAGE'],
 
                     case_dic['FIXED_COST_CSP'],
@@ -338,8 +362,14 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['VAR_COST_SOLAR2'],
                     case_dic['VAR_COST_WIND2'],
                     case_dic['VAR_COST_NUCLEAR'],
+                    case_dic['VAR_COST_STORAGE'],
                     case_dic['VAR_COST_TO_STORAGE'],
                     case_dic['VAR_COST_FROM_STORAGE'],
+                    
+                    case_dic['VAR_COST_STORAGE2'],
+                    case_dic['VAR_COST_TO_STORAGE2'],
+                    case_dic['VAR_COST_FROM_STORAGE2'],
+                    
                     case_dic['VAR_COST_TO_PGP_STORAGE'],
                     case_dic['VAR_COST_FROM_PGP_STORAGE'],
                     
@@ -352,6 +382,11 @@ def save_basic_results( global_dic, case_dic_list ):
                     case_dic['CHARGING_EFFICIENCY_STORAGE'],
                     case_dic['CHARGING_TIME_STORAGE'],
                     case_dic['DECAY_RATE_STORAGE'],
+                    
+                    case_dic['CHARGING_EFFICIENCY_STORAGE2'],
+                    case_dic['CHARGING_TIME_STORAGE2'],
+                    case_dic['DECAY_RATE_STORAGE2'],
+                    
                     case_dic['CHARGING_EFFICIENCY_PGP_STORAGE'],
                     case_dic['DECAY_RATE_PGP_STORAGE'],
 
@@ -376,6 +411,7 @@ def save_basic_results( global_dic, case_dic_list ):
                     result_dic['CAPACITY_WIND2'],
                     result_dic['CAPACITY_NUCLEAR'],
                     result_dic['CAPACITY_STORAGE'],
+                    result_dic['CAPACITY_STORAGE2'],
                     result_dic['CAPACITY_PGP_STORAGE'],
                     result_dic['CAPACITY_TO_PGP_STORAGE'],
                     result_dic['CAPACITY_FROM_PGP_STORAGE'],
@@ -398,6 +434,11 @@ def save_basic_results( global_dic, case_dic_list ):
                     np.average(result_dic['DISPATCH_TO_STORAGE']),
                     np.average(result_dic['DISPATCH_FROM_STORAGE']),
                     np.average(result_dic['ENERGY_STORAGE']),
+                    
+                    np.average(result_dic['DISPATCH_TO_STORAGE2']),
+                    np.average(result_dic['DISPATCH_FROM_STORAGE2']),
+                    np.average(result_dic['ENERGY_STORAGE2']),
+                    
                     np.average(result_dic['DISPATCH_TO_PGP_STORAGE']),
                     np.average(result_dic['DISPATCH_FROM_PGP_STORAGE']),
                     np.average(result_dic['ENERGY_PGP_STORAGE']),

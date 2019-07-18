@@ -20,26 +20,7 @@ Each dictionary in <case_dic_list> ALWAYS contains:
                  'NATGAS','NATGAS_CCS','NUCLEAR','STORAGE', 'PGP_STORAGE', 'CSP', 'UNMET'
     'DEMAND_SERIES' -- TIME SERIES OF DEMAND DATA
     
-Each dictionary in <case_dic_list> OPTIONALLY contains:
-    
-           ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
-             'END_DAY','END_HOUR','END_MONTH',
-            'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_NATGAS_CCS','FIXED_COST_SOLAR','FIXED_COST_WIND',
-            'FIXED_COST_NUCLEAR','FIXED_COST_STORAGE',
-            'START_DAY','START_HOUR','START_MONTH',
-            'START_YEAR','CHARGING_EFFICIENCY_STORAGE',
-            'VAR_COST_STORAGE','VAR_COST_TO_STORAGE',
-            'VAR_COST_NATGAS','VAR_COST_NATGAS_CCS','VAR_COST_SOLAR','DECAY_RATE_STORAGE',
-            'VAR_COST_WIND','VAR_COST_NUCLEAR','VAR_COST_UNMET_DEMAND',
-            'CHARGING_TIME_STORAGE',
-            'FIXED_COST_WIND2','VAR_COST_WIND2',
-            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2',
-            'FIXED_COST_PGP_STORAGE',
-            'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
-            'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
-            'CHARGING_EFFICIENCY_PGP_STORAGE',
-            'FIXED_COST_CSP','VAR_COST_CSP','CHARGING_EFFICIENCY_CSP_STORAGE',
-            'FIXED_COST_CSP_STORAGE','VAR_COST_CSP_STORAGE','DECAY_RATE_CSP_STORAGE']
+Each dictionary in <case_dic_list> OPTIONALLY contains keywords listed in the text below
 
 '''
 
@@ -166,30 +147,73 @@ def preprocess_input(case_input_path_filename):
     
     keywords_real = list(map(str.upper,
             ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
-             'END_DAY','END_HOUR','END_MONTH','CO2_PRICE',
-            'END_YEAR','FIXED_COST_NATGAS','FIXED_COST_NATGAS_CCS','FIXED_COST_SOLAR','FIXED_COST_WIND',
-            'FIXED_COST_NUCLEAR','FIXED_COST_STORAGE',
-            'FIXED_CO2_NATGAS','FIXED_CO2_NATGAS_CCS','FIXED_CO2_NUCLEAR','FIXED_CO2_WIND','FIXED_CO2_SOLAR',
-            'VAR_CO2_NATGAS','VAR_CO2_NATGAS_CCS','VAR_CO2_NUCLEAR','VAR_CO2_WIND','VAR_CO2_SOLAR',
-            'START_DAY','START_HOUR','START_MONTH',
-            'START_YEAR','CHARGING_EFFICIENCY_STORAGE',
-            'VAR_COST_FROM_STORAGE','VAR_COST_TO_STORAGE',
-            'VAR_COST_NATGAS','VAR_COST_NATGAS_CCS','VAR_COST_SOLAR','DECAY_RATE_STORAGE',
-            'VAR_COST_WIND','VAR_COST_NUCLEAR','VAR_COST_UNMET_DEMAND',
-            'VAR_COST_CSP','VAR_COST_CSP_STORAGE',
-            'FIXED_COST_WIND2','VAR_COST_WIND2','VAR_CO2_WIND2',
-            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2','VAR_CO2_SOLAR2',            
-            'CHARGING_TIME_STORAGE',
-            'FIXED_COST_PGP_STORAGE',
-            'FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
-            'FIXED_COST_CSP','FIXED_COST_CSP_STORAGE',
+             
+             'START_DAY','START_HOUR','START_MONTH','START_YEAR',
+            
+            
+             'END_DAY','END_HOUR','END_MONTH','END_YEAR',
+             
+            'CO2_PRICE',
+            
+            'CAPACITY_NATGAS',
+            'FIXED_COST_NATGAS','VAR_COST_NATGAS',
+            'FIXED_CO2_NUCLEAR','VAR_CO2_NUCLEAR',
+            
+            'CAPACITY_NATGAS_CCS',
+            'FIXED_COST_NATGAS_CCS','VAR_COST_NATGAS_CCS',
+            
+            'CAPACITY_SOLAR',
+            'FIXED_COST_SOLAR','VAR_COST_SOLAR',
+            'FIXED_CO2_SOLAR','VAR_CO2_SOLAR',
+            
+            'CAPACITY_WIND',
+            'FIXED_COST_WIND','VAR_COST_WIND',
+            'FIXED_CO2_WIND', 'VAR_CO2_WIND',
+            
+            'FIXED_COST_WIND2','VAR_COST_WIND2',
+            'VAR_CO2_WIND2',
+            
+            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2',
+            'VAR_CO2_SOLAR2', 
+
+            'CAPACITY_CSP','CAPACITY_CSP_STORAGE',
+            'FIXED_COST_CSP','VAR_COST_CSP',
+            'FIXED_COST_CSP_STORAGE','VAR_COST_CSP_STORAGE',
+            'DECAY_RATE_CSP_STORAGE','CHARGING_EFFICIENCY_CSP_STORAGE',
+            
+            'CAPACITY_NUCLEAR',
+            'FIXED_COST_NUCLEAR','VAR_COST_NUCLEAR',
+            'VAR_CO2_NUCLEAR',
+            
+            'FIXED_CO2_NATGAS','VAR_CO2_NATGAS',
+            
+            'FIXED_CO2_NATGAS_CCS','VAR_CO2_NATGAS_CCS',
+            
+            'CAPACITY_STORAGE',
+            'FIXED_COST_STORAGE','VAR_COST_STORAGE',
+            'VAR_COST_TO_STORAGE','VAR_COST_FROM_STORAGE',
+            'CHARGING_TIME_STORAGE'
+            'CHARGING_EFFICIENCY_STORAGE','DECAY_RATE_STORAGE',
+           
+            'CAPACITY_STORAGE2',
+            'FIXED_COST_STORAGE2','VAR_COST_STORAGE2',
+            'VAR_COST_TO_STORAGE2','VAR_COST_FROM_STORAGE2',
+            'CHARGING_TIME_STORAGE2',
+            'CHARGING_EFFICIENCY_STORAGE2','DECAY_RATE_STORAGE2',
+            
+            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE',
+            'FIXED_COST_PGP_STORAGE','FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
             'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
             'CHARGING_EFFICIENCY_PGP_STORAGE','DECAY_RATE_PGP_STORAGE',
-            'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
-            'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE',
-            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE',
-            'CAPACITY_CSP','CAPACITY_CSP_STORAGE','DECAY_RATE_CSP_STORAGE',
-            'CHARGING_EFFICIENCY_CSP_STORAGE']
+
+            'FIXED_COST_STORAGE2','VAR_COST_STORAGE2',
+            'VAR_COST_TO_STORAGE2','VAR_COST_FROM_STORAGE2',
+            'CHARGING_TIME_STORAGE2',
+            'CHARGING_EFFICIENCY_STORAGE2','DECAY_RATE_STORAGE2',
+            
+            'VAR_COST_UNMET_DEMAND'
+
+            ]
             ))
     
     keywords_real_notscaled = list(map(str.upper,
@@ -199,9 +223,15 @@ def preprocess_input(case_input_path_filename):
             'START_DAY','START_HOUR','START_MONTH',
             'START_YEAR',
             'CHARGING_EFFICIENCY_PGP_STORAGE','DECAY_RATE_PGP_STORAGE',
+            
+            'CAPACITY_STORAGE','CHARGING_TIME_STORAGE',
             'CHARGING_EFFICIENCY_STORAGE','DECAY_RATE_STORAGE',
+            
+            'CAPACITY_STORAGE2','CHARGING_TIME_STORAGE2',
+            'CHARGING_EFFICIENCY_STORAGE2','DECAY_RATE_STORAGE2',
+            
             'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
-            'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE',
+            'CAPACITY_WIND','CAPACITY_NUCLEAR',
             'CAPACITY_WIND2','CAPACITY_SOLAR2',
             'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE',
             'CAPACITY_CSP','CAPACITY_CSP_STORAGE','DECAY_RATE_CSP_STORAGE',
@@ -242,14 +272,14 @@ def preprocess_input(case_input_path_filename):
     # default global values to help with numerical issues
     #------convert file input to dictionary of global data ---------
     for list_item in global_data:
-        test_key = str.upper(list_item[0])
-        test_value = list_item[1]
-        if test_key in keywords_str:
-            global_dic[test_key] = test_value
-        elif test_key in keywords_real:
-            global_dic[test_key] = float(test_value)
-        elif test_key in keywords_logical:
-            global_dic[test_key] = literal_to_boolean(test_value)
+        input_key = str.upper(list_item[0])
+        input_value = list_item[1]
+        if input_key in keywords_str:
+            global_dic[input_key] = input_value
+        elif input_key in keywords_real:
+            global_dic[input_key] = float(input_value)
+        elif input_key in keywords_logical:
+            global_dic[input_key] = literal_to_boolean(input_value)
     
     verbose = global_dic['VERBOSE']
 #    print ( global_dic
@@ -259,6 +289,12 @@ def preprocess_input(case_input_path_filename):
     # Parse all_cases_dic data
     all_cases_dic = {}
     
+    # prevent missing values for keys
+    for key in keywords_real + keywords_real_notscaled:
+        all_cases_dic[key] = -1.
+    for key in keywords_str:
+        all_cases_dic[key] = ''
+    
     #------ DEFAULT VALUES FOR global_dic ---------
     # For now, default for quicklook output is True
     all_cases_dic['NORMALIZE_DEMAND_TO_ONE'] = False # If True, normalize mean demand to 1.0
@@ -267,33 +303,17 @@ def preprocess_input(case_input_path_filename):
     all_cases_dic['NUMERICS_COST_SCALING'] = 1e+12 # multiplies all costs by a factor and then divides at end
     all_cases_dic['NUMERICS_DEMAND_SCALING'] = 1e+12 # multiplies demand by a factor and then divides all costs and capacities at end
     
-    #                'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
-    #            'CAPACITY_WIND','CAPACITY_NUCLEAR','CAPACITY_STORAGE,
-    #            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE']
-    
-    all_cases_dic['CAPACITY_NATGAS'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_NATGAS_CCS'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_SOLAR'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_WIND'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_SOLAR2'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_WIND2'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_NUCLEAR'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_STORAGE'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_TO_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_FROM_PGP_STORAGE'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_CSP'] = -1. # if < 0, then calculated in optimization
-    all_cases_dic['CAPACITY_CSP_STORAGE'] = -1. # if < 0, then calculated in optimization
+
 
     for list_item in all_cases_data:
-        test_key = str.upper(list_item[0])
-        test_value = list_item[1]
-        if test_key in keywords_str:
-            all_cases_dic[test_key] = test_value
-        elif test_key in keywords_real:
-            all_cases_dic[test_key] = float(test_value)
-        elif test_key in keywords_logical:
-            all_cases_dic[test_key] = literal_to_boolean(test_value)
+        input_key = str.upper(list_item[0])
+        input_value = list_item[1]
+        if input_key in keywords_str:
+            all_cases_dic[input_key] = input_value
+        elif input_key in keywords_real:
+            all_cases_dic[input_key] = float(input_value)
+        elif input_key in keywords_logical:
+            all_cases_dic[input_key] = literal_to_boolean(input_value)
     
 #    print ( all_cases_data
 #    print ( all_cases_dic        
@@ -309,19 +329,19 @@ def preprocess_input(case_input_path_filename):
         case_list_dic[keyword] = [all_cases_dic[keyword] for i in range(num_cases)] # replicate values
             
     for list_item in case_transpose:
-        test_key = str.upper(list_item[0])
-        test_values = list_item[1:]
-        if test_key in keywords_str:
-            case_list_dic[test_key] = test_values
-        elif test_key in keywords_real:
-            if test_key in keywords_real_notscaled:
-                setNegToM1 = np.array(list(map(float,test_values)))
+        input_key = str.upper(list_item[0])
+        input_values = list_item[1:]
+        if input_key in keywords_str:
+            case_list_dic[input_key] = input_values
+        elif input_key in keywords_real:
+            if input_key in keywords_real_notscaled:
+                setNegToM1 = np.array(list(map(float,input_values)))
             else:
-                setNegToM1 = case_list_dic[test_key] * np.array(list(map(float,test_values)))
+                setNegToM1 = case_list_dic[input_key] * np.array(list(map(float,input_values)))
             setNegToM1[setNegToM1 < 0] = -1
-            case_list_dic[test_key] = setNegToM1
-        elif test_key in keywords_logical:
-            case_list_dic[test_key] = list(map(bool,test_values))
+            case_list_dic[input_key] = setNegToM1
+        elif input_key in keywords_logical:
+            case_list_dic[input_key] = list(map(bool,input_values))
 
     # define all keywords in dictionary, but set to -1 if not present    
     dummy = [-1 for i in range(num_cases)]
@@ -381,6 +401,10 @@ def preprocess_input(case_input_path_filename):
         if 'FIXED_COST_STORAGE' in have_keys:
             if case_list_dic['FIXED_COST_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE'][case_index] >= 0 :
                 component_list.append('STORAGE')
+                                                
+        if 'FIXED_COST_STORAGE2' in have_keys:
+            if case_list_dic['FIXED_COST_STORAGE2'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE2'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE2'][case_index] >= 0 :
+                component_list.append('STORAGE2')
                 
         if 'FIXED_COST_PGP_STORAGE' in have_keys:
             if (case_list_dic['FIXED_COST_PGP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_FROM_PGP_STORAGE'][case_index] >= 0  and 

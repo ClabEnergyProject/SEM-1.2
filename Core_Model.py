@@ -116,6 +116,7 @@ def core_model (global_dic, case_dic):
     fixed_cost_wind2 = case_dic['FIXED_COST_WIND2']*numerics_cost_scaling
     fixed_cost_nuclear = case_dic['FIXED_COST_NUCLEAR']*numerics_cost_scaling
     fixed_cost_storage = case_dic['FIXED_COST_STORAGE']*numerics_cost_scaling
+    fixed_cost_storage2 = case_dic['FIXED_COST_STORAGE2']*numerics_cost_scaling
     fixed_cost_pgp_storage = case_dic['FIXED_COST_PGP_STORAGE']*numerics_cost_scaling
     fixed_cost_to_pgp_storage = case_dic['FIXED_COST_TO_PGP_STORAGE']*numerics_cost_scaling
     fixed_cost_from_pgp_storage = case_dic['FIXED_COST_FROM_PGP_STORAGE']*numerics_cost_scaling
@@ -133,6 +134,8 @@ def core_model (global_dic, case_dic):
     var_cost_unmet_demand = case_dic['VAR_COST_UNMET_DEMAND']*numerics_cost_scaling
     var_cost_to_storage = case_dic['VAR_COST_TO_STORAGE']*numerics_cost_scaling
     var_cost_from_storage = case_dic['VAR_COST_FROM_STORAGE']*numerics_cost_scaling
+    var_cost_to_storage2 = case_dic['VAR_COST_TO_STORAGE2']*numerics_cost_scaling
+    var_cost_from_storage2 = case_dic['VAR_COST_FROM_STORAGE2']*numerics_cost_scaling
     var_cost_to_pgp_storage = case_dic['VAR_COST_TO_PGP_STORAGE']*numerics_cost_scaling #to pgp storage
     var_cost_from_pgp_storage = case_dic['VAR_COST_FROM_PGP_STORAGE']*numerics_cost_scaling  # from pgp storage
     var_cost_csp = case_dic['VAR_COST_CSP']*numerics_cost_scaling
@@ -141,6 +144,10 @@ def core_model (global_dic, case_dic):
     charging_efficiency_storage = case_dic['CHARGING_EFFICIENCY_STORAGE']
     charging_time_storage       = case_dic['CHARGING_TIME_STORAGE']
     decay_rate_storage          = case_dic['DECAY_RATE_STORAGE'] # fraction of stored electricity lost each hour
+    
+    charging_efficiency_storage2 = case_dic['CHARGING_EFFICIENCY_STORAGE2']
+    charging_time_storage2       = case_dic['CHARGING_TIME_STORAGE2']
+    decay_rate_storage2          = case_dic['DECAY_RATE_STORAGE2'] # fraction of stored electricity lost each hour
     
     charging_efficiency_pgp_storage = case_dic['CHARGING_EFFICIENCY_PGP_STORAGE']
     decay_rate_pgp_storage = case_dic['DECAY_RATE_PGP_STORAGE']
@@ -363,6 +370,47 @@ def core_model (global_dic, case_dic):
         dispatch_from_storage = np.zeros(num_time_periods)
         energy_storage = np.zeros(num_time_periods)
 
+#%%-------------------- storage ------------------------------------------
+    if 'STORAGE2' in system_components:
+        if(case_dic['CAPACITY_STORAGE2']<0):
+            capacity_storage2 = cvx.Variable(1) # calculate SOLAR capacity
+            constraints += [
+                capacity_storage2 >= 0]
+        else:
+            capacity_storage2 = case_dic['CAPACITY_STORAGE2'] * numerics_demand_scaling
+
+        dispatch_to_storage2 = cvx.Variable(num_time_periods)
+        dispatch_from_storage2 = cvx.Variable(num_time_periods)
+        energy_storage2 = cvx.Variable(num_time_periods)
+        constraints += [
+                dispatch_to_storage2 >= 0,
+                dispatch_to_storage2 <= capacity_storage2 / charging_time_storage2,
+                dispatch_from_storage2 >= 0, # dispatch_to_storage2 is negative value
+                dispatch_from_storage2 <= capacity_storage2 / charging_time_storage2,
+                dispatch_from_storage2 <= energy_storage2 * (1 - decay_rate_storage2), # you can't dispatch more from storage2 in a time step than is in the battery
+                                                                                    # This constraint is redundant
+                energy_storage2 >= 0,
+                energy_storage2 <= capacity_storage2
+                ]
+
+        fcn2min += capacity_storage2 * fixed_cost_storage2 +  \
+            cvx.sum(dispatch_to_storage2 * var_cost_to_storage2)/num_time_periods + \
+            cvx.sum(dispatch_from_storage2 * var_cost_from_storage2)/num_time_periods
+
+        for i in range(num_time_periods):
+
+            constraints += [
+                    energy_storage2[(i+1) % num_time_periods] ==
+                        energy_storage2[i] + charging_efficiency_storage2 * dispatch_to_storage2[i]
+                        - dispatch_from_storage2[i] - energy_storage2[i]*decay_rate_storage2
+                    ]
+
+    else:
+        capacity_storage2 = 0
+        dispatch_to_storage2 = np.zeros(num_time_periods)
+        dispatch_from_storage2 = np.zeros(num_time_periods)
+        energy_storage2 = np.zeros(num_time_periods)
+
 #%%-------------------- PGP storage (power to gas to power) -------------------
 # For PGP storage, there are three capacity decisions:
 #   1.  to_storage (power):capacity_to_pgp_storage
@@ -515,10 +563,11 @@ def core_model (global_dic, case_dic):
             + dispatch_wind2
             + dispatch_nuclear
             + dispatch_from_storage
+            + dispatch_from_storage2
             + dispatch_from_pgp_storage
             + dispatch_from_csp
             + dispatch_unmet_demand
-            == demand_series + dispatch_to_storage + dispatch_to_pgp_storage
+            == demand_series + dispatch_to_storage + dispatch_to_storage2 + dispatch_to_pgp_storage
             ]
 
     # -----------------------------------------------------------------------------
@@ -570,6 +619,7 @@ def core_model (global_dic, case_dic):
         result['CAPACITY_WIND2'] = -1
         result['CAPACITY_NUCLEAR'] = -1
         result['CAPACITY_STORAGE'] = -1
+        result['CAPACITY_STORAGE2'] = -1
         result['CAPACITY_PGP_STORAGE'] = -1
         result['CAPACITY_TO_PGP_STORAGE'] = -1
         result['CAPACITY_FROM_PGP_STORAGE'] = -1
@@ -595,6 +645,10 @@ def core_model (global_dic, case_dic):
         result['DISPATCH_TO_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_FROM_STORAGE'] = -1 * np.ones(demand_series.size)
         result['ENERGY_STORAGE'] = -1 * np.ones(demand_series.size)
+        
+        result['DISPATCH_TO_STORAGE2'] = -1 * np.ones(demand_series.size)
+        result['DISPATCH_FROM_STORAGE2'] = -1 * np.ones(demand_series.size)
+        result['ENERGY_STORAGE2'] = -1 * np.ones(demand_series.size)
         
         result['DISPATCH_TO_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_FROM_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
@@ -721,6 +775,20 @@ def core_model (global_dic, case_dic):
             result['DISPATCH_TO_STORAGE'] = dispatch_to_storage/numerics_demand_scaling
             result['DISPATCH_FROM_STORAGE'] = dispatch_from_storage/numerics_demand_scaling
             result['ENERGY_STORAGE'] = energy_storage/numerics_demand_scaling
+
+        if 'STORAGE2' in system_components:
+            if case_dic['CAPACITY_STORAGE2'] < 0:
+                result['CAPACITY_STORAGE2'] = np.asscalar(capacity_storage2.value)/numerics_demand_scaling
+            else:
+                result['CAPACITY_STORAGE2'] = case_dic['CAPACITY_STORAGE2']
+            result['DISPATCH_TO_STORAGE2'] = np.array(dispatch_to_storage2.value).flatten()/numerics_demand_scaling
+            result['DISPATCH_FROM_STORAGE2'] = np.array(dispatch_from_storage2.value).flatten()/numerics_demand_scaling
+            result['ENERGY_STORAGE2'] = np.array(energy_storage2.value).flatten()/numerics_demand_scaling
+        else:
+            result['CAPACITY_STORAGE2'] = capacity_storage2/numerics_demand_scaling
+            result['DISPATCH_TO_STORAGE2'] = dispatch_to_storage2/numerics_demand_scaling
+            result['DISPATCH_FROM_STORAGE2'] = dispatch_from_storage2/numerics_demand_scaling
+            result['ENERGY_STORAGE2'] = energy_storage2/numerics_demand_scaling
 
         if 'PGP_STORAGE' in system_components:
             if case_dic['CAPACITY_PGP_STORAGE'] < 0:
