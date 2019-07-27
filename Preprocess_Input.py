@@ -26,6 +26,7 @@ Each dictionary in <case_dic_list> OPTIONALLY contains keywords listed in the te
 
 import csv
 import numpy as np
+from utilities import dict_of_lists_to_list_of_dicts
 
 
 
@@ -605,21 +606,8 @@ def preprocess_input(case_input_path_filename):
 
     
     #Now case_dic is a dictionary of lists. We want to turn it into a list
-    # of dictionaries.  The method for doing this is taken from:
-    # https://stackoverflow.com/questions/5558418/list-of-dicts-to-from-dict-of-lists
-    
-    # case_dic_list = [dict(zip(case_list_dic,t)) for t in zip(*case_list_dic.values())]
-    
-    # The fancy thing didn't work for me so I will brute force it.
-    #
-    keywords = case_list_dic.keys()
-    case_dic_list = [ {} for  case in range(num_cases)]
-    for i in range(num_cases):
-        dic = case_dic_list[i]
-        for keyword in keywords:
-            dic[keyword] = case_list_dic[keyword][i]
-        case_dic_list[i] = dic
+    # of dictionaries.  
+    case_dic_list = dict_of_lists_to_list_of_dicts(case_list_dic)
     
     return global_dic,case_dic_list
-
-             
+            

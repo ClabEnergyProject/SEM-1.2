@@ -52,14 +52,13 @@ from Save_Basic_Results import pickle_raw_results
 
 def core_model_loop (global_dic, case_dic_list):
     verbose = global_dic['VERBOSE']
-    if verbose:
-        print ('Core_Model.py: Entering core model loop')
     num_cases = len(case_dic_list)
 
     for case_index in range(num_cases):
 
         if verbose:
             today = datetime.datetime.now()
+            print('---')
             print ('solving ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
 
         result_dic = core_model (global_dic, case_dic_list[case_index])
@@ -68,7 +67,7 @@ def core_model_loop (global_dic, case_dic_list):
 
             if verbose:
                 today = datetime.datetime.now()
-                print ('solved  ',case_dic_list[case_index]['CASE_NAME'])
+                print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
 
             # put raw results in file for later analysis
             # NOTE: THIS NEEDS TO BE FIXED UP FOR STORAGE2
@@ -82,9 +81,6 @@ def core_model_loop (global_dic, case_dic_list):
             if verbose:
                 today = datetime.datetime.now()
                 print ('failed to solve  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
-
-        if verbose:
-            print ('writing out results for case ',case_dic_list[case_index]['CASE_NAME'])
 
         save_vector_results_as_csv( global_dic, case_dic_list[case_index], result_dic )
         pickle_raw_results( global_dic, case_dic_list[case_index], result_dic )
@@ -661,7 +657,6 @@ def core_model (global_dic, case_dic):
         result['ENERGY_PGP_STORAGE'] = -1 * np.ones(demand_series.size)
         
         result['DISPATCH_CSP'] = -1 * np.ones(demand_series.size) 
-        result['CURTAILMENT_CSP'] = -1 * np.ones(demand_series.size) 
         result['DISPATCH_TO_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
         result['DISPATCH_FROM_CSP'] = -1 * np.ones(demand_series.size)
         result['ENERGY_CSP_STORAGE'] = -1 * np.ones(demand_series.size)
@@ -671,8 +666,8 @@ def core_model (global_dic, case_dic):
     else:
 
         if verbose:
-            print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling))
-            print ('runtime: ', (end_time - start_time), 'seconds')
+            print ('system cost ',prob.value/(numerics_cost_scaling * numerics_demand_scaling),
+                ' runtime: ', (end_time - start_time), 'seconds')
 
         # -----------------------------------------------------------------------------
 
@@ -837,7 +832,6 @@ def core_model (global_dic, case_dic):
             result['CURTAILMENT_CSP'] = result['CAPACITY_CSP'] * csp_series - result['DISPATCH_TO_CSP_STORAGE']
         else:
             result['CAPACITY_CSP'] = capacity_csp/numerics_demand_scaling
-            result['CURTAILMENT_CSP'] = (capacity_csp-dispatch_csp)/numerics_demand_scaling 
             result['CAPACITY_CSP_STORAGE'] = capacity_csp_storage/numerics_demand_scaling
             result['DISPATCH_TO_CSP_STORAGE'] = dispatch_to_csp_storage/numerics_demand_scaling
             result['DISPATCH_FROM_CSP'] = dispatch_from_csp/numerics_demand_scaling

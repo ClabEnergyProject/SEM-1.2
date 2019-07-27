@@ -63,7 +63,7 @@ core_model_loop (global_dic, case_dic_list)
 
 print ('Simple_Energy_Model: Saving basic results')
 # Note that results for individual cases are output from core_model_loop
-scalar_names,scalar_table = save_basic_results(global_dic, case_dic_list)
+save_basic_results(global_dic, case_dic_list)
 
 # -----------------------------------------------------------------------------
 
