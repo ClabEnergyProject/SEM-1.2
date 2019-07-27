@@ -2,6 +2,22 @@
 Python 3.7 and cvxpy 1.x version of SEM-1. This is a Simple Energy Model that optimizes electricity (or electricity
 and fuels) without considering any spatial variation, policy, capacity markets, etc.
 
+Currently, the technologies considered in this release of SEM 1.2 are:
+
+ 1. solar
+ 2. solar2
+ 3. wind
+ 4. wind2
+ 5. csp (conc solar)
+ 6. natgas
+ 7. natgas_ccs ( = natgas2 ? )
+ 8. nuclear
+ 9. storage
+10. storage2
+11.pgp (power to gas to power)
+
+
+
 <br>
 <b>=====  WISH LIST OF THINGS TO BE DONE ON THIS MODEL  =====</b>
 <br>
