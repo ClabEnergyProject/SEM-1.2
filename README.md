@@ -14,7 +14,7 @@ Currently, the technologies considered in this release of SEM 1.2 are:
  8. NUCLEAR
  9. STORAGE
 10. STORAGE2
-11. PGP_STORAGE (power to gas to power, also )
+11. PGP_STORAGE (power to gas to power )
 
 For a full list of input variables, it is best to look inside <Preprocess_Input.py>.
 
