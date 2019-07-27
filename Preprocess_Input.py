@@ -145,71 +145,42 @@ def preprocess_input(case_input_path_filename):
              'CASE_NAME','GLOBAL_NAME']
             ))
     
-    keywords_real = list(map(str.upper,
-            ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
-             
-             'START_DAY','START_HOUR','START_MONTH','START_YEAR',
-            
-            
-             'END_DAY','END_HOUR','END_MONTH','END_YEAR',
-             
+    keywords_real_scaled = list(map(str.upper,
+            [             
             'CO2_PRICE',
             
-            'CAPACITY_NATGAS',
             'FIXED_COST_NATGAS','VAR_COST_NATGAS',
-            'FIXED_CO2_NUCLEAR','VAR_CO2_NUCLEAR',
+            'FIXED_CO2_NATGAS','VAR_CO2_NATGAS',
             
-            'CAPACITY_NATGAS_CCS',
             'FIXED_COST_NATGAS_CCS','VAR_COST_NATGAS_CCS',
+            'FIXED_CO2_NATGAS_CCS','VAR_CO2_NATGAS_CCS',
             
-            'CAPACITY_SOLAR',
             'FIXED_COST_SOLAR','VAR_COST_SOLAR',
             'FIXED_CO2_SOLAR','VAR_CO2_SOLAR',
             
-            'CAPACITY_WIND',
+            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2',
+            'FIXED_CO2_SOLAR2','VAR_CO2_SOLAR2', 
+            
             'FIXED_COST_WIND','VAR_COST_WIND',
             'FIXED_CO2_WIND', 'VAR_CO2_WIND',
             
             'FIXED_COST_WIND2','VAR_COST_WIND2',
-            'VAR_CO2_WIND2',
-            
-            'FIXED_COST_SOLAR2','VAR_COST_SOLAR2',
-            'VAR_CO2_SOLAR2', 
-
-            'CAPACITY_CSP','CAPACITY_CSP_STORAGE',
-            'FIXED_COST_CSP','VAR_COST_CSP',
-            'FIXED_COST_CSP_STORAGE','VAR_COST_CSP_STORAGE',
-            'DECAY_RATE_CSP_STORAGE','CHARGING_EFFICIENCY_CSP_STORAGE',
-            
-            'CAPACITY_NUCLEAR',
+            'FIXED_CO2_WIND2','VAR_CO2_WIND2',
+                        
             'FIXED_COST_NUCLEAR','VAR_COST_NUCLEAR',
-            'VAR_CO2_NUCLEAR',
+            'FIXED_CO2_NUCLEAR','VAR_CO2_NUCLEAR',
             
-            'FIXED_CO2_NATGAS','VAR_CO2_NATGAS',
-            
-            'FIXED_CO2_NATGAS_CCS','VAR_CO2_NATGAS_CCS',
-            
-            'CAPACITY_STORAGE',
             'FIXED_COST_STORAGE','VAR_COST_STORAGE',
             'VAR_COST_TO_STORAGE','VAR_COST_FROM_STORAGE',
-            'CHARGING_TIME_STORAGE'
-            'CHARGING_EFFICIENCY_STORAGE','DECAY_RATE_STORAGE',
            
-            'CAPACITY_STORAGE2',
             'FIXED_COST_STORAGE2','VAR_COST_STORAGE2',
             'VAR_COST_TO_STORAGE2','VAR_COST_FROM_STORAGE2',
-            'CHARGING_TIME_STORAGE2',
-            'CHARGING_EFFICIENCY_STORAGE2','DECAY_RATE_STORAGE2',
             
-            'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE',
             'FIXED_COST_PGP_STORAGE','FIXED_COST_TO_PGP_STORAGE','FIXED_COST_FROM_PGP_STORAGE',
             'VAR_COST_TO_PGP_STORAGE','VAR_COST_FROM_PGP_STORAGE',
-            'CHARGING_EFFICIENCY_PGP_STORAGE','DECAY_RATE_PGP_STORAGE',
 
-            'FIXED_COST_STORAGE2','VAR_COST_STORAGE2',
-            'VAR_COST_TO_STORAGE2','VAR_COST_FROM_STORAGE2',
-            'CHARGING_TIME_STORAGE2',
-            'CHARGING_EFFICIENCY_STORAGE2','DECAY_RATE_STORAGE2',
+            'FIXED_COST_CSP','VAR_COST_CSP',
+            'FIXED_COST_CSP_STORAGE','VAR_COST_CSP_STORAGE',
             
             'VAR_COST_UNMET_DEMAND'
 
@@ -217,12 +188,24 @@ def preprocess_input(case_input_path_filename):
             ))
     
     keywords_real_notscaled = list(map(str.upper,
-            ['NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
-             'END_DAY','END_HOUR','END_MONTH',
-            'END_YEAR',
-            'START_DAY','START_HOUR','START_MONTH',
-            'START_YEAR',
-            'CHARGING_EFFICIENCY_PGP_STORAGE','DECAY_RATE_PGP_STORAGE',
+            [
+            'NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
+            'END_DAY','END_HOUR','END_MONTH','END_YEAR',
+            'START_DAY','START_HOUR','START_MONTH','START_YEAR',
+
+            'CAPACITY_NATGAS',
+            
+            'CAPACITY_NATGAS_CCS',
+            
+            'CAPACITY_SOLAR',
+
+            'CAPACITY_SOLAR2',
+
+            'CAPACITY_WIND',
+
+            'CAPACITY_WIND2',
+            
+            'CAPACITY_NUCLEAR',
             
             'CAPACITY_STORAGE','CHARGING_TIME_STORAGE',
             'CHARGING_EFFICIENCY_STORAGE','DECAY_RATE_STORAGE',
@@ -230,12 +213,12 @@ def preprocess_input(case_input_path_filename):
             'CAPACITY_STORAGE2','CHARGING_TIME_STORAGE2',
             'CHARGING_EFFICIENCY_STORAGE2','DECAY_RATE_STORAGE2',
             
-            'CAPACITY_NATGAS','CAPACITY_NATGAS_CCS','CAPACITY_SOLAR',
-            'CAPACITY_WIND','CAPACITY_NUCLEAR',
-            'CAPACITY_WIND2','CAPACITY_SOLAR2',
             'CAPACITY_PGP_STORAGE','CAPACITY_TO_PGP_STORAGE','CAPACITY_FROM_PGP_STORAGE',
-            'CAPACITY_CSP','CAPACITY_CSP_STORAGE','DECAY_RATE_CSP_STORAGE',
-            'CHARGING_EFFICIENCY_CSP_STORAGE']
+            'CHARGING_EFFICIENCY_PGP_STORAGE','DECAY_RATE_PGP_STORAGE',
+
+            'CAPACITY_CSP','CAPACITY_CSP_STORAGE',
+            'DECAY_RATE_CSP_STORAGE','CHARGING_EFFICIENCY_CSP_STORAGE'
+            ]
             ))
     
     #Capacity cost -- Cost per hour of capacity that must be incurred whether or 
@@ -276,7 +259,7 @@ def preprocess_input(case_input_path_filename):
         input_value = list_item[1]
         if input_key in keywords_str:
             global_dic[input_key] = input_value
-        elif input_key in keywords_real:
+        elif input_key in keywords_real_scaled + keywords_real_notscaled:
             global_dic[input_key] = float(input_value)
         elif input_key in keywords_logical:
             global_dic[input_key] = literal_to_boolean(input_value)
@@ -290,7 +273,7 @@ def preprocess_input(case_input_path_filename):
     all_cases_dic = {}
     
     # prevent missing values for keys
-    for key in keywords_real + keywords_real_notscaled:
+    for key in keywords_real_scaled + keywords_real_notscaled:
         all_cases_dic[key] = -1.
     for key in keywords_str:
         all_cases_dic[key] = ''
@@ -310,7 +293,7 @@ def preprocess_input(case_input_path_filename):
         input_value = list_item[1]
         if input_key in keywords_str:
             all_cases_dic[input_key] = input_value
-        elif input_key in keywords_real:
+        elif input_key in keywords_real_scaled + keywords_real_notscaled:
             all_cases_dic[input_key] = float(input_value)
         elif input_key in keywords_logical:
             all_cases_dic[input_key] = literal_to_boolean(input_value)
@@ -333,11 +316,12 @@ def preprocess_input(case_input_path_filename):
         input_values = list_item[1:]
         if input_key in keywords_str:
             case_list_dic[input_key] = input_values
-        elif input_key in keywords_real:
-            if input_key in keywords_real_notscaled:
-                setNegToM1 = np.array(list(map(float,input_values)))
-            else:
-                setNegToM1 = case_list_dic[input_key] * np.array(list(map(float,input_values)))
+        elif input_key in keywords_real_scaled:
+            setNegToM1 = case_list_dic[input_key] * np.array(list(map(float,input_values)))
+            setNegToM1[setNegToM1 < 0] = -1
+            case_list_dic[input_key] = setNegToM1
+        elif input_key in keywords_real_notscaled:
+            setNegToM1 = np.array(list(map(float,input_values)))
             setNegToM1[setNegToM1 < 0] = -1
             case_list_dic[input_key] = setNegToM1
         elif input_key in keywords_logical:
@@ -345,7 +329,7 @@ def preprocess_input(case_input_path_filename):
 
     # define all keywords in dictionary, but set to -1 if not present    
     dummy = [-1 for i in range(num_cases)]
-    for keyword in list(set(keywords_real).difference(case_list_dic.keys())):
+    for keyword in list(set(keywords_real_scaled + keywords_real_notscaled).difference(case_list_dic.keys())):
         case_list_dic[keyword] = dummy
 
                                                 
@@ -356,8 +340,6 @@ def preprocess_input(case_input_path_filename):
     # are used in each case.
     
     # for wind, solar, and demand, we also need to get the relevant demand files
-    
-
     
     have_keys = case_list_dic.keys()
 

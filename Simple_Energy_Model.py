@@ -31,7 +31,8 @@ import sys
 #if whoami == 'kcaldeira-carbo\\kcaldeira\r\n':
 #    case_input_path_filename = '/Users/kcaldeira/Google Drive/git/SEM-1/case_input.csv'
 if len(sys.argv) == 1:
-    case_input_path_filename = './case_input.csv'
+    #case_input_path_filename = './case_input.csv'
+    case_input_path_filename = './case_input_test_190726.csv'
 else:
     case_input_path_filename = sys.argv[1]
 
@@ -53,7 +54,7 @@ if not os.path.exists(output_folder):
 try:
     copy2(case_input_path_filename, output_folder)
 except:
-    print ('case input file not copied. Perhaps it is open and cannot be overwritten.')
+    print ('case input file '+case_input_path_filename+' not copied. Perhaps it does not exist. Perhaps it is open and cannot be overwritten.')
 
 # -----------------------------------------------------------------------------
 

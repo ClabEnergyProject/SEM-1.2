@@ -71,6 +71,7 @@ def core_model_loop (global_dic, case_dic_list):
                 print ('solved  ',case_dic_list[case_index]['CASE_NAME'])
 
             # put raw results in file for later analysis
+            # NOTE: THIS NEEDS TO BE FIXED UP FOR STORAGE2
             if 'STORAGE' in case_dic_list[case_index]['SYSTEM_COMPONENTS']:
                 sdic = storage_analysis(global_dic,case_dic_list[case_index],result_dic)
                 for key in sdic.keys():
@@ -363,7 +364,9 @@ def core_model (global_dic, case_dic):
                         energy_storage[i] + charging_efficiency_storage * dispatch_to_storage[i]
                         - dispatch_from_storage[i] - energy_storage[i]*decay_rate_storage
                     ]
-
+        #print ('done with STORAGE')
+        #print (constraints)
+        #print (fcn2min)
     else:
         capacity_storage = 0
         dispatch_to_storage = np.zeros(num_time_periods)
@@ -397,6 +400,9 @@ def core_model (global_dic, case_dic):
             cvx.sum(dispatch_to_storage2 * var_cost_to_storage2)/num_time_periods + \
             cvx.sum(dispatch_from_storage2 * var_cost_from_storage2)/num_time_periods
 
+        #print ('done with STORAGE2')
+        #print (constraints)
+        #print (fcn2min)
         for i in range(num_time_periods):
 
             constraints += [
@@ -676,11 +682,13 @@ def core_model (global_dic, case_dic):
                 'PROBLEM_STATUS':prob.status
                 }
 
-        result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling).flatten()
-        # note that hourly pricing can be determined from the dual of the constraint on energy balance
-        # The num_time_periods is in the above because the influence on the cost of an hour is much bigger then
-        # the impact of average cost over the period. The divide by the cost scaling corrects for the cost scaling.
-
+        try:
+            result['PRICE'] = np.array(-1.0 * num_time_periods * constraints[-1].dual_value/ numerics_cost_scaling).flatten()
+            # note that hourly pricing can be determined from the dual of the constraint on energy balance
+            # The num_time_periods is in the above because the influence on the cost of an hour is much bigger then
+            # the impact of average cost over the period. The divide by the cost scaling corrects for the cost scaling.
+        except:
+            result['PRICE']=np.zeros(num_time_periods)
 
         if 'NATGAS' in system_components:
             if case_dic['CAPACITY_NATGAS'] < 0:
