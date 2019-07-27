@@ -14,7 +14,7 @@ Currently, the technologies considered in this release of SEM 1.2 are:
  8. nuclear
  9. storage
 10. storage2
-11.pgp (power to gas to power)
+11. pgp (power to gas to power)
 
 
 
