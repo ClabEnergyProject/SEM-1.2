@@ -8,13 +8,15 @@ Currently, the technologies considered in this release of SEM 1.2 are:
  2. SOLAR2
  3. WIND
  4. WIND2
- 5. CSP (conc solar)
+ 5. CSP (conc solar, considers CAPACITY_CSP and CAPACITY_CSP_STORAGE)
  6. NATGAS
  7. NATGAS_CCS ( = natgas2 ? )
  8. NUCLEAR
  9. STORAGE
 10. STORAGE2
-11. PGP_STORAGE (power to gas to power )
+11. PGP_STORAGE (power to gas to power, considers CAPACITY_PGP_STORAGE, CAPACITY_TO_PGP_STORAGE and CAPACITY_FROM_PGP_STORAGE)
+
+If not otherwise noted, each of these technologies are solved for one capacity, CAPACITY_techname, plus dispatch.
 
 For a full list of input variables, it is best to look inside <Preprocess_Input.py>.
 
