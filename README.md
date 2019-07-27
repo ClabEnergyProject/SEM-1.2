@@ -4,19 +4,19 @@ and fuels) without considering any spatial variation, policy, capacity markets, 
 
 Currently, the technologies considered in this release of SEM 1.2 are:
 
- 1. solar
- 2. solar2
- 3. wind
- 4. wind2
- 5. csp (conc solar)
- 6. natgas
- 7. natgas_ccs ( = natgas2 ? )
- 8. nuclear
- 9. storage
-10. storage2
-11. pgp (power to gas to power)
+ 1. SOLAR
+ 2. SOLAR2
+ 3. WIND
+ 4. WIND2
+ 5. CSP (conc solar)
+ 6. NATGAS
+ 7. NATGAS_CCS ( = natgas2 ? )
+ 8. NUCLEAR
+ 9. STORAGE
+10. STORAGE2
+11. PGP_STORAGE (power to gas to power, also )
 
-
+For a full list of input variables, it is best to look inside <Preprocess_Input.py>.
 
 <br>
 <b>=====  WISH LIST OF THINGS TO BE DONE ON THIS MODEL  =====</b>
