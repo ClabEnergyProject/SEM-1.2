@@ -26,19 +26,21 @@ For a full list of input variables, it is best to look inside <Preprocess_Input.
 
 The following is a wish list for improvements to our model and its usability:
 
-A. Some LIFO storage and PGP_storage analysis and figures as part of standard output.
+-- Check standard output for new technologies (WIND2, SOLAR2, STORAGE2, CSP, etc). For example, the battery analysis is now done only on STORAGE and not STORAGE2. 
 
-B. Reconfigure model to allow running more cases without needing more memory.
+-- Some LIFO storage and PGP_storage analysis and figures as part of standard output.
 
-C. Automate some checks on aberrant usage of storage (?)
+-- Reconfigure model to allow running more cases without needing more memory.
 
-D. Make some test cases and output files. (Ideally automate.)
+-- Automate some checks on aberrant usage of storage (?)
 
-E. Add inter-case comparisons to Quick_Look.py
+-- Automate test cases and comparison with output files.
 
-F. Do a runtime analysis to speed up execution of Quick_Look.py
+-- Add inter-case comparisons to Quick_Look.py
 
-G. Make version that can be spread across CEES-Mazama.
+-- Do a runtime analysis to speed up execution of Quick_Look.py
+
+-- Make version that can be spread across CEES-Mazama.
 
 
 <br>
