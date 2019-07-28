@@ -42,3 +42,8 @@ def list_of_dicts_to_dict_of_lists(list_of_dicts):
             values.append((list_of_dicts[i])[key])
         dict_of_lists[key] = values
     return dict_of_lists
+
+#%%  Get unique elements from list of lists
+
+def unique_list_of_lists(lol):
+    return set(x for item in lol for x in item)

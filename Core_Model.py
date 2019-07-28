@@ -65,9 +65,9 @@ def core_model_loop (global_dic, case_dic_list):
 
         if result_dic['SYSTEM_COST'] > 0:
 
-            if verbose:
-                today = datetime.datetime.now()
-                print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
+#            if verbose:
+#                today = datetime.datetime.now()
+#                print ('solved  ',case_dic_list[case_index]['CASE_NAME'],' time = ',today)
 
             # put raw results in file for later analysis
             # NOTE: THIS NEEDS TO BE FIXED UP FOR STORAGE2
@@ -85,6 +85,8 @@ def core_model_loop (global_dic, case_dic_list):
         save_vector_results_as_csv( global_dic, case_dic_list[case_index], result_dic )
         pickle_raw_results( global_dic, case_dic_list[case_index], result_dic )
 
+    if verbose:
+        print('---')
     return
 
 # -----------------------------------------------------------------------------

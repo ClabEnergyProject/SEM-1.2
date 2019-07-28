@@ -1,0 +1,61 @@
+runfile('C:/Users/kcaldeira/Google Drive/git/SEM-1.2/Simple_Energy_Model.py', wdir='C:/Users/kcaldeira/Google Drive/git/SEM-1.2')
+Reloaded modules: Core_Model, Storage_Analysis, Save_Basic_Results, utilities, Preprocess_Input, Postprocess_Results, Quick_Look, Supporting_Functions
+Simple_Energy_Model: Pre-processing input
+Preprocess_Input.py: Preparing case input for  test_190726
+Preprocess_Input.py: time series for  wind+wind2+unmet
+Preprocess_Input.py: time series for  solar+solar2+PGP
+Preprocess_Input.py: time series for  solar+solar2+storage+storage2_0.30
+Preprocess_Input.py: time series for  nuclear+CSP_0.25
+Preprocess_Input.py: time series for  natgas+unmet
+Preprocess_Input.py: time series for  natgasCCS+nuclear_0.5
+Preprocess_Input.py: time series for  EIAbase
+Simple_Energy_Model: Executing core model loop
+---
+solving  wind+wind2+unmet  time =  2019-07-28 07:28:03.798754
+system cost C:\Users\kcaldeira\Anaconda3\lib\site-packages\cvxpy\problems\problem.py:858: RuntimeWarning: overflow encountered in long_scalars
+  max_big_small_squared = big*(small**2)
+ 0.17224779438447668  runtime:  0.18877363204956055 seconds
+---
+solving  solar+solar2+PGP  time =  2019-07-28 07:28:04.033406
+Warning for adding constraints: zero or small (< 1e-13) coefficients, ignored
+system cost  0.5618362601149164  runtime:  2.798513412475586 seconds
+---
+solving  solar+solar2+storage+storage2_0.30  time =  2019-07-28 07:28:06.898743
+Warning for adding constraints: zero or small (< 1e-13) coefficients, ignored
+system cost  0.29850788978488885  runtime:  6.285187482833862 seconds
+---
+solving  nuclear+CSP_0.25  time =  2019-07-28 07:28:13.290648
+Warning for adding constraints: zero or small (< 1e-13) coefficients, ignored
+system cost  0.18707972211774984  runtime:  2.507293462753296 seconds
+---
+solving  natgas+unmet  time =  2019-07-28 07:28:15.853793
+Warning for adding constraints: zero or small (< 1e-13) coefficients, ignored
+system cost  0.10702726219181723  runtime:  2.4514763355255127 seconds
+---
+solving  natgasCCS+nuclear_0.5  time =  2019-07-28 07:28:18.358097
+system cost  0.05088786294328981  runtime:  0.20046472549438477 seconds
+---
+solving  EIAbase  time =  2019-07-28 07:28:18.600449
+Warning for adding constraints: zero or small (< 1e-13) coefficients, ignored
+system cost  0.05339458150656109  runtime:  11.682756900787354 seconds
+---
+Simple_Energy_Model: Saving basic results
+file written: test_190726_20190728_072830.csv
+gurboi.log not erased
+Simple_Energy_Model: Preparing quick look at results
+pickle files read
+preparing case  0   wind+wind2+unmet
+done with call_plot_results_1scenario for case wind+wind2+unmet
+preparing case  1   solar+solar2+PGP
+done with call_plot_results_1scenario for case solar+solar2+PGP
+preparing case  2   solar+solar2+storage+storage2_0.30
+done with call_plot_results_1scenario for case solar+solar2+storage+storage2_0.30
+preparing case  3   nuclear+CSP_0.25
+done with call_plot_results_1scenario for case nuclear+CSP_0.25
+preparing case  4   natgas+unmet
+done with call_plot_results_1scenario for case natgas+unmet
+preparing case  5   natgasCCS+nuclear_0.5
+done with call_plot_results_1scenario for case natgasCCS+nuclear_0.5
+preparing case  6   EIAbase
+done with call_plot_results_1scenario for case EIAbase
+files closed

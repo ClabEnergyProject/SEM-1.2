@@ -18,7 +18,7 @@ import csv
 import datetime
 import contextlib
 import pickle
-from utilities import list_of_dicts_to_dict_of_lists
+from utilities import list_of_dicts_to_dict_of_lists, unique_list_of_lists
 
 
 
@@ -220,7 +220,7 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
 #%%
 # save scalar results for all cases
 def save_basic_results( global_dic, case_dic_list ):
-    global output_array, series_list, header_list, case_list_dic, case_dic_list_0,res,key,series_list0
+    global case_list_dic,case_dic_list_0
     
     verbose = global_dic['VERBOSE']
     
@@ -257,6 +257,8 @@ def save_basic_results( global_dic, case_dic_list ):
     
     # cvt list of dictionaries to dictionary of lists    
     case_list_dic = list_of_dicts_to_dict_of_lists (case_dic_list_0)
+    
+    components = unique_list_of_lists(case_list_dic['SYSTEM_COMPONENTS'])
 
     header_list = []
     series_list = []
@@ -280,163 +282,172 @@ def save_basic_results( global_dic, case_dic_list ):
     series_list.append(case_list_dic['DEMAND_SERIES'])
     
     # Input: NATGAS
+    if 'NATGAS' in components:
+        header_list += ['fixed cost natgas ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_NATGAS'])
     
-    header_list += ['fixed cost natgas ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_NATGAS'])
-
-    header_list += ['var cost natgas ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_NATGAS'])
+        header_list += ['var cost natgas ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_NATGAS'])
 
     # Input: NATGAS_CCS
-
-    header_list += ['fixed cost natgas_ccs ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_NATGAS_CCS'])
-
-    header_list += ['var cost natgas_ccs ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_NATGAS_CCS'])
+    if 'NATGAS_CCS' in components:
+        header_list += ['fixed cost natgas_ccs ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_NATGAS_CCS'])
+    
+        header_list += ['var cost natgas_ccs ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_NATGAS_CCS'])
    
     # Input: SOLAR
+    if 'SOLAR' in components: 
+        header_list += ['fixed cost solar ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_SOLAR'])
+     
+        header_list += ['var cost solar ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_SOLAR'])
     
-    header_list += ['fixed cost solar ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_SOLAR'])
- 
-    header_list += ['var cost solar ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_SOLAR'])
-
-    header_list += ['solar file']
-    series_list.append(case_list_dic['SOLAR_CAPACITY_FILE'])
-
-    header_list += ['cap factor solar (-)']
-    series_list.append( case_list_dic['SOLAR_SERIES'])
+        header_list += ['solar file']
+        series_list.append(case_list_dic['SOLAR_CAPACITY_FILE'])
     
-    # Input: NATGAS_SOLAR2
-    header_list += ['fixed cost solar2 ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_SOLAR2'])
-
-    header_list += ['var cost solar2 ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_SOLAR2'])
-
-    header_list += ['solar2 file']
-    series_list.append(case_list_dic['SOLAR2_CAPACITY_FILE'])
+        header_list += ['cap factor solar (-)']
+        series_list.append( case_list_dic['SOLAR_SERIES'])
     
-    header_list += ['cap factor solar2 (-)']
-    series_list.append( case_list_dic['SOLAR2_SERIES'])
-
-    # Input: NATGAS_WIND
-    header_list += ['fixed cost wind ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_WIND'])
-
-    header_list += ['var cost wind ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_WIND'] )
-
-    header_list += ['wind file']
-    series_list.append(case_list_dic['WIND_CAPACITY_FILE'])
-
-    header_list += ['cap factor wind (-)']
-    series_list.append(case_list_dic['WIND_SERIES'])
+    # Input: SOLAR2
+    if 'SOLAR' in components: 
+        header_list += ['fixed cost solar2 ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_SOLAR2'])
     
-    # Input: NATGAS_WIND2
-    header_list += ['fixed cost wind2 ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_WIND2'])
-
-    header_list += ['var cost wind2 ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_WIND2'] )
-
-    header_list += ['wind2 file']
-    series_list.append(case_list_dic['WIND2_CAPACITY_FILE'])
-
-    header_list += ['cap factor wind2 (-)']
-    series_list.append( case_list_dic['WIND2_SERIES'])
+        header_list += ['var cost solar2 ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_SOLAR2'])
     
-    # Input: NATGAS_NUCLEAR
-    header_list += ['fixed cost nuclear ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_NUCLEAR'] )
+        header_list += ['solar2 file']
+        series_list.append(case_list_dic['SOLAR2_CAPACITY_FILE'])
+        
+        header_list += ['cap factor solar2 (-)']
+        series_list.append( case_list_dic['SOLAR2_SERIES'])
 
-    header_list += ['var cost nuclear ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_NUCLEAR'] )
-
-    # Input: NATGAS_STORAGE
-    header_list += ['fixed cost storage ($/kWh/h)']
-    series_list.append( case_list_dic['FIXED_COST_STORAGE'])
-
-    header_list += ['var cost storage ($/kWh/h)']
-    series_list.append( case_list_dic['VAR_COST_STORAGE'] )
-
-    header_list += ['storage charging efficiency']
-    series_list.append( case_list_dic['CHARGING_EFFICIENCY_STORAGE'])
-
-    header_list += ['storage charging time (h)']
-    series_list.append( case_list_dic['CHARGING_TIME_STORAGE'] )
-
-    header_list += ['storage decay rate (1/h))']
-    series_list.append( case_list_dic['DECAY_RATE_STORAGE'] )
+    # Input: WIND
+    if 'WIND' in components: 
+        header_list += ['fixed cost wind ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_WIND'])
     
-    # Input: NATGAS_STORAGE2
-    header_list += ['fixed cost storage2 ($/kWh/h)']
-    series_list.append( case_list_dic['FIXED_COST_STORAGE2'])
+        header_list += ['var cost wind ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_WIND'] )
+    
+        header_list += ['wind file']
+        series_list.append(case_list_dic['WIND_CAPACITY_FILE'])
+    
+        header_list += ['cap factor wind (-)']
+        series_list.append(case_list_dic['WIND_SERIES'])
+    
+    # Input: WIND2
+    if 'WIND2' in components: 
+        header_list += ['fixed cost wind2 ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_WIND2'])
+    
+        header_list += ['var cost wind2 ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_WIND2'] )
+    
+        header_list += ['wind2 file']
+        series_list.append(case_list_dic['WIND2_CAPACITY_FILE'])
+    
+        header_list += ['cap factor wind2 (-)']
+        series_list.append( case_list_dic['WIND2_SERIES'])
+    
+    # Input: NUCLEAR
+    if 'NUCLEAR' in components: 
+        header_list += ['fixed cost nuclear ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_NUCLEAR'] )
+    
+        header_list += ['var cost nuclear ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_NUCLEAR'] )
 
-    header_list += ['var cost storage2 ($/kWh/h)']
-    series_list.append( case_list_dic['VAR_COST_STORAGE2'])
-
-    header_list += ['storage2 charging efficiency']
-    series_list.append( case_list_dic['CHARGING_EFFICIENCY_STORAGE2'])
-
-    header_list += ['storage2 charging time (h)']
-    series_list.append( case_list_dic['CHARGING_TIME_STORAGE2'])
-
-    header_list += ['storage2 decay rate (1/h))']
-    series_list.append( case_list_dic['DECAY_RATE_STORAGE2'] )
+    # Input: STORAGE
+    if 'STORAGE' in components: 
+        header_list += ['fixed cost storage ($/kWh/h)']
+        series_list.append( case_list_dic['FIXED_COST_STORAGE'])
+    
+        header_list += ['var cost storage ($/kWh/h)']
+        series_list.append( case_list_dic['VAR_COST_STORAGE'] )
+    
+        header_list += ['storage charging efficiency']
+        series_list.append( case_list_dic['CHARGING_EFFICIENCY_STORAGE'])
+    
+        header_list += ['storage charging time (h)']
+        series_list.append( case_list_dic['CHARGING_TIME_STORAGE'] )
+    
+        header_list += ['storage decay rate (1/h))']
+        series_list.append( case_list_dic['DECAY_RATE_STORAGE'] )
+    
+    # Input: STORAGE2
+    if 'STORAGE2' in components: 
+        header_list += ['fixed cost storage2 ($/kWh/h)']
+        series_list.append( case_list_dic['FIXED_COST_STORAGE2'])
+    
+        header_list += ['var cost storage2 ($/kWh/h)']
+        series_list.append( case_list_dic['VAR_COST_STORAGE2'])
+    
+        header_list += ['storage2 charging efficiency']
+        series_list.append( case_list_dic['CHARGING_EFFICIENCY_STORAGE2'])
+    
+        header_list += ['storage2 charging time (h)']
+        series_list.append( case_list_dic['CHARGING_TIME_STORAGE2'])
+    
+        header_list += ['storage2 decay rate (1/h))']
+        series_list.append( case_list_dic['DECAY_RATE_STORAGE2'] )
 
     # Input: PGP_STORAGE
-    header_list += ['fixed cost pgp storage ($/kWh/h)']
-    series_list.append( case_list_dic['FIXED_COST_PGP_STORAGE'] )
-
-    header_list += ['fixed cost to pgp storage ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_TO_PGP_STORAGE'])
-
-    header_list += ['fixed cost from pgp storage ($/kW/h)']
-    series_list.append ( case_list_dic['FIXED_COST_FROM_PGP_STORAGE'])
-
-    header_list += ['var cost to pgp storage ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_TO_PGP_STORAGE'])
-
-    header_list += ['var cost from pgp storage ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_FROM_PGP_STORAGE'])
-
-    header_list += ['pgp storage charging efficiency']
-    series_list.append( case_list_dic['CHARGING_EFFICIENCY_PGP_STORAGE'])
-
-    header_list += ['pgp storage decay rate (1/h))']
-    series_list.append( case_list_dic['DECAY_RATE_PGP_STORAGE'])
+    if 'PGP_STORAGE' in components: 
+        header_list += ['fixed cost pgp storage ($/kWh/h)']
+        series_list.append( case_list_dic['FIXED_COST_PGP_STORAGE'] )
+    
+        header_list += ['fixed cost to pgp storage ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_TO_PGP_STORAGE'])
+    
+        header_list += ['fixed cost from pgp storage ($/kW/h)']
+        series_list.append ( case_list_dic['FIXED_COST_FROM_PGP_STORAGE'])
+    
+        header_list += ['var cost to pgp storage ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_TO_PGP_STORAGE'])
+    
+        header_list += ['var cost from pgp storage ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_FROM_PGP_STORAGE'])
+    
+        header_list += ['pgp storage charging efficiency']
+        series_list.append( case_list_dic['CHARGING_EFFICIENCY_PGP_STORAGE'])
+    
+        header_list += ['pgp storage decay rate (1/h))']
+        series_list.append( case_list_dic['DECAY_RATE_PGP_STORAGE'])
     
     # Input: CSP
-    header_list += ['fixed cost csp ($/kW/h)']
-    series_list.append( case_list_dic['FIXED_COST_CSP'])
-
-    header_list += ['var cost csp ($/kW/h)']
-    series_list.append( case_list_dic['VAR_COST_CSP'])
-
-    header_list += ['fixed cost csp storage ($/kWh/h)']
-    series_list.append( case_list_dic['FIXED_COST_CSP_STORAGE'])
+    if 'CSP' in components: 
+        header_list += ['fixed cost csp ($/kW/h)']
+        series_list.append( case_list_dic['FIXED_COST_CSP'])
     
-    header_list += ['var cost csp storage ($/kWh/h)']
-    series_list.append( case_list_dic['VAR_COST_CSP_STORAGE'])
+        header_list += ['var cost csp ($/kW/h)']
+        series_list.append( case_list_dic['VAR_COST_CSP'])
     
-    header_list += ['csp charging efficiency']
-    series_list.append( case_list_dic['CHARGING_EFFICIENCY_CSP_STORAGE'])
-
-    header_list += ['csp storage decay rate (1/h))']
-    series_list.append( case_list_dic['DECAY_RATE_CSP_STORAGE'])
-
-    header_list += ['csp file']
-    series_list.append(case_list_dic['CSP_CAPACITY_FILE'])
+        header_list += ['fixed cost csp storage ($/kWh/h)']
+        series_list.append( case_list_dic['FIXED_COST_CSP_STORAGE'])
+        
+        header_list += ['var cost csp storage ($/kWh/h)']
+        series_list.append( case_list_dic['VAR_COST_CSP_STORAGE'])
+        
+        header_list += ['csp charging efficiency']
+        series_list.append( case_list_dic['CHARGING_EFFICIENCY_CSP_STORAGE'])
     
-    header_list += ['cap factor csp (-)']
-    series_list.append(case_list_dic['CSP_SERIES'])
+        header_list += ['csp storage decay rate (1/h))']
+        series_list.append( case_list_dic['DECAY_RATE_CSP_STORAGE'])
+    
+        header_list += ['csp file']
+        series_list.append(case_list_dic['CSP_CAPACITY_FILE'])
+        
+        header_list += ['cap factor csp (-)']
+        series_list.append(case_list_dic['CSP_SERIES'])
           
     # Input: UNMET_DEMAND
-    header_list += ['var cost unmet demand ($/kWh)']
-    series_list.append( case_list_dic['VAR_COST_UNMET_DEMAND'])
+    if 'UNMET_DEMAND' in components: 
+        header_list += ['var cost unmet demand ($/kWh)']
+        series_list.append( case_list_dic['VAR_COST_UNMET_DEMAND'])
 
     #==========================================================================
     # OUTPUT VARIABLES
@@ -447,134 +458,145 @@ def save_basic_results( global_dic, case_dic_list ):
     series_list.append( case_list_dic['SYSTEM_COST'])
 
     # Results: NATGAS
-    header_list += ['capacity natgas (kW)']
-    series_list.append( case_list_dic['CAPACITY_NATGAS'])
-
-    header_list += ['dispatch natgas (kW)']
-    series_list.append( case_list_dic['DISPATCH_NATGAS'])
+    if 'NATGAS' in components: 
+        header_list += ['capacity natgas (kW)']
+        series_list.append( case_list_dic['CAPACITY_NATGAS'])
+    
+        header_list += ['dispatch natgas (kW)']
+        series_list.append( case_list_dic['DISPATCH_NATGAS'])
     
     # Results: NATGAS_CCS
-    header_list += ['capacity natgas_ccs (kW)']
-    series_list.append( case_list_dic['CAPACITY_NATGAS_CCS'])
-
-    header_list += ['dispatch natgas ccs (kW)']
-    series_list.append( case_list_dic['DISPATCH_NATGAS_CCS'])
+    if 'NATGAS_CCS' in components: 
+        header_list += ['capacity natgas_ccs (kW)']
+        series_list.append( case_list_dic['CAPACITY_NATGAS_CCS'])
+    
+        header_list += ['dispatch natgas ccs (kW)']
+        series_list.append( case_list_dic['DISPATCH_NATGAS_CCS'])
     
     # Results: SOLAR
-    header_list += ['capacity solar (kW)']
-    series_list.append(  case_list_dic['CAPACITY_SOLAR'])
-
-    header_list += ['dispatch solar (kW)']
-    series_list.append( case_list_dic['DISPATCH_SOLAR'])
-
-    header_list += ['curtailment solar (kW)']
-    series_list.append( case_list_dic['CURTAILMENT_SOLAR'])
+    if 'SOLAR' in components: 
+        header_list += ['capacity solar (kW)']
+        series_list.append(  case_list_dic['CAPACITY_SOLAR'])
+    
+        header_list += ['dispatch solar (kW)']
+        series_list.append( case_list_dic['DISPATCH_SOLAR'])
+    
+        header_list += ['curtailment solar (kW)']
+        series_list.append( case_list_dic['CURTAILMENT_SOLAR'])
     
     # Results: SOLAR2
-    header_list += ['capacity solar (kW)']
-    series_list.append(  case_list_dic['CAPACITY_SOLAR2'])
-
-    header_list += ['dispatch solar2 (kW)']
-    series_list.append( case_list_dic['DISPATCH_SOLAR2'])
-
-    header_list += ['curtailment solar2 (kW)']
-    series_list.append( case_list_dic['CURTAILMENT_SOLAR2'])
+    if 'SOLAR2' in components: 
+        header_list += ['capacity solar (kW)']
+        series_list.append(  case_list_dic['CAPACITY_SOLAR2'])
+    
+        header_list += ['dispatch solar2 (kW)']
+        series_list.append( case_list_dic['DISPATCH_SOLAR2'])
+    
+        header_list += ['curtailment solar2 (kW)']
+        series_list.append( case_list_dic['CURTAILMENT_SOLAR2'])
     
     # Results: WIND
-    header_list += ['capacity wind (kW)']
-    series_list.append(  case_list_dic['CAPACITY_WIND'])
-
-    header_list += ['dispatch wind (kW)']
-    series_list.append( case_list_dic['DISPATCH_WIND'])
-
-    header_list += ['curtailment wind (kW)']
-    series_list.append( case_list_dic['CURTAILMENT_WIND'])
+    if 'WIND' in components: 
+        header_list += ['capacity wind (kW)']
+        series_list.append(  case_list_dic['CAPACITY_WIND'])
+    
+        header_list += ['dispatch wind (kW)']
+        series_list.append( case_list_dic['DISPATCH_WIND'])
+    
+        header_list += ['curtailment wind (kW)']
+        series_list.append( case_list_dic['CURTAILMENT_WIND'])
     
     # Results: WIND2
-    header_list += ['capacity wind2 (kW)']
-    series_list.append(  case_list_dic['CAPACITY_WIND2'])
-
-    header_list += ['dispatch wind2 (kW)']
-    series_list.append( case_list_dic['DISPATCH_WIND2'])
-
-    header_list += ['curtailment wind2 (kW)']
-    series_list.append( case_list_dic['CURTAILMENT_WIND2'])
+    if 'WIND2' in components: 
+        header_list += ['capacity wind2 (kW)']
+        series_list.append(  case_list_dic['CAPACITY_WIND2'])
+    
+        header_list += ['dispatch wind2 (kW)']
+        series_list.append( case_list_dic['DISPATCH_WIND2'])
+    
+        header_list += ['curtailment wind2 (kW)']
+        series_list.append( case_list_dic['CURTAILMENT_WIND2'])
     
     # Results: NUCLEAR
-    header_list += ['capacity nuclear (kW)']
-    series_list.append(  case_list_dic['CAPACITY_NUCLEAR'])
-
-    header_list += ['dispatch nuclear (kW)']
-    series_list.append( case_list_dic['DISPATCH_NUCLEAR'])
-
-    header_list += ['curtailment nuclear (kW)']
-    series_list.append( case_list_dic['CURTAILMENT_NUCLEAR'])
+    if 'NUCLEAR' in components: 
+        header_list += ['capacity nuclear (kW)']
+        series_list.append(  case_list_dic['CAPACITY_NUCLEAR'])
+    
+        header_list += ['dispatch nuclear (kW)']
+        series_list.append( case_list_dic['DISPATCH_NUCLEAR'])
+    
+        header_list += ['curtailment nuclear (kW)']
+        series_list.append( case_list_dic['CURTAILMENT_NUCLEAR'])
     
     # Results: STORAGE
-    header_list += ['capacity storage (kW)']
-    series_list.append(  case_list_dic['CAPACITY_STORAGE'])
-
-    header_list += ['energy storage (kW)']
-    series_list.append( case_list_dic['ENERGY_STORAGE'])
-
-    header_list += ['dispatch to storage (kW)']
-    series_list.append( case_list_dic['DISPATCH_TO_STORAGE'])
-
-    header_list += ['dispatch from storage (kW)']
-    series_list.append( case_list_dic['DISPATCH_FROM_STORAGE'])
+    if 'STORAGE' in components: 
+        header_list += ['capacity storage (kW)']
+        series_list.append(  case_list_dic['CAPACITY_STORAGE'])
+    
+        header_list += ['energy storage (kW)']
+        series_list.append( case_list_dic['ENERGY_STORAGE'])
+    
+        header_list += ['dispatch to storage (kW)']
+        series_list.append( case_list_dic['DISPATCH_TO_STORAGE'])
+    
+        header_list += ['dispatch from storage (kW)']
+        series_list.append( case_list_dic['DISPATCH_FROM_STORAGE'])
     
     # Results: STORAGE2
-    header_list += ['capacity storage2 (kW)']
-    series_list.append(  case_list_dic['CAPACITY_STORAGE2'])
-
-    header_list += ['energy storage2 (kW)']
-    series_list.append( case_list_dic['ENERGY_STORAGE2'])
-
-    header_list += ['dispatch to storage2 (kW)']
-    series_list.append( case_list_dic['DISPATCH_TO_STORAGE2'])
-
-    header_list += ['dispatch from storage2 (kW)']
-    series_list.append( case_list_dic['DISPATCH_FROM_STORAGE2'])
+    if 'STORAGE2' in components: 
+        header_list += ['capacity storage2 (kW)']
+        series_list.append(  case_list_dic['CAPACITY_STORAGE2'])
+    
+        header_list += ['energy storage2 (kW)']
+        series_list.append( case_list_dic['ENERGY_STORAGE2'])
+    
+        header_list += ['dispatch to storage2 (kW)']
+        series_list.append( case_list_dic['DISPATCH_TO_STORAGE2'])
+    
+        header_list += ['dispatch from storage2 (kW)']
+        series_list.append( case_list_dic['DISPATCH_FROM_STORAGE2'])
    
     # Results: PGP STORAGE
-    header_list += ['capacity pgp storage (kW)']
-    series_list.append(  case_list_dic['CAPACITY_PGP_STORAGE'])
-   
-    header_list += ['capacity to pgp storage (kW)']
-    series_list.append(  case_list_dic['CAPACITY_TO_PGP_STORAGE'])
-   
-    header_list += ['capacity from pgp storage (kW)']
-    series_list.append(  case_list_dic['CAPACITY_FROM_PGP_STORAGE'])
-
-    header_list += ['energy pgp storage (kW)']
-    series_list.append( case_list_dic['ENERGY_PGP_STORAGE'])
-
-    header_list += ['dispatch to pgp storage (kW)']
-    series_list.append( case_list_dic['DISPATCH_TO_PGP_STORAGE'])
-
-    header_list += ['dispatch from pgp storage (kW)']
-    series_list.append( case_list_dic['DISPATCH_FROM_PGP_STORAGE'])
+    if 'PGP_STORAGE' in components: 
+        header_list += ['capacity pgp storage (kW)']
+        series_list.append(  case_list_dic['CAPACITY_PGP_STORAGE'])
+       
+        header_list += ['capacity to pgp storage (kW)']
+        series_list.append(  case_list_dic['CAPACITY_TO_PGP_STORAGE'])
+       
+        header_list += ['capacity from pgp storage (kW)']
+        series_list.append(  case_list_dic['CAPACITY_FROM_PGP_STORAGE'])
+    
+        header_list += ['energy pgp storage (kW)']
+        series_list.append( case_list_dic['ENERGY_PGP_STORAGE'])
+    
+        header_list += ['dispatch to pgp storage (kW)']
+        series_list.append( case_list_dic['DISPATCH_TO_PGP_STORAGE'])
+    
+        header_list += ['dispatch from pgp storage (kW)']
+        series_list.append( case_list_dic['DISPATCH_FROM_PGP_STORAGE'])
    
     # Results: CSP
-    header_list += ['capacity csp (kW)']
-    series_list.append( case_list_dic['CAPACITY_CSP'])
-   
-    header_list += ['capacity csp storage (kW)']
-    series_list.append( case_list_dic['CAPACITY_CSP_STORAGE'])
-
-    header_list += ['energy csp storage (kW)']
-    series_list.append( case_list_dic['ENERGY_CSP_STORAGE'])
-
-    header_list += ['dispatch to csp storage (kW)']
-    series_list.append( case_list_dic['DISPATCH_TO_CSP_STORAGE'])
-
-    header_list += ['dispatch from csp (kW)']
-    series_list.append( case_list_dic['DISPATCH_FROM_CSP'])
+    if 'CSP' in components: 
+        header_list += ['capacity csp (kW)']
+        series_list.append( case_list_dic['CAPACITY_CSP'])
+       
+        header_list += ['capacity csp storage (kW)']
+        series_list.append( case_list_dic['CAPACITY_CSP_STORAGE'])
+    
+        header_list += ['energy csp storage (kW)']
+        series_list.append( case_list_dic['ENERGY_CSP_STORAGE'])
+    
+        header_list += ['dispatch to csp storage (kW)']
+        series_list.append( case_list_dic['DISPATCH_TO_CSP_STORAGE'])
+    
+        header_list += ['dispatch from csp (kW)']
+        series_list.append( case_list_dic['DISPATCH_FROM_CSP'])
 
     #Results: UNMET_DEMAND   
-
-    header_list += ['dispatch unmet demand (kW)']
-    series_list.append( case_list_dic['DISPATCH_UNMET_DEMAND'])
+    if 'CSP' in components: 
+        header_list += ['dispatch unmet demand (kW)']
+        series_list.append( case_list_dic['DISPATCH_UNMET_DEMAND'])
 
     #=========================================================================
     # set missing vector means to zero
