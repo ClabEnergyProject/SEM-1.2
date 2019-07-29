@@ -26,6 +26,8 @@ For a full list of input variables, it is best to look inside <Preprocess_Input.
 
 The following is a wish list for improvements to our model and its usability:
 
+-- Fix redundancy in calculation of curtailment (Curtailment should not be in Core_Model.py and should only be calculated for output.)
+
 -- Check standard output for new technologies (WIND2, SOLAR2, STORAGE2, CSP, etc). For example, the battery analysis is now done only on STORAGE and not STORAGE2. 
 
 -- Some LIFO storage and PGP_storage analysis and figures as part of standard output.
