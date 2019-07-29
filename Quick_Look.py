@@ -115,8 +115,8 @@ def quick_look(global_dic, case_dic_list):
     color_NATGAS  = 'red' # not explicitly referenced but referenced through eval()
     color_NATGAS_CCS  = 'brown' # not explicitly referenced but referenced through eval()
     color_SOLAR   = 'orange' # not explicitly referenced but referenced through eval()
-    color_WIND    = 'blue' # not explicitly referenced but referenced through eval()
     color_SOLAR2   = 'orangered' # not explicitly referenced but referenced through eval()
+    color_WIND    = 'blue' # not explicitly referenced but referenced through eval()
     color_WIND2    = 'darkblue' # not explicitly referenced but referenced through eval()
     color_NUCLEAR = 'green' # not explicitly referenced but referenced through eval()
     color_STORAGE = 'purple'
@@ -2439,11 +2439,23 @@ def compute_curtailment(case_dic, result_dic):
             dispatch_wind = np.array(result_dic['DISPATCH_WIND'])
             curtailment_dic['WIND'] = wind_series * capacity_wind - dispatch_wind
         
+        if component == 'WIND2':
+            wind2_series = np.array(case_dic['WIND2_SERIES'])
+            capacity_wind2 = np.array(result_dic['CAPACITY_WIND2'])
+            dispatch_wind2 = np.array(result_dic['DISPATCH_WIND2'])
+            curtailment_dic['WIND2'] = wind2_series * capacity_wind2 - dispatch_wind2
+        
         elif component == 'SOLAR':
             solar_series = np.array(case_dic['SOLAR_SERIES'])
             capacity_solar = np.array(result_dic['CAPACITY_SOLAR'])
             dispatch_solar = np.array(result_dic['DISPATCH_SOLAR'])
             curtailment_dic['SOLAR'] = solar_series * capacity_solar - dispatch_solar
+        
+        elif component == 'SOLAR2':
+            solar2_series = np.array(case_dic['SOLAR2_SERIES'])
+            capacity_solar2 = np.array(result_dic['CAPACITY_SOLAR2'])
+            dispatch_solar2 = np.array(result_dic['DISPATCH_SOLAR2'])
+            curtailment_dic['SOLAR2'] = solar2_series * capacity_solar2 - dispatch_solar2
             
         elif component == 'NATGAS':
             curtailment_dic['NATGAS'] = np.array(result_dic['CAPACITY_NATGAS']) - np.array(result_dic['DISPATCH_NATGAS'])
