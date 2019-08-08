@@ -594,7 +594,7 @@ def save_basic_results( global_dic, case_dic_list ):
         series_list.append( case_list_dic['DISPATCH_FROM_CSP'])
 
     #Results: UNMET_DEMAND   
-    if 'CSP' in components: 
+    if 'UNMET_DEMAND' in components: 
         header_list += ['dispatch unmet demand (kW)']
         series_list.append( case_list_dic['DISPATCH_UNMET_DEMAND'])
 

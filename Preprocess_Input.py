@@ -218,7 +218,9 @@ def preprocess_input(case_input_path_filename):
             'CHARGING_EFFICIENCY_PGP_STORAGE','DECAY_RATE_PGP_STORAGE',
 
             'CAPACITY_CSP','CAPACITY_CSP_STORAGE',
-            'DECAY_RATE_CSP_STORAGE','CHARGING_EFFICIENCY_CSP_STORAGE'
+            'DECAY_RATE_CSP_STORAGE','CHARGING_EFFICIENCY_CSP_STORAGE',
+            
+            'SYSTEM_RELIABILITY'
             ]
             ))
     
@@ -273,7 +275,7 @@ def preprocess_input(case_input_path_filename):
     # Parse all_cases_dic data
     all_cases_dic = {}
     
-    # prevent missing values for keys
+    # prevent missing values for keys, all will be -1 if not used.
     for key in keywords_real_scaled + keywords_real_notscaled:
         all_cases_dic[key] = -1.
     for key in keywords_str:
@@ -403,6 +405,13 @@ def preprocess_input(case_input_path_filename):
         if 'VAR_COST_UNMET_DEMAND' in have_keys:
             if case_list_dic['VAR_COST_UNMET_DEMAND'][case_index] >= 0:
                 component_list.append('UNMET_DEMAND')
+                
+        if 'SYSTEM_RELIABILITY' in have_keys:
+            if case_list_dic['SYSTEM_RELIABILITY'][case_index] >= 0:
+                if not 'UNMET_DEMAND' in component_list:  # If system reliability is specified make sure unmet demand is a possibility
+                                                          # and set cost to zero if not otherwise set.
+                    component_list.append('UNMET_DEMAND')
+                    case_list_dic['VAR_COST_UNMET_DEMAND'][case_index] = 0
                                 
         list_of_component_lists.append(component_list)
     case_list_dic['SYSTEM_COMPONENTS'] = list_of_component_lists

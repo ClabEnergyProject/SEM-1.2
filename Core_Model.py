@@ -555,6 +555,13 @@ def core_model (global_dic, case_dic):
         fcn2min += cvx.sum(dispatch_unmet_demand * var_cost_unmet_demand)/num_time_periods
     else:
         dispatch_unmet_demand = np.zeros(num_time_periods)
+        
+#%%------------------ unmet demand ------------------------------------------
+    if case_dic['SYSTEM_RELIABILITY'] >= 0:
+        sys_rel = case_dic['SYSTEM_RELIABILITY']
+        constraints += [
+                cvx.sum(dispatch_unmet_demand) ==  (1.-sys_rel)  * cvx.sum(demand_series)
+                ]
 
 
 #%%------------------- dispatch energy balance constraint ------------------------------------------
