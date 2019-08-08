@@ -267,6 +267,9 @@ def save_basic_results( global_dic, case_dic_list ):
     header_list += ['case name']
     series_list.append( case_list_dic['CASE_NAME'])
 
+    header_list += ['system reliability']
+    series_list.append( case_list_dic['SYSTEM_RELIABILITY'])
+
     header_list += ['CO2 price ($/kgCO2)']
     series_list.append( case_list_dic['CO2_PRICE'])
 
@@ -486,7 +489,7 @@ def save_basic_results( global_dic, case_dic_list ):
     
     # Results: SOLAR2
     if 'SOLAR2' in components: 
-        header_list += ['capacity solar (kW)']
+        header_list += ['capacity solar2 (kW)']
         series_list.append(  case_list_dic['CAPACITY_SOLAR2'])
     
         header_list += ['dispatch solar2 (kW)']
