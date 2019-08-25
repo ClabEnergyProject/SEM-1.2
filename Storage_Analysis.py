@@ -174,3 +174,22 @@ def storage_analysis(global_dic,case_dic,result_dic):
             #  <revenue_elec_storage> revenue from electricity sold from storage in each hour
         
     return storage_dic
+
+
+# Need to return an empty storage dict so that the restults keys are consistent
+# across all cases
+def no_storage_analysis():
+
+    storage_dic = {
+            "max_headroom":             -1,
+            "mean_storage_time":        -1,
+            "max_storage_time":         -1,
+            "elec_cost_elec_storage":   -1,
+            "var_cost_elec_storage":    -1,
+            "net_cost_elec_storage":    -1,
+            "revenue_elec_storage":     -1,
+            "net_revenue":              -1,
+            "net_revenue_perkWh":       -1,
+            "storage_cost_perkWh":      -1
+            }
+    return storage_dic

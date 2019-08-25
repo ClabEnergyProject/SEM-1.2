@@ -39,7 +39,7 @@ import time
 import datetime
 import numpy as np
 
-from Storage_Analysis import storage_analysis
+from Storage_Analysis import storage_analysis, no_storage_analysis
 
 from Save_Basic_Results import save_vector_results_as_csv
 from Save_Basic_Results import pickle_raw_results
@@ -73,8 +73,11 @@ def core_model_loop (global_dic, case_dic_list):
             # NOTE: THIS NEEDS TO BE FIXED UP FOR STORAGE2
             if 'STORAGE' in case_dic_list[case_index]['SYSTEM_COMPONENTS']:
                 sdic = storage_analysis(global_dic,case_dic_list[case_index],result_dic)
+            else:
+                sdic = no_storage_analysis()
                 for key in sdic.keys():
                     result_dic[key] = sdic[key]
+
 
         else:
 
