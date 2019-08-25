@@ -654,6 +654,7 @@ def core_model (global_dic, case_dic):
         result['CURTAILMENT_WIND'] = -1 * np.ones(demand_series.size)
         result['CURTAILMENT_SOLAR2'] = -1 * np.ones(demand_series.size)
         result['CURTAILMENT_WIND2'] = -1 * np.ones(demand_series.size)
+        result['CURTAILMENT_CSP'] = -1 * np.ones(demand_series.size)
         result['CURTAILMENT_NUCLEAR'] = -1 * np.ones(demand_series.size)
  
         result['DISPATCH_TO_STORAGE'] = -1 * np.ones(demand_series.size)
@@ -848,6 +849,7 @@ def core_model (global_dic, case_dic):
             result['DISPATCH_TO_CSP_STORAGE'] = dispatch_to_csp_storage/numerics_demand_scaling
             result['DISPATCH_FROM_CSP'] = dispatch_from_csp/numerics_demand_scaling
             result['ENERGY_CSP_STORAGE'] = energy_csp_storage/numerics_demand_scaling
+            result['CURTAILMENT_CSP'] = (capacity_csp-dispatch_from_csp)/numerics_demand_scaling
 
         if 'UNMET_DEMAND' in system_components:
             result['DISPATCH_UNMET_DEMAND'] = np.array(dispatch_unmet_demand.value).flatten()/numerics_demand_scaling
