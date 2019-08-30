@@ -318,7 +318,7 @@ def save_basic_results( global_dic, case_dic_list ):
         series_list.append( case_list_dic['SOLAR_SERIES'])
     
     # Input: SOLAR2
-    if 'SOLAR' in components: 
+    if 'SOLAR2' in components: 
         header_list += ['fixed cost solar2 ($/kW/h)']
         series_list.append( case_list_dic['FIXED_COST_SOLAR2'])
     
