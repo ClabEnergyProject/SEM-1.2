@@ -882,15 +882,20 @@ def plot_results_storage_1scenario (input_data, hours_to_avg = None, start_hour 
 
     pdf_each = input_data['pdf_each']
     
-    price = copy.deepcopy(input_data['PRICE'])
-    max_headroom = copy.deepcopy(input_data['max_headroom'])
-    revenue_elec_storage = copy.deepcopy(input_data['net_revenue'])
-    net_revenue = copy.deepcopy(input_data['net_revenue'])
-    net_cost_elec_storage = copy.deepcopy(input_data['net_cost_elec_storage'])
-    # note: net_revenue = revenue_elec_storage - net_cost_elec_storage
-    dispatch_to_storage = copy.deepcopy(input_data['DISPATCH_TO_STORAGE'])
-    dispatch_from_storage = copy.deepcopy(input_data['DISPATCH_FROM_STORAGE'])
-    energy_storage = copy.deepcopy(input_data['ENERGY_STORAGE'])
+    # Catch cases where storage was not included in system
+    try:
+        price = copy.deepcopy(input_data['PRICE'])
+        max_headroom = copy.deepcopy(input_data['max_headroom'])
+        revenue_elec_storage = copy.deepcopy(input_data['net_revenue'])
+        net_revenue = copy.deepcopy(input_data['net_revenue'])
+        net_cost_elec_storage = copy.deepcopy(input_data['net_cost_elec_storage'])
+        # note: net_revenue = revenue_elec_storage - net_cost_elec_storage
+        dispatch_to_storage = copy.deepcopy(input_data['DISPATCH_TO_STORAGE'])
+        dispatch_from_storage = copy.deepcopy(input_data['DISPATCH_FROM_STORAGE'])
+        energy_storage = copy.deepcopy(input_data['ENERGY_STORAGE'])
+    except KeyError:
+        print("Storage not included in system, skipping plotting storage results from Quick_Look.plot_results_storage_1scenario")
+        return
 
     case_name = input_data['CASE_NAME']
     

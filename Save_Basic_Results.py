@@ -203,6 +203,9 @@ def save_vector_results_as_csv( global_dic, case_dic, result_dic ):
     header_list += ['cutailment wind2 (kW)']
     series_list.append( result_dic['CURTAILMENT_WIND2'].flatten() )
     
+    header_list += ['cutailment csp (kW)']
+    series_list.append( result_dic['CURTAILMENT_CSP'].flatten() )
+    
     header_list += ['cutailment nuclear (kW)']
     series_list.append( result_dic['CURTAILMENT_NUCLEAR'].flatten() )
     
@@ -315,7 +318,7 @@ def save_basic_results( global_dic, case_dic_list ):
         series_list.append( case_list_dic['SOLAR_SERIES'])
     
     # Input: SOLAR2
-    if 'SOLAR' in components: 
+    if 'SOLAR2' in components: 
         header_list += ['fixed cost solar2 ($/kW/h)']
         series_list.append( case_list_dic['FIXED_COST_SOLAR2'])
     
@@ -595,6 +598,9 @@ def save_basic_results( global_dic, case_dic_list ):
     
         header_list += ['dispatch from csp (kW)']
         series_list.append( case_list_dic['DISPATCH_FROM_CSP'])
+    
+        header_list += ['curtailment csp (kW)']
+        series_list.append( case_list_dic['CURTAILMENT_CSP'])
 
     #Results: UNMET_DEMAND   
     if 'UNMET_DEMAND' in components: 
