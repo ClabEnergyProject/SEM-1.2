@@ -384,22 +384,28 @@ def preprocess_input(case_input_path_filename):
                 component_list.append('SOLAR2')
                                                 
         if 'FIXED_COST_STORAGE' in have_keys:
-            if case_list_dic['FIXED_COST_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE'][case_index] >= 0 :
+            if (case_list_dic['FIXED_COST_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE'][case_index] >= 0  and 
+            case_list_dic['VAR_COST_FROM_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_STORAGE'][case_index] >= 0 and
+            case_list_dic['DECAY_RATE_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_TIME_STORAGE'][case_index] >= 0) :
                 component_list.append('STORAGE')
                                                 
         if 'FIXED_COST_STORAGE2' in have_keys:
-            if case_list_dic['FIXED_COST_STORAGE2'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE2'][case_index] >= 0  and case_list_dic['VAR_COST_FROM_STORAGE2'][case_index] >= 0 :
+            if (case_list_dic['FIXED_COST_STORAGE2'][case_index] >= 0 and case_list_dic['VAR_COST_TO_STORAGE2'][case_index] >= 0  and 
+            case_list_dic['VAR_COST_FROM_STORAGE2'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_STORAGE2'][case_index] >= 0 and
+            case_list_dic['DECAY_RATE_STORAGE2'][case_index] >= 0 and case_list_dic['CHARGING_TIME_STORAGE2'][case_index] >= 0) :
                 component_list.append('STORAGE2')
                 
         if 'FIXED_COST_PGP_STORAGE' in have_keys:
-            if (case_list_dic['FIXED_COST_PGP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_FROM_PGP_STORAGE'][case_index] >= 0  and 
-                case_list_dic['VAR_COST_TO_PGP_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_PGP_STORAGE'][case_index] >= 0):
+            if (case_list_dic['FIXED_COST_PGP_STORAGE'][case_index] >= 0 and 
+                case_list_dic['FIXED_COST_TO_PGP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_TO_PGP_STORAGE'][case_index] >= 0 and 
+                case_list_dic['FIXED_COST_FROM_PGP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_FROM_PGP_STORAGE'][case_index] >= 0 and 
+                case_list_dic['DECAY_RATE_PGP_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_PGP_STORAGE'][case_index] >= 0) :
                 component_list.append('PGP_STORAGE')
                 
         if 'FIXED_COST_CSP' in have_keys:
-            if (case_list_dic['FIXED_COST_CSP'][case_index] >= 0 and case_list_dic['VAR_COST_CSP'][case_index] >= 0  and 
+            if (case_list_dic['FIXED_COST_CSP'][case_index] >= 0 and case_list_dic['VAR_COST_CSP'][case_index] >= 0 and 
                 case_list_dic['FIXED_COST_CSP_STORAGE'][case_index] >= 0 and case_list_dic['VAR_COST_CSP_STORAGE'][case_index] >= 0 and 
-                case_list_dic['CHARGING_EFFICIENCY_CSP_STORAGE'][case_index] >= 0):
+                case_list_dic['DECAY_RATE_CSP_STORAGE'][case_index] >= 0 and case_list_dic['CHARGING_EFFICIENCY_CSP_STORAGE'][case_index] >= 0):
                 component_list.append('CSP')
                 
         if 'VAR_COST_UNMET_DEMAND' in have_keys:
