@@ -23,7 +23,6 @@ Optimization:
     Linear programming (LP)
     Energy balance constraints for the grid and the energy storage facility.
 
-@author: Fan
 Time
     Dec 1, 4-8, 11, 19, 22
     Jan 2-4, 24-27
