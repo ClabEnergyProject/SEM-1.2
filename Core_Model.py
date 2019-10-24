@@ -611,10 +611,19 @@ def core_model (global_dic, case_dic):
 
       # Ask solvers to automatically output log files. The log file for Gurobi is "gurobi.log".
       #  prob.solve(solver = 'GUROBI', verbose = True)
-        prob.solve(solver = 'GUROBI')
+#        prob.solve(solver = 'GUROBI')
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-11, feasibilityTol = 1e-9)
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-10, feasibilityTol = 1e-8)
 #    prob.solve(solver = 'GUROBI',BarConvTol = 1e-8, FeasibilityTol = 1e-6)
+        prob.solve(solver = 'GUROBI', seed = 42) # Add a seed to get consistent results
+        
+        print(prob.status)
+        if prob.status != 'optimal':
+            print('Trying to solve again with numeric focus')
+            prob.solve(solver = 'GUROBI', seed = 42, NumericFocus=3)
+            print(prob.status)
+            if prob.status != 'solved' and prob.status != 'optimal':
+                raise cvx.error.SolverError
 
         end_time = time.time()  # timer ends
 
