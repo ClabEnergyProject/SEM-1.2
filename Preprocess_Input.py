@@ -148,7 +148,6 @@ def preprocess_input(case_input_path_filename):
     
     keywords_real_scaled = list(map(str.upper,
             [             
-            'CO2_PRICE',
             
             'FIXED_COST_NATGAS','VAR_COST_NATGAS',
             'FIXED_CO2_NATGAS','VAR_CO2_NATGAS',
@@ -190,6 +189,7 @@ def preprocess_input(case_input_path_filename):
     
     keywords_real_notscaled = list(map(str.upper,
             [
+            'CO2_PRICE',
             'NUMERICS_COST_SCALING','NUMERICS_DEMAND_SCALING',
             'END_DAY','END_HOUR','END_MONTH','END_YEAR',
             'START_DAY','START_HOUR','START_MONTH','START_YEAR',
@@ -284,7 +284,7 @@ def preprocess_input(case_input_path_filename):
     #------ DEFAULT VALUES FOR global_dic ---------
     # For now, default for quicklook output is True
     all_cases_dic['NORMALIZE_DEMAND_TO_ONE'] = False # If True, normalize mean demand to 1.0
-    all_cases_dic['CO2_PRICE'] = 0.0 # If True, normalize mean demand to 1.0
+    all_cases_dic['CO2_PRICE'] = 0.0 
     # default global values to help with numerical issues
     all_cases_dic['NUMERICS_COST_SCALING'] = 1e+12 # multiplies all costs by a factor and then divides at end
     all_cases_dic['NUMERICS_DEMAND_SCALING'] = 1e+12 # multiplies demand by a factor and then divides all costs and capacities at end
@@ -616,7 +616,7 @@ def preprocess_input(case_input_path_filename):
                                                   
             #  NOTE:  Carbon embodied in STORAGE, PGP_STORAGE or CSP is not considered here !!!
             
-            print  (case_list_dic['VAR_COST_NATGAS'][case_index] , case_list_dic['CO2_PRICE'][case_index],case_list_dic['VAR_CO2_NATGAS'][case_index])
+            #print  (case_list_dic['VAR_COST_NATGAS'][case_index] , case_list_dic['CO2_PRICE'][case_index],case_list_dic['VAR_CO2_NATGAS'][case_index])
             
 
     
