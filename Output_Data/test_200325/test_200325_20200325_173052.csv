@@ -1,0 +1,96 @@
+case name,wind+wind2+unmet,solar+solar2+PGP,solar+solar2+storage+storage2_0.30,nuclear+CSP_0.25,natgas+unmet,natgasCCS+nuclear_0.5,EIAbase
+system reliability,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0
+CO2 price ($/kgCO2),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+norm. demand to 1,True,True,True,True,True,True,True
+demand file,US_demand_unnormalized.csv,US_demand_unnormalized.csv,US_demand_unnormalized.csv,US_demand_unnormalized.csv,US_demand_unnormalized.csv,US_demand_unnormalized.csv,US_demand_unnormalized.csv
+mean demand (kW),1.0,1.0,1.0,1.0,1.0,1.0,1.0
+fixed cost natgas ($/kW/h),-1.0,-1.0,-1.0,-1.0,0.0236838,-1.0,0.0118419
+var cost natgas ($/kW/h),-1.0,-1.0,-1.0,-1.0,0.078,-1.0,0.039
+fixed cost natgas_ccs ($/kW/h),-1.0,-1.0,-1.0,-1.0,-1.0,0.0272712,0.0272712
+var cost natgas_ccs ($/kW/h),-1.0,-1.0,-1.0,-1.0,-1.0,0.0566,0.0566
+fixed cost solar ($/kW/h),-1.0,0.0218638,0.0218638,-1.0,-1.0,-1.0,0.0218638
+var cost solar ($/kW/h),-1.0,1e-08,1e-08,-1.0,-1.0,-1.0,1e-08
+solar file,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv
+cap factor solar (-),0.0,0.140622604047043,0.140622604047043,0.0,0.0,0.0,0.140622604047043
+fixed cost solar2 ($/kW/h),-1.0,0.0218638,0.0218638,-1.0,-1.0,-1.0,0.0218638
+var cost solar2 ($/kW/h),-1.0,1e-08,1e-08,-1.0,-1.0,-1.0,1e-08
+solar2 file,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv
+cap factor solar2 (-),0.0,0.140622604047043,0.140622604047043,0.0,0.0,0.0,0.140622604047043
+fixed cost wind ($/kW/h),0.0206486,-1.0,-1.0,-1.0,-1.0,-1.0,0.0206486
+var cost wind ($/kW/h),1.05e-08,-1.0,-1.0,-1.0,-1.0,-1.0,1.05e-08
+wind file,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv
+cap factor wind (-),0.3083658508467742,0.0,0.0,0.0,0.0,0.0,0.3083658508467742
+fixed cost wind2 ($/kW/h),0.0206486,-1.0,-1.0,-1.0,-1.0,-1.0,0.0206486
+var cost wind2 ($/kW/h),1.05e-08,-1.0,-1.0,-1.0,-1.0,-1.0,1.05e-08
+wind2 file,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv,US_capacity_wind_CONUS_unnormalized.csv
+cap factor wind2 (-),0.3083658508467742,0.0,0.0,0.0,0.0,0.0,0.3083658508467742
+fixed cost nuclear ($/kW/h),-1.0,-1.0,-1.0,0.1295078,-1.0,0.03237695,0.0647539
+var cost nuclear ($/kW/h),-1.0,-1.0,-1.0,0.0456,-1.0,0.0114,0.0228
+fixed cost storage ($/kWh/h),-1.0,-1.0,0.00423925,-1.0,-1.0,-1.0,0.00423925
+var cost storage ($/kWh/h),-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0
+storage charging efficiency,0.9,0.9,0.9,0.9,0.9,0.9,0.9
+storage charging time (h),6.008,6.008,6.008,6.008,6.008,6.008,6.008
+storage decay rate (1/h)),1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06
+fixed cost storage2 ($/kWh/h),-1.0,-1.0,0.001271775,-1.0,-1.0,-1.0,0.001271775
+var cost storage2 ($/kWh/h),-1.0,-1.0,-1.0,-1.0,-1.0,-1.0,-1.0
+storage2 charging efficiency,0.9,0.9,0.3,0.9,0.9,0.9,0.1
+storage2 charging time (h),6.008,6.008,6.008,6.008,6.008,6.008,6.008
+storage2 decay rate (1/h)),1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06,1.13513e-06
+fixed cost pgp storage ($/kWh/h),-1.0,1.47092e-06,-1.0,-1.0,-1.0,-1.0,1.47092e-06
+fixed cost to pgp storage ($/kW/h),1.0,0.0148027,1.0,0.0148027,0.0148027,1.0,0.0148027
+fixed cost from pgp storage ($/kW/h),-1.0,0.0630376,-1.0,0.0630376,0.0630376,-1.0,0.0630376
+var cost to pgp storage ($/kW/h),-0.0,0.0,-0.0,0.0,0.0,-0.0,0.0
+var cost from pgp storage ($/kW/h),-0.0,0.0,-0.0,0.0,0.0,-0.0,0.0
+pgp storage charging efficiency,0.49,0.49,0.49,0.49,0.49,0.49,0.49
+pgp storage decay rate (1/h)),1.14074e-08,1.14074e-08,1.14074e-08,1.14074e-08,1.14074e-08,1.14074e-08,1.14074e-08
+fixed cost csp ($/kW/h),-1.0,-1.0,-1.0,0.004882175,0.0195287,-1.0,0.0195287
+var cost csp ($/kW/h),-1.0,-1.0,-1.0,2.5e-09,1e-08,-1.0,1e-08
+fixed cost csp storage ($/kWh/h),-1.0,-1.0,-1.0,0.002511425,0.0100457,-1.0,0.0100457
+var cost csp storage ($/kWh/h),-1.0,-1.0,-1.0,2.5e-09,1e-08,-1.0,1e-08
+csp charging efficiency,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+csp storage decay rate (1/h)),0.1,0.1,0.1,0.1,0.1,0.1,0.1
+csp file,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv,US_capacity_solar_CONUS_unnormalized.csv
+cap factor csp (-),0.0,0.0,0.0,0.140622604047043,0.140622604047043,0.0,0.140622604047043
+var cost unmet demand ($/kWh),10.0,-1.0,-1.0,-1.0,10.0,-1.0,10.0
+problem status,optimal,optimal,optimal,optimal,optimal,optimal,optimal
+system cost ($ or $/kWh),0.16470178131801244,0.3874074196833838,0.2598411851900643,0.17978827366848393,0.10700945151989107,0.050861619463243725,0.05349163280184024
+capacity natgas (kW),0.0,0.0,0.0,0.0,1.2167185008651262,0.0,1.195021035556608
+dispatch natgas (kW),0.0,0.0,0.0,0.0,0.9999805549396188,0.0,1.0016406647347196
+capacity natgas_ccs (kW),0.0,0.0,0.0,0.0,0.0,0.11324311192948926,0.0
+dispatch natgas ccs (kW),0.0,0.0,0.0,0.0,0.0,0.003933075997760338,0.0
+capacity solar (kW),0.0,11.409105251169992,8.296214774741946,0.0,0.0,0.0,0.0
+dispatch solar (kW),0.0,1.5847515761848214,1.1323821841473252,0.0,0.0,0.0,0.0
+curtailment solar (kW),0.0,0.019626514081495506,0.03425314121043984,0.0,0.0,0.0,0.0
+capacity solar2 (kW),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+dispatch solar2 (kW),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+curtailment solar2 (kW),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+capacity wind (kW),4.083553545199385,0.0,0.0,0.0,0.0,0.0,0.0
+dispatch wind (kW),0.32461480652201447,0.0,0.0,0.0,0.0,0.0,0.0
+curtailment wind (kW),0.934613656921755,0.0,0.0,0.0,0.0,0.0,0.0
+capacity wind2 (kW),2.987276960888151,0.0,0.0,0.0,0.0,0.0,0.0
+dispatch wind2 (kW),0.6735152914730207,0.0,0.0,0.0,0.0,0.0,0.0
+curtailment wind2 (kW),0.2476589102862197,0.0,0.0,0.0,0.0,0.0,0.0
+capacity nuclear (kW),0.0,0.0,0.0,0.8089023857593537,0.0,1.117942513859196,0.0
+dispatch nuclear (kW),0.0,0.0,0.0,0.4434323561246015,0.0,0.9960669240022396,0.0
+curtailment nuclear (kW),0.0,0.0,0.0,0.3654700296347522,0.0,0.12187558985695642,0.0
+capacity storage (kW),0.0,0.0,14.248925754498153,0.0,0.0,0.0,0.0
+energy storage (kW),0.0,0.0,6.802375533106325,0.0,0.0,0.0,0.0
+dispatch to storage (kW),0.0,0.0,0.6070323062738909,0.0,0.0,0.0,0.0
+dispatch from storage (kW),0.0,0.0,0.5463213540659629,0.0,0.0,0.0,0.0
+capacity storage2 (kW),0.0,0.0,14.192474902780319,0.0,0.0,0.0,0.21727685811432096
+energy storage2 (kW),0.0,0.0,4.343730014499884,0.0,0.0,0.0,0.002641975724266262
+dispatch to storage2 (kW),0.0,0.0,0.10238043034449384,0.0,0.0,0.0,0.001822957484148619
+dispatch from storage2 (kW),0.0,0.0,0.030709198405096807,0.0,0.0,0.0,0.00018229274942895804
+capacity pgp storage (kW),0.0,40.716601948111105,0.0,0.0,0.0,0.0,0.0
+capacity to pgp storage (kW),0.0,4.157108213111881,0.0,0.0,0.0,0.0,0.0
+capacity from pgp storage (kW),0.0,1.2114149624187611,0.0,0.0,0.0,0.0,0.0
+energy pgp storage (kW),0.0,18.762205231282916,0.0,0.0,0.0,0.0,0.0
+dispatch to pgp storage (kW),0.0,1.1465712983467473,0.0,0.0,0.0,0.0,0.0
+dispatch from pgp storage (kW),0.0,0.5618197221619258,0.0,0.0,0.0,0.0,0.0
+capacity csp (kW),0.0,0.0,0.0,6.111903899596119,0.0,0.0,0.0
+capacity csp storage (kW),0.0,0.0,0.0,9.942242563667815,0.0,0.0,0.0
+energy csp storage (kW),0.0,0.0,0.0,2.9967470288267304,0.0,0.0,0.0
+dispatch to csp storage (kW),0.0,0.0,0.0,0.8562423467580718,0.0,0.0,0.0
+dispatch from csp (kW),0.0,0.0,0.0,0.5565676438753986,0.0,0.0,0.0
+curtailment csp (kW),0.0,0.0,0.0,0.0032294952884116073,0.0,0.0,0.0
+dispatch unmet demand (kW),0.0018699020049647234,0.0,0.0,0.0,1.9445060381127796e-05,0.0,0.0
